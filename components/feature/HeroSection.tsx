@@ -450,12 +450,18 @@ function AnimatedBeamDemo() {
         startYOffset={-10}
         endXOffset={-10}
         duration={3}
+        pathColor="lightgray"
+        pathWidth={3}
+        pathOpacity={0.4}
       />
       <AnimatedBeam
         containerRef={containerRef}
         fromRef={div2Ref}
         toRef={div4Ref}
         duration={3}
+        pathColor="lightgray"
+        pathWidth={3}
+        pathOpacity={0.4}
       />
       <AnimatedBeam
         containerRef={containerRef}
@@ -465,6 +471,9 @@ function AnimatedBeamDemo() {
         startYOffset={10}
         endXOffset={-10}
         duration={3}
+        pathColor="lightgray"
+        pathWidth={3}
+        pathOpacity={0.4}
       />
 
       <AnimatedBeam
@@ -476,6 +485,9 @@ function AnimatedBeamDemo() {
         endXOffset={10}
         reverse
         duration={3}
+        pathColor="lightgray"
+        pathWidth={3}
+        pathOpacity={0.4}
       />
       <AnimatedBeam
         containerRef={containerRef}
@@ -483,6 +495,9 @@ function AnimatedBeamDemo() {
         toRef={div4Ref}
         reverse
         duration={3}
+        pathColor="lightgray"
+        pathWidth={3}
+        pathOpacity={0.4}
       />
       <AnimatedBeam
         containerRef={containerRef}
@@ -493,6 +508,9 @@ function AnimatedBeamDemo() {
         endXOffset={10}
         reverse
         duration={3}
+        pathColor="lightgray"
+        pathWidth={3}
+        pathOpacity={0.4}
       />
     </div>
   );
