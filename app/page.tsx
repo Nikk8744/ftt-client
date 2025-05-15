@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import HeroSection from '@/components/feature/HeroSection';
 import FeaturesSection from '@/components/feature/FeaturesSection';
+import FlowingFeaturesSection from '@/components/feature/FlowingFeaturesSection';
 import TestimonialsSection from '@/components/feature/TestimonialsSection';
 import PricingSection from '@/components/feature/PricingSection';
 import HowItWorksSection from '@/components/feature/HowItWorksSection';
@@ -183,7 +184,7 @@ export default function Home() {
         </div>
         
         <div id="features" className="fade-in">
-          <FeaturesSection />
+          <FlowingFeaturesSection />
         </div>
         
         <div id="how-it-works" className="fade-in">

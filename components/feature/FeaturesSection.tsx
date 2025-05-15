@@ -1,5 +1,7 @@
 'use client';
 
+import SpotlightCard from '../ui/SpotlightCard/SpotlightCard';
+
 export default function FeaturesSection() {
   const features = [
     {
@@ -80,13 +82,17 @@ export default function FeaturesSection() {
         <div className="mt-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-6 hover:bg-indigo-50 transition-colors duration-300 shadow-sm hover:shadow">
+              <SpotlightCard 
+                key={index} 
+                className="h-full"
+                spotlightColor="rgba(99, 1092, 241, 0.3)"
+                >
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white mb-4">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">{feature.name}</h3>
-                <p className="mt-2 text-base text-gray-500">{feature.description}</p>
-              </div>
+                <h3 className="text-lg font-medium text-white">{feature.name}</h3>
+                <p className="mt-2 text-base text-gray-400">{feature.description}</p>
+              </SpotlightCard>
             ))}
           </div>
         </div>
