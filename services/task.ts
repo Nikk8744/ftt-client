@@ -1,57 +1,108 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from './api-client';
-import { Task, TaskCreateData, TaskUpdateData, ApiResponse } from '@/types';
+import { Task, TaskCreateData, TaskUpdateData } from '@/types';
+import {
+  getMockTasks,
+  getMockTaskById,
+  getMockTasksByProject,
+  addMockTask,
+  updateMockTask,
+  deleteMockTask
+} from '@/lib/mockData';
+
+// Comment out the original API client import
+// import apiClient from './api-client';
 
 /**
  * Create a new task within a project
  */
-export async function createTask(
-  projectId: number, 
-  taskData: TaskCreateData
-): Promise<ApiResponse<Task>> {
-  return apiPost<ApiResponse<Task>>(`/tasks/createTask/${projectId}`, taskData);
-}
+export const createTask = async (data: TaskCreateData) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.post('/task/createTask', data);
+  // return response.data;
+  
+  const task = addMockTask({
+    ...data,
+    userId: 1, // Mock user ID
+  });
+  return { task };
+};
 
 /**
  * Get a task by ID
  */
-export async function getTaskById(taskId: number): Promise<ApiResponse<Task>> {
-  return apiGet<ApiResponse<Task>>(`/tasks/getTask/${taskId}`);
-}
+export const getTaskById = async (id: number) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.get(`/task/getSingleTask/${id}`);
+  // return response.data;
+  
+  const task = getMockTaskById(id);
+  if (!task) {
+    throw new Error('Task not found');
+  }
+  return { task };
+};
 
 /**
  * Get all tasks for a project
  */
-export async function getProjectTasks(projectId: number): Promise<{ tasks: Task[]; msg: string }> {
-  return apiGet<{ tasks: Task[]; msg: string }>(`/tasks/getProjectTasks/${projectId}`);
-}
+export const getTasksByProject = async (projectId: number) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.get(`/task/getTasksByProject/${projectId}`);
+  // return response.data;
+  
+  const tasks = getMockTasksByProject(projectId);
+  return { tasks };
+};
 
 /**
  * Get all tasks assigned to the authenticated user
  */
-export async function getUserTasks(): Promise<{ tasks: Task[]; msg: string }> {
-  return apiGet<{ tasks: Task[]; msg: string }>('/tasks/getUserTasks');
-}
+export const getUserTasks = async () => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.get('/task/getUserTasks');
+  // return response.data;
+  
+  const tasks = getMockTasks();
+  return { tasks };
+};
 
 /**
  * Get all tasks (admin only)
  */
-export async function getAllTasks(): Promise<{ tasks: Task[]; msg: string }> {
-  return apiGet<{ tasks: Task[]; msg: string }>('/tasks/getAllTask');
-}
+export const getAllTasks = async () => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.get('/task/getAllTask');
+  // return response.data;
+  
+  const tasks = getMockTasks();
+  return { tasks };
+};
 
 /**
  * Update a task
  */
-export async function updateTask(
-  taskId: number, 
-  updateData: TaskUpdateData
-): Promise<ApiResponse<Task>> {
-  return apiPatch<ApiResponse<Task>>(`/tasks/updateTask/${taskId}`, updateData);
-}
+export const updateTask = async (id: number, data: TaskUpdateData) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.patch(`/task/updateTask/${id}`, data);
+  // return response.data;
+  
+  const task = updateMockTask(id, data);
+  if (!task) {
+    throw new Error('Task not found');
+  }
+  return { task };
+};
 
 /**
  * Delete a task
  */
-export async function deleteTask(taskId: number): Promise<ApiResponse<boolean>> {
-  return apiDelete<ApiResponse<boolean>>(`/tasks/deleteTask/${taskId}`);
-} 
+export const deleteTask = async (id: number) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.delete(`/task/deleteTask/${id}`);
+  // return response.data;
+  
+  const success = deleteMockTask(id);
+  if (!success) {
+    throw new Error('Task not found');
+  }
+  return { msg: 'Task deleted successfully' };
+}; 

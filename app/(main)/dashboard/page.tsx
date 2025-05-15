@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getAllProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
@@ -12,10 +13,20 @@ import useTimer from '@/lib/hooks/useTimer';
 import useAuth from '@/lib/hooks/useAuth';
 import Link from 'next/link';
 import { Project, Task, TimeLog } from '@/types';
+import { mockUser } from '@/lib/mockData';
+import useAuthStore from '@/store/auth';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { isRunning, formattedTime } = useTimer();
+  const { login } = useAuthStore();
+
+  // Auto-login for development
+  useEffect(() => {
+    // Force login with the mock user for development
+    login(mockUser);
+    console.log('Auto-logged in with mock user for development');
+  }, [login]);
 
   // Fetch data for dashboard
   const { data: projectsData, isLoading: projectsLoading } = useQuery({

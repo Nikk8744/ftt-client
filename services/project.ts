@@ -1,40 +1,83 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from './api-client';
-import { Project, ProjectCreateData, ProjectUpdateData, ApiResponse } from '@/types';
+import { Project, ProjectCreateData, ProjectUpdateData } from '@/types';
+import {
+  getMockProjects,
+  getMockProjectById,
+  addMockProject,
+  updateMockProject,
+  deleteMockProject
+} from '@/lib/mockData';
+
+// Comment out the original API client import
+// import apiClient from './api-client';
 
 /**
  * Create a new project
  */
-export async function createProject(projectData: ProjectCreateData): Promise<ApiResponse<Project>> {
-  return apiPost<ApiResponse<Project>>('/project/createProject', projectData);
-}
+export const createProject = async (data: ProjectCreateData) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.post('/project/createProject', data);
+  // return response.data;
+  
+  const project = addMockProject({
+    ...data,
+    userId: 1, // Mock user ID
+  });
+  return { project };
+};
 
 /**
  * Get a project by ID
  */
-export async function getProjectById(projectId: number): Promise<ApiResponse<Project>> {
-  return apiGet<ApiResponse<Project>>(`/project/getProject/${projectId}`);
-}
+export const getProjectById = async (id: number) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.get(`/project/getSingleProject/${id}`);
+  // return response.data;
+  
+  const project = getMockProjectById(id);
+  if (!project) {
+    throw new Error('Project not found');
+  }
+  return { project };
+};
 
 /**
  * Get all projects owned by the authenticated user
  */
-export async function getAllProjectsOfUser(): Promise<{ projects: Project[]; msg: string }> {
-  return apiGet<{ projects: Project[]; msg: string }>('/project/getAllProjectsOfUser');
-}
+export const getAllProjectsOfUser = async () => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.get('/project/getAllUserProjects');
+  // return response.data;
+  
+  const projects = getMockProjects();
+  return { projects };
+};
 
 /**
  * Update a project
  */
-export async function updateProject(
-  projectId: number,
-  updateData: ProjectUpdateData
-): Promise<ApiResponse<Project>> {
-  return apiPatch<ApiResponse<Project>>(`/project/updateProject/${projectId}`, updateData);
-}
+export const updateProject = async (id: number, data: ProjectUpdateData) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.patch(`/project/updateProject/${id}`, data);
+  // return response.data;
+  
+  const project = updateMockProject(id, data);
+  if (!project) {
+    throw new Error('Project not found');
+  }
+  return { project };
+};
 
 /**
  * Delete a project
  */
-export async function deleteProject(projectId: number): Promise<ApiResponse<boolean>> {
-  return apiDelete<ApiResponse<boolean>>(`/project/deleteProject/${projectId}`);
-} 
+export const deleteProject = async (id: number) => {
+  // Comment out the API call and replace with mock data
+  // const response = await apiClient.delete(`/project/deleteProject/${id}`);
+  // return response.data;
+  
+  const success = deleteMockProject(id);
+  if (!success) {
+    throw new Error('Project not found');
+  }
+  return { msg: 'Project deleted successfully' };
+}; 

@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import useTimerStore from '@/store/timer';
-import { startTimeLog, stopTimeLog } from '@/services/log';
+import { addMockLog, updateMockLog } from '@/lib/mockData';
+// Comment out API imports
+// import { startTimeLog, stopTimeLog } from '@/services/log';
 import { formatDuration } from '@/lib/utils';
 
 export default function useTimer() {
@@ -48,11 +50,21 @@ export default function useTimer() {
       setIsLoading(true);
       setError(null);
       
-      const response = await startTimeLog();
-      const newLogId = response.log.id;
+      // Mock the startTimeLog API call
+      // const response = await startTimeLog();
+      const newLog = addMockLog({
+        userId: 1,
+        startTime: new Date().toISOString(),
+        endTime: null,
+        duration: null,
+      });
+      
+      const newLogId = newLog.id;
       
       startTimer(newLogId);
       setIsLoading(false);
+      
+      return { log: newLog };
     } catch (err) {
       setError('Failed to start timer');
       setIsLoading(false);
@@ -67,10 +79,21 @@ export default function useTimer() {
       setIsLoading(true);
       setError(null);
       
-      await stopTimeLog(activeLogId, data);
+      // Mock the stopTimeLog API call
+      // await stopTimeLog(activeLogId, data);
+      const now = new Date();
+      const endTime = now.toISOString();
+      
+      const updatedLog = updateMockLog(activeLogId, {
+        ...data,
+        endTime,
+        duration: Math.floor(elapsedTime), // Use elapsed time from store
+      });
       
       stopTimer();
       setIsLoading(false);
+      
+      return { log: updatedLog };
     } catch (err) {
       setError('Failed to stop timer');
       setIsLoading(false);

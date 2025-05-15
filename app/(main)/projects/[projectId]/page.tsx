@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getProjectById, updateProject } from '@/services/project';
-import { getProjectTasks } from '@/services/task';
+import { getTasksByProject } from '@/services/task';
 import { getAllMembersOfProject, addMemberToProject, removeMemberFromProject } from '@/services/projectMember';
 import useAuth from '@/lib/hooks/useAuth';
 import Button from '@/components/ui/Button';
@@ -18,7 +18,7 @@ import { formatDate, formatRelativeTime } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Task } from '@/types';
+import { Task, ProjectMember } from '@/types';
 import TaskForm from '@/components/feature/TaskForm';
 import TaskList from '@/components/feature/TaskList';
 
@@ -68,7 +68,7 @@ export default function ProjectDetailsPage() {
     error: tasksError,
   } = useQuery({
     queryKey: ['tasks', projectId],
-    queryFn: () => getProjectTasks(Number(projectId)),
+    queryFn: () => getTasksByProject(Number(projectId)),
     enabled: !!projectId,
   });
 
@@ -275,7 +275,7 @@ export default function ProjectDetailsPage() {
                 <p className="text-gray-500 text-sm">No members yet.</p>
               ) : (
                 <ul className="divide-y divide-gray-200">
-                  {members.map((member) => (
+                  {members.map((member: ProjectMember) => (
                     <li key={member.id} className="py-3 flex items-center justify-between">
                       <div>
                         <p className="font-medium">User ID: {member.userId}</p>

@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+// import { redirect } from 'next/navigation';
+// import { cookies } from 'next/headers';  
 import ClientLayout from '@/components/layout/ClientLayout';
 
 export default async function MainLayout({
@@ -8,12 +8,13 @@ export default async function MainLayout({
   children: React.ReactNode
 }) {
   // Check if user is authenticated by checking for accessToken cookie
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken');
+  // AUTHENTICATION TEMPORARILY DISABLED
+  // const cookieStore = await cookies();
+  // const accessToken = cookieStore.get('accessToken');
   
-  if (!accessToken) {
-    redirect('/login');
-  }
+  // if (!accessToken) {
+  //   redirect('/login');
+  // }
 
   return <ClientLayout>{children}</ClientLayout>;
 } 

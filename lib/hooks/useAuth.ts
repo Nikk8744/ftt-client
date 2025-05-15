@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/auth';
-import { loginUser, registerUser, logoutUser } from '@/services/user';
+import { mockUser } from '@/lib/mockData';
+// Comment out API imports
+// import { loginUser, registerUser, logoutUser } from '@/services/user';
 import { LoginCredentials, RegisterData, User } from '@/types';
 
 export default function useAuth() {
@@ -17,7 +19,10 @@ export default function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      const response = await loginUser(credentials);
+      // Mock the login response
+      // const response = await loginUser(credentials);
+      const response = { user: mockUser };
+      
       login(response.user as User);
 
       setIsSubmitting(false);
@@ -38,7 +43,9 @@ export default function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      const response = await registerUser(data);
+      // Mock the register response
+      // const response = await registerUser(data);
+      const response = { msg: 'Registration successful' };
       
       setIsSubmitting(false);
       setIsLoading(false);
@@ -57,7 +64,9 @@ export default function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      await logoutUser();
+      // Mock the logout response
+      // await logoutUser();
+      
       logout();
 
       setIsLoading(false);
@@ -69,8 +78,8 @@ export default function useAuth() {
   };
 
   return {
-    isAuthenticated,
-    user,
+    isAuthenticated: true, // Force authentication to be true
+    user: mockUser, // Use mock user
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
