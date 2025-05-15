@@ -21,6 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const { login, isSubmitting, error } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const {
     register,
@@ -35,11 +36,16 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    setApiError(null); // Reset API error
     try {
       await login(data);
-    } catch (error) {
+      // The redirect is handled in the useAuth hook
+    } catch (error: unknown) {
       // Error handling is done in useAuth hook
       console.error('Login failed:', error);
+      // You can add additional error handling here if needed
+      const errorMessage = error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+      setApiError(errorMessage);
     }
   };
 
@@ -62,9 +68,10 @@ export default function LoginPage() {
 
         <Card>
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {error && (
+            {/* Display error messages */}
+            {(error || apiError) && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                {error}
+                {error || apiError}
               </div>
             )}
 
@@ -76,6 +83,7 @@ export default function LoginPage() {
               fullWidth
               error={errors.email?.message}
               {...register('email')}
+              disabled={isSubmitting}
             />
 
             <div className="relative">
@@ -91,6 +99,7 @@ export default function LoginPage() {
                     type="button"
                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isSubmitting}
                   >
                     {showPassword ? (
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-500">
@@ -105,6 +114,7 @@ export default function LoginPage() {
                   </button>
                 }
                 {...register('password')}
+                disabled={isSubmitting}
               />
             </div>
 
@@ -115,6 +125,7 @@ export default function LoginPage() {
                   name="remember-me"
                   type="checkbox"
                   className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  disabled={isSubmitting}
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
                   Remember me
@@ -136,9 +147,14 @@ export default function LoginPage() {
                 isLoading={isSubmitting}
                 disabled={isSubmitting}
               >
-                Sign in
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </Button>
             </div>
+
+            {/* Add a note about the backend connection */}
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Connecting to backend at localhost:5000
+            </p>
           </form>
         </Card>
       </div>

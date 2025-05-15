@@ -1,20 +1,27 @@
-// import { redirect } from 'next/navigation';
-// import { cookies } from 'next/headers';  
-import ClientLayout from '@/components/layout/ClientLayout';
+'use client';
 
-export default async function MainLayout({
+import { useEffect } from 'react';
+import { redirect, useRouter } from 'next/navigation';
+import ClientLayout from '@/components/layout/ClientLayout';
+import useAuthStore from '@/store/auth';
+
+export default function MainLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Check if user is authenticated by checking for accessToken cookie
-  // AUTHENTICATION TEMPORARILY DISABLED
-  // const cookieStore = await cookies();
-  // const accessToken = cookieStore.get('accessToken');
-  
-  // if (!accessToken) {
-  //   redirect('/login');
-  // }
+  const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('auth-token');
+    
+    if (!isAuthenticated && !token) {
+      // Redirect to login if not authenticated
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   return <ClientLayout>{children}</ClientLayout>;
 } 

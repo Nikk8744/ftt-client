@@ -376,7 +376,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
                 </span>
                 <Button
                   variant="danger"
-                  size="xs"
+                  size="sm"
                   onClick={() => handleDeleteItem(item.id)}
                 >
                   ✕
@@ -404,7 +404,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
                     />
                     <Button
                       variant="outline"
-                      size="xs"
+                      size="sm"
                       onClick={() => setEditingItemId(null)}
                     >
                       Save
@@ -426,7 +426,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
                     </span>
                     <Button
                       variant="danger"
-                      size="xs"
+                      size="sm"
                       onClick={() => handleDeleteItem(item.id)}
                     >
                       ✕

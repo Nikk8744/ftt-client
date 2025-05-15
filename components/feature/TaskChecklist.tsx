@@ -195,7 +195,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                     <div className="flex space-x-1">
                       <Button
                         variant="outline"
-                        size="xs"
+                        size="sm"
                         onClick={() => setEditingItem({ id: item.id, text: item.item })}
                         disabled={updateItemMutation.isPending}
                       >
@@ -203,7 +203,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                       </Button>
                       <Button
                         variant="danger"
-                        size="xs"
+                        size="sm"
                         onClick={() => openDeleteModal(item.id)}
                         disabled={deleteItemMutation.isPending}
                       >

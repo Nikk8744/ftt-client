@@ -1,15 +1,39 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api/v1';
+// Use the proxy path for API requests
+const API_BASE_URL = '/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 10000, 
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   }
 });
+
+// Add request interceptor to handle JWT tokens
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth-token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Add response interceptor to handle common errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { response } = error;
+    if (response && response.status === 401) {
+      // Handle unauthorized errors (e.g., redirect to login)
+      localStorage.removeItem('auth-token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 /**
  * Base fetch function with error handling and automatic JSON parsing
@@ -23,6 +47,12 @@ export async function apiFetch<T>(
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
   };
+
+  // Add auth token to headers if available
+  const token = localStorage.getItem('auth-token');
+  if (token) {
+    defaultHeaders.Authorization = `Bearer ${token}`;
+  }
 
   // Merge default headers with passed headers
   const fetchOptions: RequestInit = {
@@ -71,7 +101,7 @@ export function apiGet<T>(endpoint: string, options: RequestInit = {}): Promise<
 /**
  * POST request helper
  */
-export function apiPost<T, D = any>(
+export function apiPost<T, D extends Record<string, unknown> = Record<string, unknown>>(
   endpoint: string,
   data?: D,
   options: RequestInit = {}
@@ -86,7 +116,7 @@ export function apiPost<T, D = any>(
 /**
  * PATCH request helper
  */
-export function apiPatch<T, D = any>(
+export function apiPatch<T, D extends Record<string, unknown> = Record<string, unknown>>(
   endpoint: string,
   data?: D,
   options: RequestInit = {}
@@ -118,9 +148,4 @@ export function handleApiError(error: unknown): string {
   return 'An unexpected error occurred';
 }
 
-export default {
-  get: apiGet,
-  post: apiPost,
-  patch: apiPatch,
-  delete: apiDelete,
-}; 
+export default apiClient; 
