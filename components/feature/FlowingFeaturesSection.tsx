@@ -33,7 +33,7 @@ export default function FlowingFeaturesSection() {
     { 
       link: '#ai-assistant', 
       text: 'AI Assistant', 
-      image: 'https://images.unsplash.com/photo-1677442135146-8260a5bb0562?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' 
+      image: 'https://plus.unsplash.com/premium_photo-1683121710572-7723bd2e235d?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' 
     },
   ];
 
