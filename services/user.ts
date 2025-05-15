@@ -1,5 +1,6 @@
 import apiClient from './api-client';
-import { LoginCredentials, RegisterData, User } from '@/types';
+import { LoginCredentials, RegisterData, User, UserUpdateData } from '@/types';
+import { mockUser } from '@/lib/mockData';
 
 export const loginUser = async (credentials: LoginCredentials) => {
   const response = await apiClient.post('/user/login', credentials);
@@ -16,9 +17,18 @@ export const getUserById = async (id: number) => {
   return response.data;
 };
 
-export const updateUser = async (id: number, data: Partial<User>) => {
-  const response = await apiClient.patch(`/user/updateDetails/${id}`, data);
-  return response.data;
+export const updateUser = async (data: UserUpdateData): Promise<{ user: User; message: string }> => {
+  // In a real app, this would send to the API
+  // const response = await apiClient.patch('/user/updateUser', data);
+  // return response.data;
+  
+  // Update mock user data for development
+  Object.assign(mockUser, data);
+  
+  return { 
+    user: mockUser,
+    message: 'Profile updated successfully'
+  };
 };
 
 export const deleteUser = async (id: number) => {
@@ -29,4 +39,14 @@ export const deleteUser = async (id: number) => {
 export const logoutUser = async () => {
   const response = await apiClient.post('/user/logout');
   return response.data;
+};
+
+// Get current user information
+export const getCurrentUser = async (): Promise<{ user: User }> => {
+  // In a real app, this would fetch from the API
+  // const response = await apiClient.get('/user/getUser');
+  // return response.data;
+  
+  // Using mock data for development
+  return { user: mockUser };
 }; 

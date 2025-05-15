@@ -66,7 +66,7 @@ export interface Task {
   name?: string;
   subject: string;
   description: string | null;
-  status: 'Pending' | 'In-Progress' | 'Done' | null;
+  status: 'Pending' | 'In-Progress' | 'Done' |  null;
   startDate: string;
   dueDate: string | null;
   totalTimeSpent: number | null;

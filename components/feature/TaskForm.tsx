@@ -1,21 +1,40 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createTask, updateTask } from '@/services/task';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Task } from '@/types';
+import { Task, User } from '@/types';
+import { useState, useEffect } from 'react';
+import { 
+  getTaskChecklist,
+  addChecklistItem, 
+  updateChecklistItem,
+  removeChecklistItem
+} from '@/services/taskChecklist';
+import { getCurrentUser } from '@/services/user';
+import Avatar from '@/components/ui/Avatar';
 
 // Form validation schema
 const taskSchema = z.object({
-  name: z.string().min(1, 'Task name is required'),
-  description: z.string().min(1, 'Task description is required'),
-  status: z.enum(['todo', 'inprogress', 'completed']),
+  subject: z.string().min(1, 'Task subject is required'),
+  description: z.string().optional(),
+  status: z.enum(['Pending', 'In-Progress', 'Done']),
+  dueDate: z.string().optional(),
+  assignedUserId: z.number().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
+
+interface ChecklistItem {
+  id: number;
+  taskId: number;
+  item: string;
+  isCompleted: boolean | null;
+  createdAt: string;
+}
 
 interface TaskFormProps {
   projectId: number;
@@ -27,28 +46,89 @@ interface TaskFormProps {
 const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const isEditMode = !!task;
+  
+  // Checklist state
+  const [newItemText, setNewItemText] = useState('');
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+  const [temporaryItems, setTemporaryItems] = useState<{ id: string, text: string, isCompleted: boolean }[]>([]);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // Get current user
+  useQuery({
+    queryKey: ['currentUser'],
+    queryFn: getCurrentUser,
+    onSuccess: (data) => {
+      setCurrentUser(data.user);
+    }
+  });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      name: task?.name || '',
+      subject: task?.subject || '',
       description: task?.description || '',
-      status: task?.status || 'todo',
+      status: task?.status || 'Pending',
+      dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+      assignedUserId: task?.assignedUserId || currentUser?.id,
     },
   });
 
+  // Set default assignee after current user is loaded
+  useEffect(() => {
+    if (currentUser && !isEditMode) {
+      setValue('assignedUserId', currentUser.id);
+    }
+  }, [currentUser, isEditMode, setValue]);
+
+  // Fetch existing checklist items if editing a task
+  const { 
+    data: checklistData,
+    isLoading: checklistLoading,
+  } = useQuery({
+    queryKey: ['checklist', task?.id],
+    queryFn: () => task ? getTaskChecklist(task.id) : null,
+    enabled: !!task?.id && isOpen,
+  });
+
+  // Load checklist items when available
+  useEffect(() => {
+    if (checklistData?.checklist) {
+      setChecklistItems(checklistData.checklist);
+    }
+  }, [checklistData]);
+
   // Create task mutation
   const createTaskMutation = useMutation({
-    mutationFn: (data: TaskFormData) => createTask({ ...data, projectId }),
+    mutationFn: async (data: TaskFormData) => {
+      const response = await createTask({ 
+        ...data, 
+        projectId
+      });
+      
+      // Create checklist items for the new task
+      if (response.task && temporaryItems.length > 0) {
+        const newTaskId = response.task.id;
+        const promises = temporaryItems.map(item => 
+          addChecklistItem({ taskId: newTaskId, item: item.text })
+        );
+        await Promise.all(promises);
+      }
+      
+      return response;
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
       onClose();
       reset();
+      setTemporaryItems([]);
     },
   });
 
@@ -56,10 +136,100 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
   const updateTaskMutation = useMutation({
     mutationFn: (data: TaskFormData) => updateTask(task!.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['checklist', task!.id] });
       onClose();
     },
   });
+
+  // Add checklist item mutation (only for edit mode)
+  const addItemMutation = useMutation({
+    mutationFn: (text: string) => addChecklistItem({ 
+      taskId: task!.id, 
+      item: text 
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['checklist', task!.id] });
+      setNewItemText('');
+    },
+  });
+
+  // Update checklist item mutation
+  const updateItemMutation = useMutation({
+    mutationFn: (data: { id: number; update: { isCompleted?: boolean } }) => 
+      updateChecklistItem(data.id, data.update),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['checklist', task!.id] });
+    },
+  });
+
+  // Delete checklist item mutation
+  const deleteItemMutation = useMutation({
+    mutationFn: (id: number) => removeChecklistItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['checklist', task!.id] });
+    },
+  });
+
+  const handleAddItem = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItemText.trim()) return;
+
+    if (isEditMode && task) {
+      // For existing tasks, directly add to the database
+      addItemMutation.mutate(newItemText.trim());
+    } else {
+      // For new tasks, temporarily store items to be added once the task is created
+      setTemporaryItems([
+        ...temporaryItems,
+        { 
+          id: `temp-${Date.now()}`, 
+          text: newItemText.trim(),
+          isCompleted: false
+        }
+      ]);
+      setNewItemText('');
+    }
+  };
+
+  const handleToggleItem = (id: number | string) => {
+    if (typeof id === 'number' && isEditMode) {
+      // Toggle existing item in database
+      const item = checklistItems.find(item => item.id === id);
+      if (item) {
+        updateItemMutation.mutate({
+          id,
+          update: { isCompleted: !item.isCompleted }
+        });
+      }
+    } else if (typeof id === 'string') {
+      // Toggle temporary item
+      setTemporaryItems(
+        temporaryItems.map(item => 
+          item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
+        )
+      );
+    }
+  };
+
+  const handleDeleteItem = (id: number | string) => {
+    if (typeof id === 'number' && isEditMode) {
+      // Delete existing item from database
+      deleteItemMutation.mutate(id);
+    } else if (typeof id === 'string') {
+      // Delete temporary item
+      setTemporaryItems(temporaryItems.filter(item => item.id !== id));
+    }
+  };
+
+  const handleEditTemporaryItem = (id: string, text: string) => {
+    setTemporaryItems(
+      temporaryItems.map(item => 
+        item.id === id ? { ...item, text } : item
+      )
+    );
+    setEditingItemId(null);
+  };
 
   const onSubmit = (data: TaskFormData) => {
     if (isEditMode) {
@@ -94,11 +264,11 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
-          id="name"
+          id="subject"
           label="Task Name"
           fullWidth
-          error={errors.name?.message}
-          {...register('name')}
+          error={errors.subject?.message}
+          {...register('subject')}
         />
 
         <div>
@@ -107,7 +277,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
           </label>
           <textarea
             id="description"
-            rows={4}
+            rows={3}
             className={`w-full rounded-md border ${
               errors.description ? 'border-red-500' : 'border-gray-300'
             } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
@@ -127,13 +297,158 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
             className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
             {...register('status')}
           >
-            <option value="todo">To Do</option>
-            <option value="inprogress">In Progress</option>
-            <option value="completed">Completed</option>
+            <option value="Pending">Not Started</option>
+            <option value="In-Progress">In Progress</option>
+            <option value="Done">Completed</option>
           </select>
           {errors.status && (
             <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
           )}
+        </div>
+
+        <div>
+          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+            Due Date
+          </label>
+          <input
+            type="date"
+            id="dueDate"
+            className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+            {...register('dueDate')}
+          />
+        </div>
+
+        {/* Assignee Selection */}
+        <div>
+          <label htmlFor="assignedUserId" className="block text-sm font-medium text-gray-700 mb-1">
+            Assignee
+          </label>
+          <div className="flex items-center space-x-2">
+            {currentUser && (
+              <div className="flex items-center space-x-2 border border-gray-300 rounded-md p-2 bg-gray-50">
+                <Avatar name={currentUser.name} size="sm" />
+                <span className="text-sm font-medium">{currentUser.name}</span>
+              </div>
+            )}
+            <input
+              type="hidden"
+              id="assignedUserId"
+              {...register('assignedUserId', { valueAsNumber: true })}
+            />
+          </div>
+          <p className="mt-1 text-xs text-gray-500">Currently, only self-assignment is supported.</p>
+        </div>
+
+        {/* Checklist Section */}
+        <div className="mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Checklist</label>
+          
+          <div className="space-y-3">
+            {/* Add new checklist item */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newItemText}
+                onChange={(e) => setNewItemText(e.target.value)}
+                placeholder="Add a new checklist item"
+                className="flex-grow rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+              />
+              <Button 
+                variant="outline" 
+                onClick={handleAddItem}
+                disabled={!newItemText.trim()}
+              >
+                Add
+              </Button>
+            </div>
+            
+            {/* Existing checklist items (for edit mode) */}
+            {isEditMode && checklistItems.map(item => (
+              <div key={item.id} className="flex items-center gap-2 bg-gray-50 p-2 rounded-md">
+                <input
+                  type="checkbox"
+                  checked={!!item.isCompleted}
+                  onChange={() => handleToggleItem(item.id)}
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <span className={`flex-grow ${item.isCompleted ? 'line-through text-gray-500' : ''}`}>
+                  {item.item}
+                </span>
+                <Button
+                  variant="danger"
+                  size="xs"
+                  onClick={() => handleDeleteItem(item.id)}
+                >
+                  ✕
+                </Button>
+              </div>
+            ))}
+            
+            {/* Temporary checklist items (for new task) */}
+            {temporaryItems.map(item => (
+              <div key={item.id} className="flex items-center gap-2 bg-gray-50 p-2 rounded-md">
+                {editingItemId === item.id ? (
+                  <>
+                    <input
+                      type="text"
+                      value={item.text}
+                      onChange={(e) => handleEditTemporaryItem(item.id, e.target.value)}
+                      className="flex-grow rounded-md border border-gray-300 shadow-sm py-1 px-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      autoFocus
+                      onBlur={() => setEditingItemId(null)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          setEditingItemId(null);
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      onClick={() => setEditingItemId(null)}
+                    >
+                      Save
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <input
+                      type="checkbox"
+                      checked={item.isCompleted}
+                      onChange={() => handleToggleItem(item.id)}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    />
+                    <span 
+                      className={`flex-grow ${item.isCompleted ? 'line-through text-gray-500' : ''}`}
+                      onClick={() => setEditingItemId(item.id)}
+                    >
+                      {item.text}
+                    </span>
+                    <Button
+                      variant="danger"
+                      size="xs"
+                      onClick={() => handleDeleteItem(item.id)}
+                    >
+                      ✕
+                    </Button>
+                  </>
+                )}
+              </div>
+            ))}
+            
+            {/* Empty state */}
+            {!isEditMode && temporaryItems.length === 0 && (
+              <p className="text-sm text-gray-500 italic p-2">No checklist items. Add some using the field above.</p>
+            )}
+            
+            {isEditMode && checklistItems.length === 0 && temporaryItems.length === 0 && !checklistLoading && (
+              <p className="text-sm text-gray-500 italic p-2">No checklist items. Add some using the field above.</p>
+            )}
+            
+            {isEditMode && checklistLoading && (
+              <p className="text-sm text-gray-500 italic p-2">Loading checklist items...</p>
+            )}
+          </div>
         </div>
 
         {(createTaskMutation.isError || updateTaskMutation.isError) && (

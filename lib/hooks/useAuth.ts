@@ -77,12 +77,17 @@ export default function useAuth() {
     }
   };
 
+  const updateUserInfo = (updatedUser: User) => {
+    login(updatedUser);
+  };
+
   return {
     isAuthenticated: true, // Force authentication to be true
     user: mockUser, // Use mock user
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
+    updateUserInfo,
     isSubmitting,
     error
   };

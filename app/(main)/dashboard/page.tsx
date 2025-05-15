@@ -64,6 +64,39 @@ export default function DashboardPage() {
     })
     .reduce((total: number, log: TimeLog) => total + (log.duration || 0), 0);
 
+  // Get recent tasks that are not done
+  const recentTasks = tasks
+    .filter((task: Task) => task.status !== 'Done')
+    .slice(0, 3);
+    
+  // Status badge color
+  const getStatusBadgeVariant = (status: string | null) => {
+    if (status === null) return 'primary';
+    
+    switch (status) {
+      case 'Not Started':
+        return 'secondary';
+      case 'In Progress':
+      case 'In-Progress':
+        return 'warning';
+      case 'Done':
+        return 'success';
+      default:
+        return 'primary';
+    }
+  };
+
+  // Get color for task border based on status
+  const getTaskBorderColor = (status: string | null) => {
+    if (status === 'In Progress' || status === 'In-Progress') {
+      return '#f59e0b'; // Amber/Orange for in progress
+    } else if (status === 'Done') {
+      return '#10b981'; // Green for completed
+    } else {
+      return '#6366f1'; // Indigo for not started or other
+    }
+  };
+  
   return (
     <PageWrapper
       title={`Welcome, ${user?.name || 'User'}`}
@@ -121,6 +154,54 @@ export default function DashboardPage() {
               </div>
             </div>
           </Card>
+        </div>
+
+        {/* My Tasks Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-medium text-gray-900">My Tasks</h2>
+            <Link href="/tasks" className="text-sm text-primary-600 hover:text-primary-500">
+              View all tasks
+            </Link>
+          </div>
+
+          {tasksLoading ? (
+            <p>Loading tasks...</p>
+          ) : recentTasks.length === 0 ? (
+            <p>No active tasks found. Create a task to get started.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {recentTasks.map((task: Task) => (
+                <Card 
+                  key={task.id} 
+                  className="hover:shadow-md transition-all duration-200 border-l-4"
+                  style={{ borderLeftColor: getTaskBorderColor(task.status) }}
+                >
+                  <div className="flex flex-col h-full">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-md font-medium text-gray-900">{task.name}</h3>
+                      <Badge variant={getStatusBadgeVariant(task.status)}>
+                        {task.status}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2 flex-grow">
+                      {task.description || 'No description provided'}
+                    </p>
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-xs text-gray-500">
+                        Project: {projects.find((p: Project) => p.id === task.projectId)?.name || 'Unknown'}
+                      </span>
+                      {task.dueDate && (
+                        <span className="text-xs font-medium text-gray-500">
+                          Due: {formatDate(task.dueDate)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Recent Logs Section */}

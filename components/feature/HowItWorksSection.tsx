@@ -164,7 +164,11 @@ export default function HowItWorksSection() {
         <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-700/30 -translate-x-1/2"></div>
         <div 
           className="absolute left-1/2 top-0 w-0.5 bg-sky-400 -translate-x-1/2 transition-all duration-500 ease-out"
-          style={{ height: `${(activeStep + 1) * 100 / steps.length}%` }}
+          style={{ 
+            height: activeStep < steps.length - 1 
+              ? `calc(${(activeStep + 1) * 100 / steps.length}% - 10px)` 
+              : `calc(${(activeStep + 1) * 100 / steps.length}% - 20px)` 
+          }}
         ></div>
         
         {steps.map((step, index) => (

@@ -65,19 +65,19 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 fixed w-full z-10">
+    <header className="bg-white backdrop-blur-sm bg-opacity-80 border-b border-indigo-100 fixed w-full z-10 shadow-md">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/dashboard" className="text-xl font-bold text-primary-600">
-              Time Tracker
+            <Link href="/dashboard" className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent hover:from-indigo-700 hover:to-purple-700 transition-all duration-300">
+              TimeTracker
             </Link>
           </div>
 
           <div className="flex items-center space-x-4">
             {/* Timer Display & Controls */}
             <div className="hidden md:flex items-center space-x-2 mr-4">
-              <div className="text-lg font-mono font-medium bg-gray-100 px-3 py-1 rounded-md">
+              <div className="text-lg font-mono font-medium bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-1.5 rounded-md shadow-inner border border-indigo-100">
                 {formattedTime}
               </div>
               
@@ -87,7 +87,7 @@ const Header: React.FC = () => {
                   size="sm"
                   onClick={() => setIsStopTimerModalOpen(true)}
                   isLoading={timerIsLoading}
-                  className="font-medium"
+                  className="font-medium shadow-sm hover:shadow transition-all duration-200"
                 >
                   Stop
                 </Button>
@@ -97,7 +97,7 @@ const Header: React.FC = () => {
                   size="sm"
                   onClick={startTimer}
                   isLoading={timerIsLoading}
-                  className="font-medium"
+                  className="font-medium shadow-sm hover:shadow transition-all duration-200"
                 >
                   Start
                 </Button>
@@ -106,19 +106,22 @@ const Header: React.FC = () => {
 
             {/* User Menu */}
             <div className="relative group">
-              <button className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 focus:outline-none">
-                <span>{user?.name}</span>
+              <button className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 focus:outline-none transition-all duration-200">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center text-white font-medium shadow-md">
+                  {user?.name?.charAt(0) || 'U'}
+                </div>
+                <span className="font-medium">{user?.name}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
-                <Link href="/settings/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block border border-indigo-100 transform transition-all duration-200">
+                <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-600">
                   Profile
                 </Link>
                 <button
                   onClick={logout}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-600"
                 >
                   Logout
                 </button>
@@ -159,7 +162,7 @@ const Header: React.FC = () => {
             </label>
             <select
               id="project"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+              className="w-full rounded-md border border-indigo-200 shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gradient-to-r from-white to-indigo-50"
               value={selectedProject || ''}
               onChange={(e) => setSelectedProject(e.target.value ? Number(e.target.value) : null)}
               disabled={projectsLoading}
@@ -179,7 +182,7 @@ const Header: React.FC = () => {
             </label>
             <select
               id="task"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+              className="w-full rounded-md border border-indigo-200 shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gradient-to-r from-white to-indigo-50"
               value={selectedTask || ''}
               onChange={(e) => setSelectedTask(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedProject || tasksLoading}
@@ -187,7 +190,7 @@ const Header: React.FC = () => {
               <option value="">Select Task</option>
               {filteredTasks.map((task) => (
                 <option key={task.id} value={task.id}>
-                  {task.name}
+                  {task.name || task.subject}
                 </option>
               ))}
             </select>
@@ -200,7 +203,7 @@ const Header: React.FC = () => {
             <textarea
               id="description"
               rows={3}
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+              className="w-full rounded-md border border-indigo-200 shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What are you working on?"

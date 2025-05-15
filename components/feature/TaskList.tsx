@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { updateTask, deleteTask } from '@/services/task';
 import { Task } from '@/types';
 import Badge from '@/components/ui/Badge';
@@ -7,6 +7,10 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { ConfirmModal } from '@/components/ui/Modal';
 import TaskForm from './TaskForm';
+import { formatDate } from '@/lib/utils';
+import Link from 'next/link';
+import Avatar from '@/components/ui/Avatar';
+import { getTaskAssignee } from '@/services/taskMembers';
 
 interface TaskListProps {
   tasks: Task[];
@@ -23,10 +27,10 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, projectId }) => {
 
   // Update task status mutation
   const updateTaskMutation = useMutation({
-    mutationFn: ({ id, status }: { id: number; status: 'todo' | 'inprogress' | 'completed' }) => 
+    mutationFn: ({ id, status }: { id: number; status: string }) => 
       updateTask(id, { status }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
 
@@ -39,25 +43,45 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, projectId }) => {
     },
   });
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadgeVariant = (status: string | null) => {
+    if (status === null) return 'primary';
+    
     switch (status) {
-      case 'todo':
-        return <Badge variant="secondary">To Do</Badge>;
-      case 'inprogress':
-        return <Badge variant="primary">In Progress</Badge>;
-      case 'completed':
-        return <Badge variant="success">Completed</Badge>;
+      case 'Pending':
+        return 'secondary';
+      case 'In-Progress':
+        return 'warning';
+      case 'Done':
+        return 'success';
       default:
-        return <Badge>Unknown</Badge>;
+        return 'primary';
     }
   };
 
-  const handleStatusChange = (taskId: number, newStatus: 'todo' | 'inprogress' | 'completed') => {
+  const getStatusLabel = (status: string | null) => {
+    if (status === null) return 'Not Set';
+    
+    switch (status) {
+      case 'Pending':
+        return 'Not Started';
+      case 'In-Progress':
+        return 'In Progress';
+      case 'Done':
+        return 'Completed';
+      default:
+        return status;
+    }
+  };
+
+  const handleStatusChange = (taskId: number, newStatus: string) => {
     updateTaskMutation.mutate({ id: taskId, status: newStatus });
   };
 
-  const openDeleteModal = (taskId: number) => {
-    setDeleteModalState({ isOpen: true, taskId });
+  const openDeleteModal = (id: number) => {
+    setDeleteModalState({
+      isOpen: true,
+      taskId: id,
+    });
   };
 
   const handleDeleteTask = () => {
@@ -66,29 +90,56 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, projectId }) => {
     }
   };
 
+  // Function to get task assignee (we'll use React Query's cache to avoid multiple requests)
+  const TaskAssignee = ({ taskId }: { taskId: number }) => {
+    const { data, isLoading } = useQuery({
+      queryKey: ['taskAssignee', taskId],
+      queryFn: () => getTaskAssignee(taskId),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+
+    if (isLoading || !data?.user) return null;
+
+    return (
+      <div className="flex items-center mt-2">
+        <Avatar name={data.user.name} size="xs" className="mr-1" />
+        <span className="text-xs text-gray-500">Assigned to: {data.user.name}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {tasks.map((task) => (
-        <Card key={task.id} className="p-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <Card key={task.id} className="hover:shadow-md transition-all duration-200">
+          <div className="flex flex-col md:flex-row md:items-center justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                {getStatusBadge(task.status)}
-                <h3 className="text-lg font-medium text-gray-900">{task.name}</h3>
+              <div className="flex items-start justify-between">
+                <Link href={`/tasks/${task.id}`} className="text-lg font-medium text-gray-900 hover:text-primary-600">
+                  {task.subject}
+                </Link>
+                <Badge variant={getStatusBadgeVariant(task.status)} className="ml-2">
+                  {getStatusLabel(task.status)}
+                </Badge>
               </div>
-              <p className="text-sm text-gray-600">{task.description}</p>
+              <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                {task.description || 'No description provided'}
+              </p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {task.dueDate && (
+                  <p className="text-xs text-gray-500">
+                    Due: {formatDate(task.dueDate)}
+                  </p>
+                )}
+                <TaskAssignee taskId={task.id} />
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <select
-                className="rounded-md border border-gray-300 text-sm py-1 px-2"
-                value={task.status}
-                onChange={(e) => handleStatusChange(task.id, e.target.value as 'todo' | 'inprogress' | 'completed')}
-                disabled={updateTaskMutation.isPending}
-              >
-                <option value="todo">To Do</option>
-                <option value="inprogress">In Progress</option>
-                <option value="completed">Completed</option>
-              </select>
+            <div className="mt-4 md:mt-0 flex space-x-2">
+              <Link href={`/tasks/${task.id}`}>
+                <Button variant="outline" size="sm">
+                  View Details
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 size="sm"

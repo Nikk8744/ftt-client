@@ -60,7 +60,7 @@ export default function Footer() {
   }, []);
   
   return (
-    <div className="px-4 md:px-6 lg:px-12 xl:px-24 pb-6 md:pb-12 pt-6 md:pt-12 bg-[#fff8f0]">
+    <div className="px-4 md:px-6 lg:px-12 xl:px-12 pb-6 md:pb-12 pt-6 md:pt-12 bg-[#fdf6f0]">
       <div className={`relative py-12 md:py-16 px-5 md:px-8 bg-[#0f172a] border border-slate-800/50 rounded-3xl overflow-hidden transition-opacity duration-1000 ${visible ? 'opacity-100' : 'opacity-0'}`}>
         {/* Threads animation background */}
         <div className="absolute inset-0 overflow-hidden rounded-3xl">
