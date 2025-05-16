@@ -117,8 +117,10 @@ export interface TimeLog {
   userId: number;
   projectId: number | null;
   taskId: number | null;
+  timeSpent: number | null;
   duration: number | null; // in seconds
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface TimeLogCreateData {

@@ -228,7 +228,7 @@ export default function TasksPage() {
                         className="text-indigo-600 border-indigo-200"
                       >
                         <Link href={`/tasks/${task.id}`} className="flex items-center">
-                          View Details
+                        View Details
                         </Link>
                       </Button>
                     </div>

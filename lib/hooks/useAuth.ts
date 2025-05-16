@@ -17,20 +17,18 @@ export default function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      // Use the real login service
       const response = await loginUser(credentials);
 
-      // Check if the response includes user data
-      if (response.user) {
+      // Handle the login response according to the API guide
+      if (response && response.user) {
         login(response.user as User);
-      } else if (response.data && response.data.user) {
-        login(response.data.user as User);
+        router.push('/dashboard');
       } else {
         throw new Error('Invalid response structure from login API');
       }
+      
       setIsSubmitting(false);
       setIsLoading(false);
-      router.push('/dashboard');
       return response;
     } catch (err: unknown) {
       setIsSubmitting(false);
@@ -47,7 +45,6 @@ export default function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      // Use the real register service
       const response = await registerUser(data);
       
       setIsSubmitting(false);
@@ -68,7 +65,6 @@ export default function useAuth() {
       setIsLoading(true);
       setError(null);
 
-      // Use the real logout service
       await logoutUser();
       
       logout();

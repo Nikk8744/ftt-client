@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllProjectsOfUser, createProject, deleteProject } from '@/services/project';
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
-import { ProjectCreateData } from '@/types';
+import { ProjectCreateData, Project } from '@/types';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
@@ -20,8 +20,11 @@ import { z } from 'zod';
 
 // Form validation schema
 const projectSchema = z.object({
-  name: z.string().min(1, 'Project name is required'),
-  description: z.string().min(1, 'Project description is required'),
+  name: z.string().min(3, 'Project name must be at least 3 characters').max(255, 'Project name cannot exceed 255 characters'),
+  description: z.string().min(5, 'Project description must be at least 5 characters').max(1000, 'Project description cannot exceed 1000 characters'),
+  startDate: z.string().min(1, 'Start date is required'),
+  endDate: z.string().min(1, 'End date is required'),
+  status: z.enum(['Pending', 'In-Progress', 'Completed']).optional(),
 });
 
 type ProjectFormData = z.infer<typeof projectSchema>;
@@ -84,6 +87,9 @@ export default function ProjectsPage() {
     defaultValues: {
       name: '',
       description: '',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default 30 days from now
+      status: 'Pending',
     },
   });
 
@@ -142,7 +148,7 @@ export default function ProjectsPage() {
                 : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Projects You're Member Of
+            Projects You&apos;re Member Of
           </button>
         </nav>
       </div>
@@ -188,7 +194,7 @@ export default function ProjectsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {ownedProjects.map((project) => (
+                {ownedProjects.map((project: Project) => (
                   <div key={project.id} className="relative">
                     <Link href={`/projects/${project.id}`}>
                       <Card className="h-full hover:shadow-md transition-shadow">
@@ -244,11 +250,11 @@ export default function ProjectsPage() {
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No memberships</h3>
-                <p className="mt-1 text-sm text-gray-500">You're not a member of any projects yet.</p>
+                <p className="mt-1 text-sm text-gray-500">You&apos;re not a member of any projects yet.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {memberProjects.map((project) => (
+                {memberProjects.map((project: Project) => (
                   <Link href={`/projects/${project.id}`} key={project.id}>
                     <Card className="h-full hover:shadow-md transition-shadow">
                       <h3 className="text-lg font-medium text-gray-900">{project.name}</h3>
@@ -315,6 +321,62 @@ export default function ProjectsPage() {
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+                Start Date
+              </label>
+              <input
+                type="date"
+                id="startDate"
+                className={`w-full rounded-md border ${
+                  errors.startDate ? 'border-red-500' : 'border-gray-300'
+                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
+                {...register('startDate')}
+              />
+              {errors.startDate && (
+                <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+              )}
+            </div>
+            
+            <div>
+              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+                End Date
+              </label>
+              <input
+                type="date"
+                id="endDate"
+                className={`w-full rounded-md border ${
+                  errors.endDate ? 'border-red-500' : 'border-gray-300'
+                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
+                {...register('endDate')}
+              />
+              {errors.endDate && (
+                <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+              )}
+            </div>
+          </div>
+          
+          <div>
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              id="status"
+              className={`w-full rounded-md border ${
+                errors.status ? 'border-red-500' : 'border-gray-300'
+              } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
+              {...register('status')}
+            >
+              <option value="Pending">Pending</option>
+              <option value="In-Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+            {errors.status && (
+              <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
             )}
           </div>
         </form>

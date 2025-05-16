@@ -6,7 +6,7 @@ const API_BASE_URL = '/api/v1';
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000, 
-  withCredentials: true,
+  withCredentials: true, // Enable sending cookies with requests
   headers: {
     'Content-Type': 'application/json',
   }
@@ -14,6 +14,8 @@ const apiClient = axios.create({
 
 // Add request interceptor to handle JWT tokens
 apiClient.interceptors.request.use((config) => {
+  // JWT is sent via cookies automatically with withCredentials: true
+  // but we'll also add it to the Authorization header as a fallback
   const token = localStorage.getItem('auth-token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -28,7 +30,6 @@ apiClient.interceptors.response.use(
     const { response } = error;
     if (response && response.status === 401) {
       // Handle unauthorized errors (e.g., redirect to login)
-      localStorage.removeItem('auth-token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -47,12 +48,6 @@ export async function apiFetch<T>(
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
   };
-
-  // Add auth token to headers if available
-  const token = localStorage.getItem('auth-token');
-  if (token) {
-    defaultHeaders.Authorization = `Bearer ${token}`;
-  }
 
   // Merge default headers with passed headers
   const fetchOptions: RequestInit = {

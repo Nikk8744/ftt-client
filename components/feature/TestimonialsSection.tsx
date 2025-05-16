@@ -10,7 +10,7 @@ export default function TestimonialsSection() {
       quote: "TimeTracker has completely transformed how I manage my freelance business. I can now accurately track hours and bill clients with confidence.",
       name: "Sarah Johnson",
       role: "Freelance Designer",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+      image: "https://images.unsplash.com/photo-1550682290-d071c75759f9?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 2,
@@ -47,7 +47,7 @@ export default function TestimonialsSection() {
             What our users are saying
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-            Don't just take our word for it. See what our satisfied users have to say about TimeTracker.
+            Don&apos;t just take our word for it. See what our satisfied users have to say about TimeTracker.
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export default function TestimonialsSection() {
                 <div className="relative" style={{ paddingBottom: '150%' }}>
                   <div className="absolute inset-0">
                     <Image 
-                      className="object-cover mix-blend-multiply filter brightness-90 saturate-[.9]"
+                      className="object-cover  filter brightness-100 "
                       src={testimonials[activeTestimonial].image}
                       alt={testimonials[activeTestimonial].name}
                       fill

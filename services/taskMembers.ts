@@ -1,6 +1,6 @@
 import { User } from '@/types';
 import { mockUser } from '@/lib/mockData';
-import apiClient from './api-client';
+// import apiClient from './api-client';
 
 // Mock task followers data structure
 const taskFollowers = new Map<number, number[]>();

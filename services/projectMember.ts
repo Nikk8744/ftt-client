@@ -1,21 +1,82 @@
 import apiClient from './api-client';
 
+/**
+ * Add a member to a project
+ */
 export const addMemberToProject = async (projectId: number, userId: number) => {
-  const response = await apiClient.post(`/projectMember/addMemberToProject/${projectId}`, { userId });
-  return response.data;
+  try {
+    const response = await apiClient.post('/projectMember/addMember', { 
+      projectId, 
+      userId 
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding member to project:', error);
+    throw error;
+  }
 };
 
+/**
+ * Remove a member from a project
+ */
 export const removeMemberFromProject = async (projectId: number, userId: number) => {
-  const response = await apiClient.delete(`/projectMember/removeMemberFromProject/${projectId}/${userId}`);
-  return response.data;
+  try {
+    const response = await apiClient.delete('/projectMember/removeMember', {
+      data: { projectId, userId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error removing member from project:', error);
+    throw error;
+  }
 };
 
+/**
+ * Get all members of a project
+ */
 export const getAllMembersOfProject = async (projectId: number) => {
-  const response = await apiClient.get(`/projectMember/getAllMembersOfAProject/${projectId}`);
-  return response.data;
+  try {
+    const response = await apiClient.get(`/projectMember/getAllMembers/${projectId}`);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching members of project ${projectId}:`, error);
+    throw error;
+  }
 };
 
+/**
+ * Get all projects a user is a member of
+ */
 export const getAllProjectsUserIsMemberOf = async () => {
-  const response = await apiClient.get('/projectMember/getAllProjectsAUserIsMemberOf');
-  return response.data;
-}; 
+  try {
+    const response = await apiClient.get('/projectMember/getAllProjectsAUserIsMemberOf');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching projects user is member of:', error);
+    throw error;
+  }
+};
+
+// ----------------------------------------------
+// Alias functions for team members (for backward compatibility)
+// These functions have the same functionality but with more intuitive names
+// ----------------------------------------------
+
+/**
+ * Get all team members for a project
+ * Alias for getAllMembersOfProject
+ */
+export const getTeamMembers = getAllMembersOfProject;
+
+/**
+ * Add a new team member
+ * Alias for addMemberToProject
+ */
+export const addTeamMember = addMemberToProject;
+
+/**
+ * Remove a team member
+ * Alias for removeMemberFromProject
+ */
+export const removeTeamMember = removeMemberFromProject; 

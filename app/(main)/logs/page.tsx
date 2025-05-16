@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllUserLogs, updateTimeLog, deleteTimeLog } from '@/services/log';
+import { getUserLogs, updateTimeLog, deleteTimeLog } from '@/services/log';
 import { getAllProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
 import { useForm } from 'react-hook-form';
@@ -18,8 +18,12 @@ import { Project, Task, TimeLog, TimeLogUpdateData } from '@/types';
 // Form validation schema
 const timeLogSchema = z.object({
   description: z.string().max(1000).optional(),
-  projectId: z.string().transform(val => val ? Number(val) : null).optional(),
-  taskId: z.string().transform(val => val ? Number(val) : null).optional(),
+  projectId: z.number().transform(val => val ? Number(val) : null).optional(),
+  taskId: z.number().transform(val => val ? Number(val) : null).optional(),
+  timeSpent: z.number().transform(val => val ? Number(val) : null).optional(),
+  duration: z.number().transform(val => val ? Number(val) : null).optional(),
+  userId: z.number().transform(val => val ? Number(val) : null).optional(),
+  name: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
 });
@@ -46,7 +50,7 @@ export default function LogsPage() {
     isError: logsError,
   } = useQuery({
     queryKey: ['logs'],
-    queryFn: getAllUserLogs,
+    queryFn: getUserLogs,
   });
 
   // Fetch projects for filter and editing
@@ -111,8 +115,8 @@ export default function LogsPage() {
     resolver: zodResolver(timeLogSchema),
     defaultValues: {
       description: selectedLog?.description || '',
-      projectId: selectedLog?.projectId ? String(selectedLog.projectId) : '',
-      taskId: selectedLog?.taskId ? String(selectedLog.taskId) : '',
+      projectId: selectedLog?.projectId ? Number(selectedLog.projectId) : 0,
+      taskId: selectedLog?.taskId ? Number(selectedLog.taskId) : 0,
       startTime: selectedLog?.startTime || '',
       endTime: selectedLog?.endTime || '',
     }
@@ -142,8 +146,8 @@ export default function LogsPage() {
     setEditLogId(log.id);
     reset({
       description: log.description || '',
-      projectId: log.projectId ? String(log.projectId) : '',
-      taskId: log.taskId ? String(log.taskId) : '',
+      projectId: log.projectId ? Number(log.projectId) : 0,
+      taskId: log.taskId ? Number(log.taskId) : 0,
       startTime: log.startTime ? new Date(log.startTime).toISOString().slice(0, 16) : '',
       endTime: log.endTime ? new Date(log.endTime).toISOString().slice(0, 16) : '',
     });
@@ -171,11 +175,11 @@ export default function LogsPage() {
       updateData.description = data.description || null;
     }
     
-    if (data.projectId !== String(selectedLog?.projectId)) {
+    if (Number(data.projectId) !== selectedLog?.projectId) {
       updateData.projectId = data.projectId ? Number(data.projectId) : null;
     }
     
-    if (data.taskId !== String(selectedLog?.taskId)) {
+    if (Number(data.taskId) !== selectedLog?.taskId) {
       updateData.taskId = data.taskId ? Number(data.taskId) : null;
     }
     

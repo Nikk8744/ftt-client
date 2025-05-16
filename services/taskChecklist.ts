@@ -1,40 +1,67 @@
 import apiClient from './api-client';
-import { ChecklistItemCreateData, ChecklistItemUpdateData, TaskChecklistItemCreateData, TaskChecklistItemUpdateData } from '@/types';
-import { 
-  getMockChecklistItems, 
-  addMockChecklistItem, 
-  updateMockChecklistItem, 
-  deleteMockChecklistItem 
-} from '@/lib/mockData';
+import { ChecklistItemCreateData, ChecklistItemUpdateData } from '@/types';
 
+/**
+ * Get all checklist items for a task
+ */
 export const getTaskChecklist = async (taskId: number) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.get(`/item/getAllItemsOfATask/${taskId}`);
-  // return response.data;
-  
-  return getMockChecklistItems(taskId);
+  try {
+    const response = await apiClient.get(`/items/getTaskChecklist/${taskId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching checklist for task ${taskId}:`, error);
+    throw error;
+  }
 };
 
-export const addChecklistItem = async (data: TaskChecklistItemCreateData) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.post('/item/createItem', data);
-  // return response.data;
-  
-  return addMockChecklistItem(data);
+/**
+ * Get a specific checklist item by ID
+ */
+export const getChecklistItemById = async (itemId: number) => {
+  try {
+    const response = await apiClient.get(`/items/getChecklistItemById/${itemId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching checklist item ${itemId}:`, error);
+    throw error;
+  }
 };
 
-export const updateChecklistItem = async (id: number, data: TaskChecklistItemUpdateData) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.patch(`/item/updateItem/${id}`, data);
-  // return response.data;
-  
-  return updateMockChecklistItem(id, data);
+/**
+ * Add a checklist item to a task
+ */
+export const addChecklistItem = async (data: { taskId: number; item: string }) => {
+  try {
+    const response = await apiClient.post('/items/addItem', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding checklist item:', error);
+    throw error;
+  }
 };
 
-export const removeChecklistItem = async (id: number) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.delete(`/item/deleteItem/${id}`);
-  // return response.data;
-  
-  return deleteMockChecklistItem(id);
+/**
+ * Update a checklist item
+ */
+export const updateChecklistItem = async (itemId: number, data: { item?: string; isCompleted?: boolean }) => {
+  try {
+    const response = await apiClient.patch(`/items/updateChecklistItem/${itemId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating checklist item ${itemId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Remove a checklist item
+ */
+export const removeChecklistItem = async (itemId: number) => {
+  try {
+    const response = await apiClient.delete(`/items/removeChecklistItem/${itemId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error removing checklist item ${itemId}:`, error);
+    throw error;
+  }
 }; 

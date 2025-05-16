@@ -1,83 +1,124 @@
-import { Project, ProjectCreateData, ProjectUpdateData } from '@/types';
-import {
-  getMockProjects,
-  getMockProjectById,
-  addMockProject,
-  updateMockProject,
-  deleteMockProject
-} from '@/lib/mockData';
-
-// Comment out the original API client import
-// import apiClient from './api-client';
+import { ProjectCreateData, ProjectUpdateData } from '@/types';
+import apiClient from './api-client';
+import axios from 'axios';
 
 /**
  * Create a new project
  */
 export const createProject = async (data: ProjectCreateData) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.post('/project/createProject', data);
-  // return response.data;
-  
-  const project = addMockProject({
-    ...data,
-    userId: 1, // Mock user ID
-  });
-  return { project };
+  try {
+    const response = await apiClient.post('/project/createProject', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating project:', error);
+    throw error;
+  }
 };
 
 /**
  * Get a project by ID
  */
 export const getProjectById = async (id: number) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.get(`/project/getSingleProject/${id}`);
-  // return response.data;
-  
-  const project = getMockProjectById(id);
-  if (!project) {
-    throw new Error('Project not found');
+  try {
+    const response = await apiClient.get(`/project/getProject/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching project ${id}:`, error);
+    throw error;
   }
-  return { project };
 };
 
 /**
  * Get all projects owned by the authenticated user
  */
 export const getAllProjectsOfUser = async () => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.get('/project/getAllUserProjects');
-  // return response.data;
-  
-  const projects = getMockProjects();
-  return { projects };
+  try {
+    const response = await apiClient.get('/project/getAllProjectsOfUser');
+    return {
+      projects: response.data.projects || []
+    };
+  } catch (error) {
+    console.error('Error fetching user projects:', error);
+    throw error;
+  }
 };
 
 /**
  * Update a project
  */
 export const updateProject = async (id: number, data: ProjectUpdateData) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.patch(`/project/updateProject/${id}`, data);
-  // return response.data;
-  
-  const project = updateMockProject(id, data);
-  if (!project) {
-    throw new Error('Project not found');
+  try {
+    // Create a clean object with only defined values
+    const formattedData: ProjectUpdateData = { ...data };
+    
+    // Remove empty strings but keep valid values including zeros
+    Object.keys(formattedData).forEach(key => {
+      const keyName = key as keyof ProjectUpdateData;
+      
+      // Only delete empty strings, keep all other values (including zeros, booleans, etc.)
+      if (formattedData[keyName] === '') {
+        delete formattedData[keyName];
+      }
+    });
+    
+    // Handle date fields separately to ensure proper ISO format
+    if (formattedData.startDate) {
+      // If already a Date object
+      if (Object.prototype.toString.call(formattedData.startDate) === '[object Date]') {
+        formattedData.startDate = (formattedData.startDate as unknown as Date).toISOString();
+      } 
+      // If string but not ISO format, try to convert to Date first
+      else if (typeof formattedData.startDate === 'string' && !formattedData.startDate.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/)) {
+        try {
+          const date = new Date(formattedData.startDate);
+          formattedData.startDate = date.toISOString();
+        } catch {
+          delete formattedData.startDate; // Remove if invalid
+        }
+      }
+    }
+    
+    if (formattedData.endDate) {
+      // If already a Date object
+      if (Object.prototype.toString.call(formattedData.endDate) === '[object Date]') {
+        formattedData.endDate = (formattedData.endDate as unknown as Date).toISOString();
+      }
+      // If string but not ISO format, try to convert to Date first
+      else if (typeof formattedData.endDate === 'string' && !formattedData.endDate.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/)) {
+        try {
+          const date = new Date(formattedData.endDate);
+          formattedData.endDate = date.toISOString();
+        } catch {
+          delete formattedData.endDate; // Remove if invalid
+        }
+      }
+    }
+    
+    console.log('Sending update for project', id, 'with data:', JSON.stringify(formattedData, null, 2));
+    
+    const response = await apiClient.patch(`/project/updateProject/${id}`, formattedData);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error(`Error updating project ${id}:`, error.message);
+      console.error('Response data:', error.response.data);
+      console.error('Status code:', error.response.status);
+    } else {
+      console.error(`Error updating project ${id}:`, error);
+    }
+    throw error;
   }
-  return { project };
 };
 
 /**
  * Delete a project
  */
 export const deleteProject = async (id: number) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.delete(`/project/deleteProject/${id}`);
-  // return response.data;
-  
-  const success = deleteMockProject(id);
-  if (!success) {
-    throw new Error('Project not found');
+  try {
+    const response = await apiClient.delete(`/project/deleteProject/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting project ${id}:`, error);
+    throw error;
   }
-  return { msg: 'Project deleted successfully' };
 }; 

@@ -11,18 +11,17 @@ Okay, here is a detailed API guide based on your backend structure, designed for
 
 This API uses JWT (JSON Web Tokens) for authentication, managed via cookies.
 
-1.  **Login:** The user sends their credentials (`email`, `password`) to the `/user/login` endpoint.
-2.  **Token Issuance:** Upon successful authentication, the backend responds with user data and sets two HttpOnly cookies:
-    *   `accessToken`: A short-lived token used to authenticate subsequent requests.
-    *   `refreshToken`: A longer-lived token (though currently set to the same expiry as access in the code, this should ideally be longer) used to potentially refresh the access token in a future implementation (refresh logic is not currently implemented in the provided code).
-3.  **Authenticated Requests:** For endpoints requiring authentication, the browser should automatically send the `accessToken` cookie with each request. The `verifyJWT` middleware on the backend validates this token. Alternatively, the token can be sent via the `Authorization` header: `Authorization: Bearer <your_access_token>`.
-4.  **Logout:** The `/user/logout` endpoint clears the authentication cookies on the server-side (and instructs the browser to clear them) and removes the refresh token from the user's record in the database.
+1. **Login:** The user sends their credentials (`email`, `password`) to the `/user/login` endpoint.
+2. **Token Issuance:** Upon successful authentication, the backend responds with user data and sets two HttpOnly cookies:
+   * `accessToken`: A short-lived token used to authenticate subsequent requests.
+   * `refreshToken`: A longer-lived token used to potentially refresh the access token in a future implementation.
+3. **Authenticated Requests:** For endpoints requiring authentication, the browser automatically sends the `accessToken` cookie with each request. The backend validates this token.
+4. **Logout:** The `/user/logout` endpoint clears the authentication cookies and removes the refresh token from the user's record in the database.
 
 **Required Middleware:**
-
-*   `verifyJWT`: Checks for a valid `accessToken`. Applied to most routes after login.
-*   `isProjectOwner`: Checks if the authenticated user is the owner of the specified project. Used for actions like adding/removing members. Applied *after* `verifyJWT`.
-*   `isAdmin`: (Defined but not used in provided routes) Checks if the authenticated user has the 'Admin' role. Applied *after* `verifyJWT`.
+* `verifyJWT`: Checks for a valid `accessToken`. Applied to most routes after login.
+* `isProjectOwner`: Checks if the authenticated user is the owner of the specified project.
+* `isAdmin`: Checks if the authenticated user has the 'Admin' role.
 
 ---
 

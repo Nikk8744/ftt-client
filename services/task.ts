@@ -1,88 +1,82 @@
-import { Task, TaskCreateData, TaskUpdateData } from '@/types';
-import {
-  getMockTasks,
-  getMockTaskById,
-  getMockTasksByProject,
-  addMockTask,
-  updateMockTask,
-  deleteMockTask
-} from '@/lib/mockData';
-
-// Comment out the original API client import
-// import apiClient from './api-client';
+import { TaskCreateData, TaskUpdateData } from '@/types';
+import apiClient from './api-client';
 
 /**
  * Create a new task within a project
  */
-export const createTask = async (data: TaskCreateData) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.post('/task/createTask', data);
-  // return response.data;
-  
-  const task = addMockTask({
-    ...data,
-    subject: data.subject,
-    name: data.subject, // For backwards compatibility
-    status: data.status || 'Pending',
-    dueDate: data.dueDate || null,
-    userId: 1, // Mock user ID
-    projectId: 1, // Default project if not provided
-  });
-  
-  return { task, message: 'Task created successfully' };
+export const createTask = async (projectId: number, data: TaskCreateData) => {
+  try {
+    const response = await apiClient.post(`/tasks/createTask/${projectId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating task:', error);
+    throw error;
+  }
 };
 
 /**
  * Get all tasks for the current user
  */
 export const getUserTasks = async () => {
-  // const response = await apiClient.get('/task/getAllTasksOfUser');
-  // return response.data;
-  
-  const tasks = getMockTasks();
-  return { tasks };
+  try {
+    const response = await apiClient.get('/tasks/getUserTasks');
+    return {
+      tasks: response.data.Users_tasks || []
+    };
+  } catch (error) {
+    console.error('Error fetching user tasks:', error);
+    throw error;
+  }
 };
 
 /**
  * Get a specific task by ID
  */
 export const getTaskById = async (id: number) => {
-  // const response = await apiClient.get(`/task/getTask/${id}`);
-  // return response.data;
-  
-  const task = getMockTaskById(id);
-  return { task };
+  try {
+    const response = await apiClient.get(`/tasks/getTask/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching task ${id}:`, error);
+    throw error;
+  }
 };
 
 /**
  * Get tasks for a specific project
  */
 export const getTasksByProject = async (projectId: number) => {
-  // const response = await apiClient.get(`/task/getAllTasksOfProject/${projectId}`);
-  // return response.data;
-  
-  const tasks = getMockTasksByProject(projectId);
-  return { tasks };
+  try {
+    const response = await apiClient.get(`/tasks/getProjectTasks/${projectId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching tasks for project ${projectId}:`, error);
+    throw error;
+  }
 };
 
 /**
  * Update a task
  */
 export const updateTask = async (id: number, data: TaskUpdateData) => {
-  // const response = await apiClient.patch(`/task/updateTask/${id}`, data);
-  // return response.data;
-  
-  const updatedTask = updateMockTask(id, data);
-  return { task: updatedTask, message: 'Task updated successfully' };
+  try {
+    const response = await apiClient.patch(`/tasks/updateTask/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating task ${id}:`, error);
+    throw error;
+  }
 };
 
 /**
  * Delete a task
  */
 export const deleteTask = async (id: number) => {
-  // const response = await apiClient.delete(`/task/deleteTask/${id}`);
-  // return response.data;
-  
-  const success = deleteMockTask(id);
-  return { message: success ? 'Task deleted successfully' : 'Task not found' };
+  try {
+    const response = await apiClient.delete(`/tasks/deleteTask/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting task ${id}:`, error);
+    throw error;
+  }
 }; 

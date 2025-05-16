@@ -1,27 +1,17 @@
 import { TimeLog, TimeLogCreateData, TimeLogUpdateData } from '@/types';
-import {
-  getMockLogs,
-  getMockLogById,
-  addMockLog,
-  updateMockLog,
-  deleteMockLog
-} from '@/lib/mockData';
-
-// Comment out the original API client import
-// import apiClient from './api-client';
+import apiClient from './api-client';
 
 /**
  * Start a new time log
  */
-export async function startTimeLog(): Promise<ApiResponse<TimeLog>> {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.post('/logs/startTimeLog', {});
-  // return response.data;
-  
-  const log = addMockLog({
-    userId: 1, // Mock user ID
-  });
-  return { log };
+export async function startTimeLog() {
+  try {
+    const response = await apiClient.post('/logs/startTimeLog', {});
+    return response.data;
+  } catch (error) {
+    console.error('Error starting time log:', error);
+    throw error;
+  }
 }
 
 /**
@@ -30,67 +20,71 @@ export async function startTimeLog(): Promise<ApiResponse<TimeLog>> {
 export async function stopTimeLog(
   logId: number, 
   data: { projectId: number; taskId: number; name?: string; description?: string }
-): Promise<ApiResponse<TimeLog>> {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.post(`/logs/stopTimeLog/${logId}`, data);
-  // return response.data;
-  
-  const log = addMockLog({
-    ...data,
-    userId: 1, // Mock user ID
-  });
-  return { log };
+) {
+  try {
+    const response = await apiClient.post(`/logs/stopTimeLog/${logId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error stopping time log ${logId}:`, error);
+    throw error;
+  }
 }
 
 /**
  * Get a time log by its ID
  */
-export async function getTimeLogById(logId: number): Promise<ApiResponse<TimeLog>> {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.get(`/logs/getLogById/${logId}`);
-  // return response.data;
-  
-  const log = getMockLogById(logId);
-  if (!log) {
-    throw new Error('Log not found');
+export async function getTimeLogById(logId: number) {
+  try {
+    const response = await apiClient.get(`/logs/getLogById/${logId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching time log ${logId}:`, error);
+    throw error;
   }
-  return { log };
 }
 
 /**
  * Get all logs for the currently authenticated user
  */
-export const getAllUserLogs = async () => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.get('/log/getAllUserLogs');
-  // return response.data;
-  
-  const logs = getMockLogs();
-  return { logs };
+export const getUserLogs = async () => {
+  try {
+    // Note: The API endpoint expects a userId parameter in the path, but the controller 
+    // ignores it and uses the authenticated user ID from the request
+    const userId = 1; // This is just a placeholder since the backend ignores it
+    const response = await apiClient.get(`/logs/getUserLogs/${userId}`);
+    return {
+      logs: response.data.data || []
+    };
+  } catch (error) {
+    console.error('Error fetching user logs:', error);
+    throw error;
+  }
 };
 
 /**
  * Get all logs for a specific project
  */
-export async function getProjectLogs(projectId: number): Promise<{ logs: TimeLog[]; msg: string }> {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.get(`/logs/getProjectLogs/${projectId}`);
-  // return response.data;
-  
-  const logs = getMockLogs().filter(log => log.projectId === projectId);
-  return { logs, msg: 'Logs retrieved successfully' };
+export async function getProjectLogs(projectId: number) {
+  try {
+    const response = await apiClient.get(`/logs/getProjectLogs/${projectId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching logs for project ${projectId}:`, error);
+    throw error;
+  }
 }
 
 /**
  * Get all logs for a specific task
  */
-export async function getTaskLogs(taskId: number): Promise<{ logs: TimeLog[]; msg: string }> {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.get(`/logs/getTaskLogs/${taskId}`);
-  // return response.data;
-  
-  const logs = getMockLogs().filter(log => log.taskId === taskId);
-  return { logs, msg: 'Logs retrieved successfully' };
+export async function getTaskLogs(taskId: number) {
+  try {
+    const response = await apiClient.get(`/logs/getTaskLogs/${taskId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching logs for task ${taskId}:`, error);
+    throw error;
+  }
 }
 
 /**
@@ -99,48 +93,45 @@ export async function getTaskLogs(taskId: number): Promise<{ logs: TimeLog[]; ms
 export async function updateTimeLog(
   logId: number, 
   updateData: TimeLogUpdateData
-): Promise<ApiResponse<TimeLog>> {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.patch(`/logs/updateLog/${logId}`, updateData);
-  // return response.data;
-  
-  const log = updateMockLog(logId, updateData);
-  if (!log) {
-    throw new Error('Log not found');
+) {
+  try {
+    const response = await apiClient.patch(`/logs/updateLog/${logId}`, updateData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating time log ${logId}:`, error);
+    throw error;
   }
-  return { log };
 }
 
 /**
  * Delete a time log
  */
-export async function deleteTimeLog(logId: number): Promise<ApiResponse<boolean>> {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.delete(`/logs/deleteLog/${logId}`);
-  // return response.data;
-  
-  const success = deleteMockLog(logId);
-  if (!success) {
-    throw new Error('Log not found');
+export async function deleteTimeLog(logId: number) {
+  try {
+    const response = await apiClient.delete(`/logs/deleteLog/${logId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting time log ${logId}:`, error);
+    throw error;
   }
-  return { msg: 'Log deleted successfully' };
 }
 
 /**
  * Calculate total duration from a collection of logs
  */
 export function calculateTotalDuration(logs: TimeLog[]): number {
-  return logs.reduce((total, log) => total + (log.duration || 0), 0);
+  return logs.reduce((total, log) => total + (log.timeSpent || 0), 0);
 }
 
+/**
+ * Create a new time log manually 
+ */
 export const createTimeLog = async (data: TimeLogCreateData) => {
-  // Comment out the API call and replace with mock data
-  // const response = await apiClient.post('/log/createLog', data);
-  // return response.data;
-  
-  const log = addMockLog({
-    ...data,
-    userId: 1, // Mock user ID
-  });
-  return { log };
+  try {
+    const response = await apiClient.post('/logs/createLog', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating time log:', error);
+    throw error;
+  }
 }; 

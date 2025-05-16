@@ -150,6 +150,45 @@ export const mockProjectMembers = [
   },
 ];
 
+// Mock Team Members
+export const mockTeamMembers = [
+  {
+    id: 1,
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'Developer',
+    addedAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 2,
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    role: 'Designer',
+    addedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 3,
+    name: 'Mike Johnson',
+    email: 'mike@example.com',
+    role: 'Project Manager',
+    addedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 4,
+    name: 'Sarah Williams',
+    email: 'sarah@example.com',
+    role: 'QA Engineer',
+    addedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 5,
+    name: 'David Brown',
+    email: 'david@example.com',
+    role: 'Backend Developer',
+    addedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  }
+];
+
 // Mock Time Logs
 export const mockTimeLogs: TimeLog[] = [
   {
@@ -254,9 +293,9 @@ export const mockChecklistItems: TaskChecklistItem[] = [
 ];
 
 // Helper functions for managing mock data state
-let projects = [...mockProjects];
-let tasks = [...mockTasks];
-let logs = [...mockTimeLogs];
+const projects = [...mockProjects];
+const tasks = [...mockTasks];
+const logs = [...mockTimeLogs];
 let nextProjectId = projects.length + 1;
 let nextTaskId = tasks.length + 1;
 let nextLogId = logs.length + 1;

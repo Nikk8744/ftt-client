@@ -5,9 +5,10 @@ export const loginUser = async (credentials: UserLoginCredentials) => {
   try {
     const response = await apiClient.post('/user/login', credentials);
     
-    // Store the JWT token if it's returned from the backend
-    if (response.data.token) {
-      localStorage.setItem('auth-token', response.data.token);
+    // The backend sets cookies automatically with HttpOnly
+    // We'll also store the user data in localStorage for getCurrentUser function
+    if (response.data.user) {
+      localStorage.setItem('user', JSON.stringify(response.data.user));
     }
     
     return response.data;
@@ -37,9 +38,9 @@ export const getUserById = async (id: number) => {
   }
 };
 
-export const updateUser = async (data: UserUpdateData) => {
+export const updateUser = async (id: number, data: UserUpdateData) => {
   try {
-    const response = await apiClient.patch('/user/updateUser', data);
+    const response = await apiClient.patch(`/user/updateDetails/${id}`, data);
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error);
@@ -59,26 +60,40 @@ export const deleteUser = async (id: number) => {
 
 export const logoutUser = async () => {
   try {
-    // Remove JWT token from localStorage
+    // Call the backend logout endpoint to clear cookies
+    const response = await apiClient.post('/user/logout');
+    
+    // Also clear localStorage as a precaution
     localStorage.removeItem('auth-token');
     
-    // If your backend has a logout endpoint
-    const response = await apiClient.post('/user/logout');
     return response.data;
   } catch (error) {
     console.error('Logout error:', error);
     
-    // Even if the API call fails, we should still clear the local token
+    // Even if the API call fails, clear the localStorage
     localStorage.removeItem('auth-token');
+    
     throw error;
   }
 };
 
-// Get current user information
+// Get current user information - This should rely on the JWT token in cookies
 export const getCurrentUser = async () => {
   try {
-    const response = await apiClient.get('/user/current');
-    return response.data;
+    // According to the API guide, we can use the /user/getUser/:id endpoint
+    // But we need the ID of the current user
+    
+    // For the purpose of this app, since the JWT token in cookies contains user info,
+    // we'll just make a call to any authenticated endpoint which will use the token
+    // to identify the user. Then we'll use the response from login instead of 
+    // making an extra API call.
+    
+    // Just check if the authentication is valid
+    await apiClient.get('/user/logout');
+    
+    // Return the user from local auth state
+    const user = localStorage.getItem('user');
+    return user ? { user: JSON.parse(user) } : { user: null };
   } catch (error) {
     console.error('Error fetching current user:', error);
     throw error;

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Array of paths that don't require authentication
-const publicPaths = ['/login', '/register', '/forgot-password'];
+const publicPaths = ['/login', '/register', '/forgot-password', '/'];
 
 export function middleware(request: NextRequest) {
   // Check if the path is public
@@ -10,10 +10,12 @@ export function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   );
 
-  // Get the token from localStorage (only available in client components)
-  // In middleware, we need to use cookies instead
-  const token = request.cookies.get('auth-token')?.value;
-  const isAuthenticated = !!token;
+  // Get the token from cookies
+  // According to the API guide, the backend sets 'accessToken' and 'refreshToken' cookies
+  const token = request.cookies.get('accessToken')?.value;
+  // Fallback to our custom cookie if needed
+  const customToken = request.cookies.get('auth-token')?.value;
+  const isAuthenticated = !!(token || customToken);
 
   // If the user is on a protected path but not authenticated, redirect to login
   if (!isPublicPath && !isAuthenticated) {
@@ -21,7 +23,9 @@ export function middleware(request: NextRequest) {
   }
 
   // If the user is authenticated but tries to access login/register, redirect to dashboard
-  if (isAuthenticated && isPublicPath) {
+  if (isAuthenticated && isPublicPath && 
+      (request.nextUrl.pathname === '/login' || 
+       request.nextUrl.pathname === '/register')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

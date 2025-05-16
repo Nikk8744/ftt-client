@@ -1,27 +1,38 @@
 'use client';
 
-import { useEffect } from 'react';
-import { redirect, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import ClientLayout from '@/components/layout/ClientLayout';
 import useAuthStore from '@/store/auth';
+import { parseCookies } from 'nookies';
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user, login } = useAuthStore();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if the user is authenticated
-    const token = localStorage.getItem('auth-token');
+    // Check for authentication cookies
+    const cookies = parseCookies();
+    const hasAuthCookie = !!cookies['accessToken'] || !!cookies['auth-token'];
     
-    if (!isAuthenticated && !token) {
-      // Redirect to login if not authenticated
+    // If no auth in state but we have cookies, middleware should handle redirects
+    // If no auth in state and no cookies, redirect to login
+    if (!isAuthenticated && !hasAuthCookie) {
       router.push('/login');
     }
+    
+    setIsLoading(false);
   }, [isAuthenticated, router]);
+
+  // Don't render anything during loading to prevent flash of content
+  if (isLoading) {
+    return null;
+  }
 
   return <ClientLayout>{children}</ClientLayout>;
 } 
