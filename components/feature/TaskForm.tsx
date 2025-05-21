@@ -55,20 +55,24 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Get current user
-  useQuery({
+  const { data: userData } = useQuery({
     queryKey: ['currentUser'],
     queryFn: getCurrentUser,
-    onSuccess: (data) => {
-      setCurrentUser(data.user);
-    }
   });
+
+  // Update current user when data is loaded
+  useEffect(() => {
+    if (userData?.user) {
+      setCurrentUser(userData.user);
+    }
+  }, [userData]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
+    // watch,
     setValue,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -108,11 +112,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
   // Create task mutation
   const createTaskMutation = useMutation({
     mutationFn: async (data: TaskFormData) => {
-      const response = await createTask({ 
-        ...data, 
-        projectId
-      });
-      
+      const response = await createTask(projectId, data);
       // Create checklist items for the new task
       if (response.task && temporaryItems.length > 0) {
         const newTaskId = response.task.id;
@@ -121,7 +121,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
         );
         await Promise.all(promises);
       }
-      
       return response;
     },
     onSuccess: () => {

@@ -29,12 +29,19 @@ export default function useTimer() {
 
     if (isRunning && startTime) {
       interval = setInterval(() => {
-        const now = new Date();
-        const start = new Date(startTime);
-        const diffInSeconds = Math.floor((now.getTime() - start.getTime()) / 1000) + elapsedTime;
-        
-        updateElapsedTime(diffInSeconds);
-        setFormattedTime(formatDuration(diffInSeconds));
+        try {
+          const now = new Date();
+          const start = new Date(startTime);
+          // Only calculate the difference from the start time, don't add elapsed time
+          const diffInSeconds = Math.floor((now.getTime() - start.getTime()) / 1000);
+          
+          updateElapsedTime(diffInSeconds);
+          setFormattedTime(formatDuration(diffInSeconds));
+        } catch (err) {
+          console.error('Error updating timer:', err);
+          setError('Error updating timer');
+          stopTimer();
+        }
       }, 1000);
     } else if (!isRunning) {
       setFormattedTime(formatDuration(elapsedTime));
@@ -43,7 +50,7 @@ export default function useTimer() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, startTime, elapsedTime, updateElapsedTime]);
+  }, [isRunning, startTime, updateElapsedTime, stopTimer]);
 
   const handleStartTimer = async () => {
     try {

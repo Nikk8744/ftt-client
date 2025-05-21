@@ -8,16 +8,14 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { formatDate, formatDuration } from '@/lib/utils';
-import useTimer from '@/lib/hooks/useTimer';
 import useAuth from '@/lib/hooks/useAuth';
 import Link from 'next/link';
 import { Project, Task, TimeLog } from '@/types';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { isRunning, formattedTime } = useTimer();
 
-  // Fetch data for dashboard
+  // Fetch data for d ashboard
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: getAllProjectsOfUser,
@@ -92,23 +90,6 @@ export default function DashboardPage() {
       description="Track your time and manage your projects"
     >
       <div className="p-6">
-        {/* Active Timer Section */}
-        {isRunning && (
-          <Card className="mb-6 border-l-4 border-l-green-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between">
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">Active Timer</h2>
-                <p className="text-sm text-gray-500">Timer currently running</p>
-              </div>
-              <div className="mt-4 md:mt-0">
-                <div className="text-3xl font-mono font-medium text-green-600">
-                  {formattedTime}
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card>
@@ -168,7 +149,7 @@ export default function DashboardPage() {
                 >
                   <div className="flex flex-col h-full">
                     <div className="flex justify-between items-start">
-                      <h3 className="text-md font-medium text-gray-900">{task.name}</h3>
+                      <h3 className="text-md font-medium text-gray-900">{task.subject }</h3>
                       <Badge variant={getStatusBadgeVariant(task.status)}>
                         {task.status}
                       </Badge>

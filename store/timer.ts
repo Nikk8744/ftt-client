@@ -21,14 +21,27 @@ const useTimerStore = create<TimerState>()(
       activeLogId: null,
       startTime: null,
       elapsedTime: 0,
-      startTimer: (logId) => set({ 
-        isRunning: true,
-        activeLogId: logId,
-        startTime: new Date().toISOString(),
-        elapsedTime: 0
+      startTimer: (logId) => {
+        if (!logId) {
+          console.error('Invalid log ID provided to startTimer');
+          return;
+        }
+        set({ 
+          isRunning: true,
+          activeLogId: logId,
+          startTime: new Date().toISOString(),
+          elapsedTime: 0
+        });
+      },
+      stopTimer: () => set((state) => ({ 
+        isRunning: false,
+        activeLogId: state.activeLogId,
+        startTime: state.startTime
+      })),
+      updateElapsedTime: (seconds) => set((state) => {
+        if (!state.isRunning) return state;
+        return { elapsedTime: seconds };
       }),
-      stopTimer: () => set({ isRunning: false }),
-      updateElapsedTime: (seconds) => set({ elapsedTime: seconds }),
       resetTimer: () => set({ 
         isRunning: false,
         activeLogId: null,
@@ -38,6 +51,13 @@ const useTimerStore = create<TimerState>()(
     }),
     {
       name: 'timer-storage',
+      version: 1,
+      partialize: (state) => ({
+        isRunning: state.isRunning,
+        activeLogId: state.activeLogId,
+        startTime: state.startTime,
+        elapsedTime: state.elapsedTime,
+      }),
     }
   )
 );

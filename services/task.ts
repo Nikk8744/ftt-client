@@ -20,6 +20,7 @@ export const createTask = async (projectId: number, data: TaskCreateData) => {
 export const getUserTasks = async () => {
   try {
     const response = await apiClient.get('/tasks/getUserTasks');
+    console.log("🚀 ~ getUserTasks ~ response:", response)
     return {
       tasks: response.data.Users_tasks || []
     };

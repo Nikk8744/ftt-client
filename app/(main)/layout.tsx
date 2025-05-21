@@ -11,7 +11,7 @@ export default function MainLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { isAuthenticated, user, login } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 

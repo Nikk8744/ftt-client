@@ -43,7 +43,7 @@ export default function ProfilePage() {
 
   // Update user mutation
   const updateUserMutation = useMutation({
-    mutationFn: (data: UserUpdateData) => updateUser(data),
+    mutationFn: (data: UserUpdateData) => updateUser(Number(user?.id), data),
     onSuccess: (data) => {
       if (data.user) {
         updateUserInfo(data.user);

@@ -72,7 +72,7 @@ export default function TasksPage() {
   });
 
   // Status options for filter
-  const statusOptions = ['Not Started', 'In Progress', 'Done'];
+  const statusOptions = ['Pending', 'In Progress', 'Done'];
 
   // Get project name by ID
   const getProjectName = (projectId: number) => {
@@ -83,9 +83,9 @@ export default function TasksPage() {
   // Status badge color
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'Not Started':
+      case 'Pending':
         return 'secondary';
-      case 'In Progress':
+      case 'In-Progress':
         return 'warning';
       case 'Done':
         return 'success';

@@ -24,6 +24,7 @@ import {
 } from '@/services/projectMember';
 import useAuth from '@/lib/hooks/useAuth';
 import { formatDate, formatRelativeTime } from '@/lib/utils';
+import TaskForm from '@/components/feature/TaskForm';
 
 // Form validation schemas
 const projectSchema = z.object({
@@ -483,20 +484,11 @@ export default function ProjectDetailsPage() {
 
       {/* Add Task Modal */}
       {isAddTaskModalOpen && (
-        <Modal
+        <TaskForm
+          projectId={Number(projectId)}
           isOpen={isAddTaskModalOpen}
           onClose={() => setIsAddTaskModalOpen(false)}
-          title="Add Task"
-        >
-          {/* Task creation form would go here */}
-          <p>Task creation form would go here...</p>
-          <div className="flex justify-end gap-2 mt-6">
-            <Button variant="outline" onClick={() => setIsAddTaskModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary">Create Task</Button>
-          </div>
-        </Modal>
+        />
       )}
     </PageWrapper>
   );

@@ -18,11 +18,11 @@ import { Project, Task, TimeLog, TimeLogUpdateData } from '@/types';
 // Form validation schema
 const timeLogSchema = z.object({
   description: z.string().max(1000).optional(),
-  projectId: z.number().transform(val => val ? Number(val) : null).optional(),
-  taskId: z.number().transform(val => val ? Number(val) : null).optional(),
-  timeSpent: z.number().transform(val => val ? Number(val) : null).optional(),
-  duration: z.number().transform(val => val ? Number(val) : null).optional(),
-  userId: z.number().transform(val => val ? Number(val) : null).optional(),
+  projectId: z.number().nullable().optional(),
+  taskId: z.number().nullable().optional(),
+  timeSpent: z.number().nullable().optional(),
+  duration: z.number().nullable().optional(),
+  userId: z.number().nullable().optional(),
   name: z.string().optional(),
   startTime: z.string().optional(),
   endTime: z.string().optional(),
@@ -115,8 +115,8 @@ export default function LogsPage() {
     resolver: zodResolver(timeLogSchema),
     defaultValues: {
       description: selectedLog?.description || '',
-      projectId: selectedLog?.projectId ? Number(selectedLog.projectId) : 0,
-      taskId: selectedLog?.taskId ? Number(selectedLog.taskId) : 0,
+      projectId: selectedLog?.projectId ? Number(selectedLog.projectId) : undefined,
+      taskId: selectedLog?.taskId ? Number(selectedLog.taskId) : undefined,
       startTime: selectedLog?.startTime || '',
       endTime: selectedLog?.endTime || '',
     }

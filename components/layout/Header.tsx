@@ -53,9 +53,10 @@ const Header: React.FC = () => {
     : [];
 
   const handleStopTimer = () => {
+    if (!selectedTask) return; // Require task selection
     stopTimer({
       projectId: selectedProject || undefined,
-      taskId: selectedTask || undefined,
+      taskId: selectedTask,
       description: description.trim() || undefined
     });
     setIsStopTimerModalOpen(false);
@@ -148,7 +149,7 @@ const Header: React.FC = () => {
               variant="primary"
               onClick={handleStopTimer}
               isLoading={timerIsLoading}
-              disabled={timerIsLoading}
+              disabled={timerIsLoading || !selectedTask}
             >
               Stop Timer
             </Button>
@@ -178,7 +179,7 @@ const Header: React.FC = () => {
 
           <div>
             <label htmlFor="task" className="block text-sm font-medium text-gray-700 mb-1">
-              Task (optional)
+              Task <span className="text-red-500">*</span>
             </label>
             <select
               id="task"
@@ -186,6 +187,7 @@ const Header: React.FC = () => {
               value={selectedTask || ''}
               onChange={(e) => setSelectedTask(e.target.value ? Number(e.target.value) : null)}
               disabled={!selectedProject || tasksLoading}
+              required
             >
               <option value="">Select Task</option>
               {filteredTasks.map((task) => (
