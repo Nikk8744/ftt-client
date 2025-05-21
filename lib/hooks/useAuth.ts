@@ -8,7 +8,7 @@ import { UserLoginCredentials, UserRegistrationData, User } from '@/types';
 
 export default function useAuth() {
   const router = useRouter();
-  const { isAuthenticated, user, login, logout, setIsLoading, setError, error } = useAuthStore();
+  const { isAuthenticated, user, login, logout, updateUser, setIsLoading, setError, error } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async (credentials: UserLoginCredentials) => {
@@ -79,7 +79,7 @@ export default function useAuth() {
   };
 
   const updateUserInfo = (updatedUser: User) => {
-    login(updatedUser);
+    updateUser(updatedUser);
   };
 
   return {

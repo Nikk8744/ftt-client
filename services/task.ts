@@ -5,6 +5,7 @@ import apiClient from './api-client';
  * Create a new task within a project
  */
 export const createTask = async (projectId: number, data: TaskCreateData) => {
+  console.log("🚀 ~ createTask ~ data:", data)
   try {
     const response = await apiClient.post(`/tasks/createTask/${projectId}`, data);
     return response.data;

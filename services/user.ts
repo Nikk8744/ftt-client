@@ -41,6 +41,10 @@ export const getUserById = async (id: number) => {
 export const updateUser = async (id: number, data: UserUpdateData) => {
   try {
     const response = await apiClient.patch(`/user/updateDetails/${id}`, data);
+    // Update localStorage with the new user data
+    if (response.data.user) {
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error);
@@ -80,20 +84,16 @@ export const logoutUser = async () => {
 // Get current user information - This should rely on the JWT token in cookies
 export const getCurrentUser = async () => {
   try {
-    // According to the API guide, we can use the /user/getUser/:id endpoint
-    // But we need the ID of the current user
-    
-    // For the purpose of this app, since the JWT token in cookies contains user info,
-    // we'll just make a call to any authenticated endpoint which will use the token
-    // to identify the user. Then we'll use the response from login instead of 
-    // making an extra API call.
-    
-    // Just check if the authentication is valid
-    await apiClient.get('/user/logout');
-    
-    // Return the user from local auth state
-    const user = localStorage.getItem('user');
-    return user ? { user: JSON.parse(user) } : { user: null };
+    // Get the current user's ID from localStorage
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      return { user: null };
+    }
+
+    const { id } = JSON.parse(storedUser);
+    // Use the getUserById function to fetch fresh user data
+    const response = await getUserById(id);
+    return response;
   } catch (error) {
     console.error('Error fetching current user:', error);
     throw error;

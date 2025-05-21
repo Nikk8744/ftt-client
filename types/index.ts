@@ -5,7 +5,7 @@ export interface User {
   userName: string;
   email: string;
   role: 'user' | 'admin';
-  createdAt: string;
+  created_at: string;
 }
 
 export interface UserLoginCredentials {

@@ -6,7 +6,7 @@ import { createTask, updateTask } from '@/services/task';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Task, User } from '@/types';
+import { Task, User, TaskCreateData } from '@/types';
 import { useState, useEffect } from 'react';
 import { 
   getTaskChecklist,
@@ -16,6 +16,7 @@ import {
 } from '@/services/taskChecklist';
 import { getCurrentUser } from '@/services/user';
 import Avatar from '@/components/ui/Avatar';
+import axios from 'axios';
 
 // Form validation schema
 const taskSchema = z.object({
@@ -80,7 +81,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
       subject: task?.subject || '',
       description: task?.description || '',
       status: task?.status || 'Pending',
-      dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+      // dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+      dueDate: task?.dueDate ? task.dueDate : '',
       assignedUserId: task?.assignedUserId || currentUser?.id,
     },
   });
@@ -112,16 +114,38 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
   // Create task mutation
   const createTaskMutation = useMutation({
     mutationFn: async (data: TaskFormData) => {
-      const response = await createTask(projectId, data);
-      // Create checklist items for the new task
-      if (response.task && temporaryItems.length > 0) {
-        const newTaskId = response.task.id;
-        const promises = temporaryItems.map(item => 
-          addChecklistItem({ taskId: newTaskId, item: item.text })
-        );
-        await Promise.all(promises);
+      // Ensure all required fields are present and properly formatted
+      const taskData: TaskCreateData = {
+        subject: data.subject.trim(),
+        description: data.description?.trim() || undefined,
+        status: data.status || 'Pending',
+        dueDate: data.dueDate || undefined,
+        assignedUserId: data.assignedUserId || currentUser?.id
+      };
+
+      // Log the data being sent
+      console.log('Creating task with data:', taskData);
+
+      try {
+        const response = await createTask(projectId, taskData);
+        console.log('Task creation response:', response);
+
+        // Create checklist items for the new task
+        if (response.task && temporaryItems.length > 0) {
+          const newTaskId = response.task.id;
+          const promises = temporaryItems.map(item => 
+            addChecklistItem({ taskId: newTaskId, item: item.text })
+          );
+          await Promise.all(promises);
+        }
+        return response;
+      } catch (error) {
+        console.error('Error in task creation:', error);
+        if (axios.isAxiosError(error) && error.response) {
+          console.error('Error response:', error.response.data);
+        }
+        throw error;
       }
-      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -129,6 +153,12 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
       reset();
       setTemporaryItems([]);
     },
+    onError: (error) => {
+      console.error('Error creating task:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Error response data:', error.response.data);
+      }
+    }
   });
 
   // Update task mutation

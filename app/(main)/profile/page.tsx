@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUser } from '@/services/user';
 import useAuth from '@/lib/hooks/useAuth';
 import Card from '@/components/ui/Card';
@@ -24,6 +24,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
   const { user, updateUserInfo } = useAuth();
+  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   
   // Form setup
@@ -44,9 +45,11 @@ export default function ProfilePage() {
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: (data: UserUpdateData) => updateUser(Number(user?.id), data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.user) {
         updateUserInfo(data.user);
+        await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+        await queryClient.refetchQueries({ queryKey: ['currentUser'] });
       }
       setIsEditing(false);
     },
@@ -68,6 +71,7 @@ export default function ProfilePage() {
   const onSubmit = (data: ProfileFormData) => {
     updateUserMutation.mutate(data);
   };
+  console.log(user);
 
   if (!user) {
     return <div>Loading profile...</div>;
@@ -124,7 +128,7 @@ export default function ProfilePage() {
                     <div className="py-3 grid grid-cols-3 gap-4">
                       <dt className="text-sm font-medium text-gray-500">Member Since</dt>
                       <dd className="text-sm text-gray-900 col-span-2">
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {new Date(user.created_at).toLocaleDateString()}
                       </dd>
                     </div>
                   </dl>

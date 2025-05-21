@@ -13,7 +13,7 @@ import { Project, Task } from '@/types';
 import Link from 'next/link';
 import TaskForm from '@/components/feature/TaskForm';
 import { ConfirmModal } from '@/components/ui/Modal';
-import Modal from '@/components/ui/Modal';
+// import Modal from '@/components/ui/Modal';
 
 export default function TasksPage() {
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
@@ -43,7 +43,7 @@ export default function TasksPage() {
 
   // Update task status mutation
   const updateTaskMutation = useMutation({
-    mutationFn: (data: { id: number; status: string }) => 
+    mutationFn: (data: { id: number; status: "Pending" | "In-Progress" | "Done" }) => 
       updateTask(data.id, { status: data.status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -209,7 +209,7 @@ export default function TasksPage() {
                         <span>Due: {task.dueDate ? formatDate(task.dueDate) : 'No deadline'}</span>
                       </div>
                     </div>
-                    <Badge variant={getStatusBadgeVariant(task.status)} className="ml-2">
+                    <Badge variant={getStatusBadgeVariant(task.status || 'Pending')} className="ml-2">
                       {task.status}
                     </Badge>
                   </div>

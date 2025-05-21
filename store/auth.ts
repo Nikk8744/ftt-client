@@ -11,7 +11,7 @@ interface AuthState {
   error: string | null;
   login: (user: User) => void;
   logout: () => void;
-  setUser: (user: User) => void;
+  updateUser: (user: User) => void;
   setIsLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
 }
@@ -25,7 +25,7 @@ const useAuthStore = create<AuthState>()(
       error: null,
       login: (user) => set({ isAuthenticated: true, user, error: null }),
       logout: () => set({ isAuthenticated: false, user: null }),
-      setUser: (user) => set({ user }),
+      updateUser: (user) => set({ user, isAuthenticated: true }),
       setIsLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
     }),
