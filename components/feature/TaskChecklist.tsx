@@ -7,7 +7,7 @@ import {
   removeChecklistItem 
 } from '@/services/taskChecklist';
 import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
+// import Card from '@/components/ui/Card';
 import { ConfirmModal } from '@/components/ui/Modal';
 
 interface ChecklistItem {

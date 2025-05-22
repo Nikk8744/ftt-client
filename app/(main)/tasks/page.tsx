@@ -18,8 +18,7 @@ import { ConfirmModal } from '@/components/ui/Modal';
 export default function TasksPage() {
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  // Add state for modals
-  const [createTaskModalOpen, setCreateTaskModalOpen] = useState(false);
+  // Remove create task modal state
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
   const [deleteTaskModalOpen, setDeleteTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -170,13 +169,6 @@ export default function TasksPage() {
             <h2 className="text-lg font-medium text-gray-900">
               {filteredTasks.length} {filteredTasks.length === 1 ? 'Task' : 'Tasks'}
             </h2>
-            <Button 
-              variant="primary" 
-              className="bg-gradient-to-r from-indigo-600 to-purple-600"
-              onClick={() => setCreateTaskModalOpen(true)}
-            >
-              Create New Task
-            </Button>
           </div>
 
           {tasksLoading ? (
@@ -184,12 +176,9 @@ export default function TasksPage() {
           ) : filteredTasks.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">No tasks found matching your criteria.</p>
-              <Button 
-                variant="outline"
-                onClick={() => setCreateTaskModalOpen(true)}
-              >
-                Create your first task
-              </Button>
+              <p className="text-sm text-gray-500">
+                To create a new task, please go to a project and use the &quot;Add Task&quot; button there.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -259,15 +248,6 @@ export default function TasksPage() {
           )}
         </div>
       </div>
-
-      {/* Create Task Modal */}
-      {createTaskModalOpen && (
-        <TaskForm 
-          projectId={selectedProject || 1} // Default to first project if none selected
-          isOpen={createTaskModalOpen}
-          onClose={() => setCreateTaskModalOpen(false)}
-        />
-      )}
 
       {/* Edit Task Modal */}
       {editTaskModalOpen && selectedTask && (
