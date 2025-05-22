@@ -71,7 +71,7 @@ export default function TasksPage() {
   });
 
   // Status options for filter
-  const statusOptions = ['Pending', 'In Progress', 'Done'];
+  const statusOptions = ['Pending', 'In-Progress', 'Done'];
 
   // Get project name by ID
   const getProjectName = (projectId: number) => {
