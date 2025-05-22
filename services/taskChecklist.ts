@@ -1,5 +1,5 @@
 import apiClient from './api-client';
-import { ChecklistItemCreateData, ChecklistItemUpdateData } from '@/types';
+// import { ChecklistItemCreateData, ChecklistItemUpdateData } from '@/types';
 
 /**
  * Get all checklist items for a task

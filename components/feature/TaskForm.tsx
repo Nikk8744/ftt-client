@@ -130,9 +130,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
       };
 
       // Log the data being sent
-      console.log('Creating task with form data:', data);
-      console.log('Creating task with formatted data:', taskData);
-      console.log('Current user:', currentUser);
+      // console.log('Creating task with form data:', data);
+      // console.log('Creating task with formatted data:', taskData);
+      // console.log('Current user:', currentUser);
 
       try {
         const response = await createTask(projectId, taskData);
