@@ -20,11 +20,17 @@ import axios from 'axios';
 
 // Form validation schema
 const taskSchema = z.object({
-  subject: z.string().min(1, 'Task subject is required'),
+  subject: z.string().min(3, 'Task subject must be at least 3 characters').max(50, 'Task subject must be less than 50 characters'),
   description: z.string().optional(),
   status: z.enum(['Pending', 'In-Progress', 'Done']),
-  dueDate: z.string().optional(),
-  assignedUserId: z.number().optional(),
+  dueDate: z.string()
+    .refine(
+      (val) => !val || !isNaN(Date.parse(val)),
+      { message: 'Invalid datetime' }
+    )
+    .transform((val) => val ? new Date(val).toISOString() : undefined)
+    .optional(),
+  assignedUserId: z.number().int().positive().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -119,12 +125,14 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
         subject: data.subject.trim(),
         description: data.description?.trim() || undefined,
         status: data.status || 'Pending',
-        dueDate: data.dueDate || undefined,
+        dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
         assignedUserId: data.assignedUserId || currentUser?.id
       };
 
       // Log the data being sent
-      console.log('Creating task with data:', taskData);
+      console.log('Creating task with form data:', data);
+      console.log('Creating task with formatted data:', taskData);
+      console.log('Current user:', currentUser);
 
       try {
         const response = await createTask(projectId, taskData);
@@ -141,8 +149,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
         return response;
       } catch (error) {
         console.error('Error in task creation:', error);
-        if (axios.isAxiosError(error) && error.response) {
-          console.error('Error response:', error.response.data);
+        if (axios.isAxiosError(error)) {
+          console.error('Error response:', error.response?.data);
+          // Throw a more descriptive error
+          throw new Error(error.response?.data?.message || 'Failed to create task');
         }
         throw error;
       }
@@ -155,8 +165,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
     },
     onError: (error) => {
       console.error('Error creating task:', error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Error response data:', error.response.data);
+      if (axios.isAxiosError(error)) {
+        console.error('Error response data:', error.response?.data);
       }
     }
   });
@@ -261,6 +271,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
   };
 
   const onSubmit = (data: TaskFormData) => {
+    console.log('Form submitted with data:', data);
     if (isEditMode) {
       updateTaskMutation.mutate(data);
     } else {
@@ -297,7 +308,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
           label="Task Name"
           fullWidth
           error={errors.subject?.message}
-          {...register('subject')}
+          {...register('subject', {
+            required: 'Task subject is required',
+            minLength: {
+              value: 3,
+              message: 'Task subject must be at least 3 characters'
+            },
+            maxLength: {
+              value: 50,
+              message: 'Task subject must be less than 50 characters'
+            }
+          })}
         />
 
         <div>
@@ -340,11 +361,14 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, task, isOpen, onClose })
             Due Date
           </label>
           <input
-            type="date"
+            type="datetime-local"
             id="dueDate"
             className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
             {...register('dueDate')}
           />
+          {errors.dueDate && (
+            <p className="mt-1 text-sm text-red-600">{errors.dueDate.message}</p>
+          )}
         </div>
 
         {/* Assignee Selection */}

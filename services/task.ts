@@ -1,16 +1,32 @@
 import { TaskCreateData, TaskUpdateData } from '@/types';
 import apiClient from './api-client';
+import axios from 'axios';
 
 /**
  * Create a new task within a project
  */
 export const createTask = async (projectId: number, data: TaskCreateData) => {
-  console.log("🚀 ~ createTask ~ data:", data)
+  // Log the full request details
+  console.log("🚀 ~ createTask ~ projectId:", projectId);
+  console.log("🚀 ~ createTask ~ data:", data);
+  
+  const requestData = {
+    ...data,
+    projectId
+  };
+  console.log("🚀 ~ createTask ~ requestData:", requestData);
+
   try {
-    const response = await apiClient.post(`/tasks/createTask/${projectId}`, data);
+    const response = await apiClient.post(`/tasks/createTask/${projectId}`, requestData);
+    console.log("🚀 ~ createTask ~ response:", response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating task:', error);
+    if (axios.isAxiosError(error) && error.response) {
+      console.error('Error response data:', error.response.data);
+      console.error('Error response status:', error.response.status);
+      console.error('Error response headers:', error.response.headers);
+    }
     throw error;
   }
 };
