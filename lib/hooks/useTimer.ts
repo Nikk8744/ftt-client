@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import useTimerStore from '@/store/timer';
-import { addMockLog, updateMockLog } from '@/lib/mockData';
-// Comment out API imports
-// import { startTimeLog, stopTimeLog } from '@/services/log';
+import { startTimeLog, stopTimeLog } from '@/services/log';
 import { formatDuration } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function useTimer() {
   const { 
@@ -22,6 +21,8 @@ export default function useTimer() {
   const [formattedTime, setFormattedTime] = useState<string>('00:00:00');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const queryClient = useQueryClient();
 
   // Calculate elapsed time and update it every second
   useEffect(() => {
@@ -50,61 +51,61 @@ export default function useTimer() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, startTime, updateElapsedTime, stopTimer]);
+  }, [isRunning, startTime, updateElapsedTime, stopTimer, elapsedTime]);
 
   const handleStartTimer = async () => {
     try {
       setIsLoading(true);
       setError(null);
       
-      // Mock the startTimeLog API call
-      // const response = await startTimeLog();
-      const newLog = addMockLog({
-        userId: 1,
-        startTime: new Date().toISOString(),
-        endTime: null,
-        duration: null,
-      });
+      // Call the actual API to start a time log
+      const response = await startTimeLog();
       
-      const newLogId = newLog.id;
-      
-      startTimer(newLogId);
-      setIsLoading(false);
-      
-      return { log: newLog };
+      if (response.data) {
+        startTimer(response.data.id);
+        setIsLoading(false);
+        return { log: response.data };
+      } else {
+        throw new Error('Failed to start timer - no data received');
+      }
     } catch (err) {
       setError('Failed to start timer');
       setIsLoading(false);
       console.error('Error starting timer:', err);
+      throw err;
     }
   };
 
-  const handleStopTimer = async (data?: { projectId?: number; taskId?: number; description?: string }) => {
+  const handleStopTimer = async (data: { projectId: number; taskId: number; description?: string }) => {
     try {
-      if (!activeLogId) return;
+      if (!activeLogId) {
+        throw new Error('No active timer to stop');
+      }
       
       setIsLoading(true);
       setError(null);
       
-      // Mock the stopTimeLog API call
-      // await stopTimeLog(activeLogId, data);
-      const now = new Date();
-      const endTime = now.toISOString();
-      
-      const updatedLog = updateMockLog(activeLogId, {
-        ...data,
-        endTime,
-        duration: Math.floor(elapsedTime), // Use elapsed time from store
+      // Call the actual API to stop the time log
+      const response = await stopTimeLog(activeLogId, {
+        projectId: data.projectId,
+        taskId: data.taskId,
+        ...(data.description && { description: data.description })
       });
       
-      stopTimer();
-      setIsLoading(false);
-      
-      return { log: updatedLog };
+      if (response.data) {
+        stopTimer();
+        setIsLoading(false);
+        handleResetTimer();
+        queryClient.invalidateQueries({ queryKey: ['logs'] });
+        return { log: response.data };
+      } else {
+        throw new Error('Failed to stop timer - no data received');
+      }
     } catch (err) {
       setError('Failed to stop timer');
       setIsLoading(false);
       console.error('Error stopping timer:', err);
+      throw err;
     }
   };
 
@@ -117,7 +118,7 @@ export default function useTimer() {
     isRunning,
     activeLogId,
     formattedTime,
-    elapsedTime,
+    elapsedTime,  
     isLoading,
     error,
     startTimer: handleStartTimer,

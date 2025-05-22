@@ -72,6 +72,7 @@ export default function LogsPage() {
   const logs = logsData?.logs || [];
   const projects = projectsData?.projects || [];
   const tasks = tasksData?.tasks || [];
+  console.log("🚀 ~ LogsPage ~ tasks:", tasks)
 
   // Selected log for editing
   const selectedLog = editLogId ? logs.find((log: TimeLog) => log.id === editLogId) : null;
@@ -325,7 +326,8 @@ export default function LogsPage() {
                       {log.projectId ? projects.find((p: Project) => p.id === log.projectId)?.name || 'Unknown Project' : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {log.taskId ? tasks.find((t: Task) => t.id === log.taskId)?.name || 'Unknown Task' : '-'}
+                      
+                      {log.taskId ? tasks.find((t: Task) => t.id === log.taskId)?.subject || 'Unknown Task' : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {log.duration ? formatDuration(log.duration) : 'In Progress'}
