@@ -27,7 +27,6 @@ export const AvatarCircles = ({
           rel="noopener noreferrer"
         >
           <img
-            key={index}
             className="h-10 w-10 rounded-full border-2 border-white dark:border-gray-800"
             src={url.imageUrl}
             width={40}

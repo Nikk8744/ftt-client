@@ -18,7 +18,7 @@ export default function CTASection() {
             href="/register" 
             className="rounded-md bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:inline-flex sm:items-center"
           >
-            Get Started - It's Free
+            Get Started - It&apos; Free
           </Link>
           <Link 
             href="#how-it-works" 
