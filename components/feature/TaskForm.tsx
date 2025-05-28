@@ -543,7 +543,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
                   </svg>
                 </Button>
               </>
-            )}
+            )}  
           </div>
         ))}
         

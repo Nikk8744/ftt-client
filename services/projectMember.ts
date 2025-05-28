@@ -35,6 +35,7 @@ export const removeMemberFromProject = async (projectId: number, userId: number)
  * Get all members of a project
  */
 export const getAllMembersOfProject = async (projectId: number) => {
+  console.log("helllo", projectId)
   try {
     const response = await apiClient.get(`/projectMember/getAllMembers/${projectId}`);
     console.log(response.data);
@@ -57,11 +58,6 @@ export const getAllProjectsUserIsMemberOf = async () => {
     throw error;
   }
 };
-
-// ----------------------------------------------
-// Alias functions for team members (for backward compatibility)
-// These functions have the same functionality but with more intuitive names
-// ----------------------------------------------
 
 /**
  * Get all team members for a project

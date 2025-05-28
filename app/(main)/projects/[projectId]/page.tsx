@@ -268,7 +268,11 @@ export default function ProjectDetailsPage() {
                   </div>
                 </Card>
               ) : (
-                <TaskList tasks={tasks} projectId={Number(projectId)} />
+                <TaskList 
+                  tasks={tasks} 
+                  projectId={Number(projectId)} 
+                  isProjectOwner={isOwner}
+                />
               )}
             </div>
           </div>

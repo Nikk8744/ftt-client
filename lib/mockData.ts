@@ -8,7 +8,7 @@ export const mockUser: User = {
   userName: 'testuser',
   email: 'test@example.com',
   role: 'user',
-  createdAt: new Date().toISOString(),
+  created_at: new Date().toISOString(),
 };
 
 // Mock Projects
@@ -201,6 +201,7 @@ export const mockTimeLogs: TimeLog[] = [
     projectId: 1,
     taskId: 1,
     duration: 10800, // 3 hours in seconds
+    timeSpent: 0,
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -212,6 +213,7 @@ export const mockTimeLogs: TimeLog[] = [
     userId: 1,
     projectId: 1,
     taskId: 2,
+    timeSpent: 0,
     duration: 14400, // 4 hours in seconds
     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -224,6 +226,7 @@ export const mockTimeLogs: TimeLog[] = [
     userId: 1,
     projectId: 2,
     taskId: 3,
+    timeSpent: 0,
     duration: 7200, // 2 hours in seconds
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
@@ -236,6 +239,7 @@ export const mockTimeLogs: TimeLog[] = [
     userId: 1,
     projectId: 2,
     taskId: 4,
+    timeSpent: 0,
     duration: 10800, // 3 hours in seconds
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -248,6 +252,7 @@ export const mockTimeLogs: TimeLog[] = [
     userId: 1,
     projectId: 3,
     taskId: 5,
+    timeSpent: 0,
     duration: 14400, // 4 hours in seconds
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
