@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAllProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
-import { getUserLogs } from '@/services/log';
+import { getUserLogs, getTotalTimeToday } from '@/services/log';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import PageWrapper from '@/components/layout/PageWrapper';
@@ -31,26 +31,19 @@ export default function DashboardPage() {
     queryFn: getUserLogs,
   });
 
+  const { data: totalTimeTodayData, isLoading: totalTimeTodayLoading } = useQuery({
+    queryKey: ['totalTimeToday'],
+    queryFn: getTotalTimeToday,
+  });
+
   const projects = projectsData?.projects || [];
   const tasks = tasksData?.tasks || [];
   const logs = logsData?.logs || [];
+  const totalTimeToday = totalTimeTodayData?.data.totalTimeSpent || 0;
 
   // Filter recent logs based on time frame
   const recentLogs = logs.slice(0, 5);
   
-  // Calculate total time today
-  const totalTimeToday = logs
-    .filter((log: TimeLog) => {
-      const logDate = new Date(log.startTime);
-      const today = new Date();
-      return (
-        logDate.getDate() === today.getDate() &&
-        logDate.getMonth() === today.getMonth() &&
-        logDate.getFullYear() === today.getFullYear()
-      );
-    })
-    .reduce((total: number, log: TimeLog) => total + (log.duration || 0), 0);
-
   // Get recent tasks that are not done
   const recentTasks = tasks
     .filter((task: Task) => task.status !== 'Done')
@@ -120,7 +113,7 @@ export default function DashboardPage() {
                 Time Today
               </h3>
               <div className="mt-2 text-3xl font-bold text-gray-900">
-                {logsLoading ? '...' : formatDuration(totalTimeToday)}
+                {totalTimeTodayLoading ? '...' : formatDuration(totalTimeToday)}
               </div>
             </div>
           </Card>
@@ -216,7 +209,7 @@ export default function DashboardPage() {
                         {projects.find((p: Project) => p.id === log.projectId)?.name || 'No Project'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {tasks.find((t: Task) => t.id === log.taskId)?.name || 'No Task'}
+                        {tasks.find((t: Task) => t.id === log.taskId)?.subject || 'No Task'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {log.duration ? formatDuration(log.duration) : 'In Progress'}

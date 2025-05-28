@@ -294,259 +294,286 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isEditMode ? "Edit Task" : "Create Task"}
-      footer={
-        <>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSubmit(onSubmit)}
-            isLoading={isPending}
-            disabled={isPending}
-          >
-            {isEditMode ? "Save" : "Create"}
-          </Button>
-        </>
-      }
-    >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input
-          id="subject"
-          label="Task Name"
-          placeholder="Enter task name..."
-          fullWidth
-          error={errors.subject?.message}
-          {...register("subject", {
-            required: "Task subject is required",
-            minLength: {
-              value: 3,
-              message: "Task subject must be at least 3 characters",
-            },
-            maxLength: {
-              value: 50,
-              message: "Task subject must be less than 50 characters",
-            },
-          })}
+  isOpen={isOpen}
+  onClose={onClose}
+  title={isEditMode ? "Edit Task" : "Create New Task"} // Slightly more descriptive title
+  footer={
+    <>
+      <Button variant="outline" onClick={onClose} className="mr-2"> {/* Added margin for spacing */}
+        Cancel
+      </Button>
+      <Button
+        variant="primary" // Assuming this is your main purple button
+        onClick={handleSubmit(onSubmit)}
+        isLoading={isPending}
+        disabled={isPending}
+      >
+        {isEditMode ? "Save Changes" : "Create Task"} {/* More descriptive button text */}
+      </Button>
+    </>
+  }
+>
+  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-1"> {/* Increased space-y and slight padding for form content */}
+    {/* Task Name */}
+    <Input
+      id="subject"
+      label="Task Name"
+      placeholder="e.g., Finalize Q3 report"
+      fullWidth
+      error={errors.subject?.message}
+      // Assuming Input component internally uses modern styling (rounded-lg, consistent py-2 px-3, focus:ring-purple-500 etc.)
+      {...register("subject", {
+        required: "Task name is required",
+        minLength: {
+          value: 3,
+          message: "Task name must be at least 3 characters",
+        },
+        maxLength: {
+          value: 70, // Slightly increased max length
+          message: "Task name must be less than 70 characters",
+        },
+      })}
+    />
+
+    {/* Description */}
+    <div>
+      <label
+        htmlFor="description"
+        className="block text-sm font-medium text-gray-700 mb-1.5" // Slightly more margin
+      >
+        Description (Optional)
+      </label>
+      <textarea
+        id="description"
+        rows={4} // Increased rows for more space
+        placeholder="Add more details about the task..."
+        className={`w-full rounded-lg border ${ // Using rounded-lg
+          errors.description ? "border-red-500 ring-1 ring-red-500" : "border-gray-300" // Added ring for error
+        } shadow-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 py-2 px-3 transition-colors duration-150 ease-in-out`}
+        {...register("description")}
+      />
+      {errors.description && (
+        <p className="mt-1.5 text-sm text-red-600"> {/* Slightly more margin */}
+          {errors.description.message}
+        </p>
+      )}
+    </div>
+
+    {/* Status and Due Date */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6"> {/* Adjusted gap for mobile */}
+      <div>
+        <label
+          htmlFor="status"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
+          Status
+        </label>
+        <select
+          id="status"
+          className="w-full rounded-lg border border-gray-300 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 bg-white" // Added bg-white, increased py
+          {...register("status")}
+        >
+          <option value="Pending">Not Started</option>
+          <option value="In-Progress">In Progress</option>
+          <option value="Done">Completed</option>
+        </select>
+      </div>
+
+      <div>
+        <label
+          htmlFor="dueDate"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
+          Due Date (Optional)
+        </label>
+        <input
+          type="datetime-local"
+          id="dueDate"
+          className="w-full rounded-lg border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500" // Matched select padding, py-2
+          {...register("dueDate")}
         />
+      </div>
+    </div>
 
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            rows={3}
-            placeholder="Add description..."
-            className={`w-full rounded-md border ${
-              errors.description ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-            {...register("description")}
-          />
-          {errors.description && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.description.message}
-            </p>
-          )}
+    {/* Assignee */}
+    {currentUser && (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          Assignee
+        </label>
+        <div className="flex items-center space-x-3 border border-gray-200 rounded-lg p-2.5 bg-gray-50 shadow-sm"> {/* Softer border, more padding, shadow */}
+          <Avatar name={currentUser.name} size="sm" /> {/* Assuming Avatar is styled */}
+          <span className="text-sm font-medium text-gray-800">{currentUser.name}</span>
         </div>
+        <input
+          type="hidden"
+          {...register("assignedUserId", { valueAsNumber: true })}
+        />
+      </div>
+    )}
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label
-              htmlFor="status"
-              className="block text-sm font-medium text-gray-700 mb-1"
+    {/* Checklist */}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Checklist
+      </label>
+
+      <div className="flex gap-2 mb-3 items-center">
+        <input
+          type="text"
+          value={newItemText}
+          onChange={(e) => setNewItemText(e.target.value)}
+          placeholder="Add checklist item..."
+          className="flex-grow rounded-lg border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
+          onKeyDown={(e) => { if (e.key === 'Enter' && newItemText.trim()) { handleAddItem(e); e.preventDefault(); } }} // Add item on Enter
+        />
+        <Button
+          variant="outline" // Assuming this is a subtle button (e.g. gray/purple outline)
+          onClick={handleAddItem}
+          disabled={!newItemText.trim()}
+          className="px-4 py-2 text-sm" // Explicit padding for consistency
+        >
+          Add
+        </Button>
+      </div>
+
+      <div className="space-y-2.5 max-h-40 overflow-y-auto p-0.5"> {/* Increased max-h, added p-0.5 for scrollbar space */}
+        {/* Existing Checklist Items (Edit Mode) */}
+        {isEditMode &&
+          checklistItems.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg shadow-sm border border-slate-200" // Increased gap, softer bg, padding
             >
-              Status
-            </label>
-            <select
-              id="status"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              {...register("status")}
-            >
-              <option value="Pending">Not Started</option>
-              <option value="In-Progress">In Progress</option>
-              <option value="Done">Completed</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="dueDate"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Due Date
-            </label>
-            <input
-              type="datetime-local"
-              id="dueDate"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              {...register("dueDate")}
-            />
-          </div>
-        </div>
-
-        {currentUser && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Assignee
-            </label>
-            <div className="flex items-center space-x-2 border border-gray-300 rounded-md p-2 bg-gray-50">
-              <Avatar name={currentUser.name} size="sm" />
-              <span className="text-sm font-medium">{currentUser.name}</span>
-            </div>
-            <input
-              type="hidden"
-              {...register("assignedUserId", { valueAsNumber: true })}
-            />
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Checklist
-          </label>
-
-          <div className="flex gap-2 mb-3">
-            <input
-              type="text"
-              value={newItemText}
-              onChange={(e) => setNewItemText(e.target.value)}
-              placeholder="Add checklist item..."
-              className="flex-grow rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            />
-            <Button
-              variant="outline"
-              onClick={handleAddItem}
-              disabled={!newItemText.trim()}
-            >
-              Add
-            </Button>
-          </div>
-
-          <div className="space-y-2 max-h-32 overflow-y-auto">
-            {isEditMode &&
-              checklistItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-2 bg-gray-50 p-2 rounded-md"
-                >
-                  <input
-                    type="checkbox"
-                    checked={!!item.isCompleted}
-                    onChange={() => handleToggleItem(item.id)}
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  />
-                  <span
-                    className={`flex-grow ${
-                      item.isCompleted ? "line-through text-gray-500" : ""
-                    }`}
-                  >
-                    {item.item}
-                  </span>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDeleteItem(item.id)}
-                  >
-                    ✕
-                  </Button>
-                </div>
-              ))}
-
-            {temporaryItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-2 bg-gray-50 p-2 rounded-md"
+              <input
+                type="checkbox"
+                checked={!!item.isCompleted}
+                onChange={() => handleToggleItem(item.id)}
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded cursor-pointer"
+              />
+              <span
+                className={`flex-grow text-sm ${
+                  item.isCompleted ? "line-through text-gray-500" : "text-gray-800"
+                }`}
               >
-                {editingItemId === item.id ? (
-                  <>
-                    <input
-                      type="text"
-                      value={item.text}
-                      onChange={(e) =>
-                        handleEditTemporaryItem(item.id, e.target.value)
-                      }
-                      className="flex-grow rounded-md border border-gray-300 shadow-sm py-1 px-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                      autoFocus
-                      onBlur={() => setEditingItemId(null)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          setEditingItemId(null);
-                        }
-                      }}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingItemId(null)}
-                    >
-                      Save
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <input
-                      type="checkbox"
-                      checked={item.isCompleted}
-                      onChange={() => handleToggleItem(item.id)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
-                    <span
-                      className={`flex-grow ${
-                        item.isCompleted ? "line-through text-gray-500" : ""
-                      }`}
-                      onClick={() => setEditingItemId(item.id)}
-                    >
-                      {item.text}
-                    </span>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDeleteItem(item.id)}
-                    >
-                      ✕
-                    </Button>
-                  </>
-                )}
-              </div>
-            ))}
+                {item.item}
+              </span>
+              <Button
+                variant="outline" // Assuming a subtle danger button (e.g., red text, transparent bg)
+                size="sm" // Assuming a smaller icon-like button size
+                onClick={() => handleDeleteItem(item.id)}
+                aria-label="Delete item"
+                className="p-1 hover:bg-red-100 rounded-md" // ensure it's small
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 text-red-500">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </Button>
+            </div>
+          ))}
 
-            {!isEditMode && temporaryItems.length === 0 && (
-              <p className="text-sm text-gray-500 italic p-2">
-                No checklist items. Add some using the field above.
-              </p>
-            )}
-
-            {isEditMode &&
-              checklistItems.length === 0 &&
-              temporaryItems.length === 0 &&
-              !checklistLoading && (
-                <p className="text-sm text-gray-500 italic p-2">
-                  No checklist items. Add some using the field above.
-                </p>
-              )}
-
-            {isEditMode && checklistLoading && (
-              <p className="text-sm text-gray-500 italic p-2">
-                Loading checklist items...
-              </p>
+        {/* Temporary Checklist Items (Create/Edit Mode) */}
+        {temporaryItems.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center gap-3 bg-slate-50 p-2.5 rounded-lg shadow-sm border border-slate-200"
+          >
+            {editingItemId === item.id ? (
+              <>
+                <input // Checkbox placeholder while editing
+                  type="checkbox"
+                  checked={item.isCompleted}
+                  disabled
+                  className="h-4 w-4 border-gray-300 rounded invisible" // Keep space, but hide
+                />
+                <input
+                  type="text"
+                  value={item.text}
+                  onChange={(e) =>
+                    handleEditTemporaryItem(item.id, e.target.value)
+                  }
+                  className="flex-grow rounded-md border border-purple-400 shadow-sm py-1.5 px-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500" // Highlighted border
+                  autoFocus
+                  onBlur={() => setEditingItemId(null)} // Consider saving on blur or requiring explicit save
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setEditingItemId(null); // Save on Enter
+                      e.preventDefault();
+                    } else if (e.key === "Escape") {
+                      setEditingItemId(null); // Cancel edit on Escape
+                      // You might want to revert changes here if not auto-saving
+                      e.preventDefault();
+                    }
+                  }}
+                />
+                <Button
+                  variant="primary" // Assuming a subtle save button
+                  size="sm"
+                  onClick={() => setEditingItemId(null)} // Save action
+                  className="text-sm px-3 py-1.5"
+                >
+                  Save
+                </Button>
+              </>
+            ) : (
+              <>
+                <input
+                  type="checkbox"
+                  checked={item.isCompleted}
+                  onChange={() => handleToggleItem(item.id)}
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded cursor-pointer"
+                />
+                <span
+                  className={`flex-grow text-sm cursor-pointer hover:text-purple-700 ${ // Make text clickable for edit
+                    item.isCompleted ? "line-through text-gray-500 hover:text-gray-500" : "text-gray-800"
+                  }`}
+                  onClick={() => setEditingItemId(item.id)}
+                >
+                  {item.text}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteItem(item.id)}
+                  aria-label="Delete item"
+                  className="p-1 hover:bg-red-100 rounded-md"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 text-red-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </Button>
+              </>
             )}
           </div>
-        </div>
-
-        {(createTaskMutation.isError || updateTaskMutation.isError) && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-            Failed to {isEditMode ? "update" : "create"} task. Please try again.
-          </div>
+        ))}
+        
+        {/* Empty States for Checklist */}
+        {(!isEditMode && temporaryItems.length === 0) && (
+          <p className="text-sm text-gray-500 italic p-2 text-center">
+            No checklist items yet.
+          </p>
         )}
-      </form>
-    </Modal>
+        {(isEditMode && checklistItems.length === 0 && temporaryItems.length === 0 && !checklistLoading) && (
+           <p className="text-sm text-gray-500 italic p-2 text-center">
+            No checklist items. Start by adding one above.
+          </p>
+        )}
+        {(isEditMode && checklistLoading) && (
+          <p className="text-sm text-gray-500 italic p-2 text-center">
+            Loading checklist...
+          </p>
+        )}
+      </div>
+    </div>
+
+    {/* General Error Message for Form Submission */}
+    {(createTaskMutation.isError || updateTaskMutation.isError) && (
+      <div className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md text-sm shadow-sm" role="alert"> {/* Enhanced alert styling */}
+        <strong className="font-medium">Oops!</strong> Failed to {isEditMode ? "update" : "create"} task. Please check your input and try again.
+      </div>
+    )}
+  </form>
+</Modal>
   );
 };
 

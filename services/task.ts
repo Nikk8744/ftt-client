@@ -6,10 +6,6 @@ import axios from 'axios';
  * Create a new task within a project
  */
 export const createTask = async (projectId: number, data: TaskCreateData) => {
-  // Log the full request details
-  console.log("🚀 ~ createTask ~ projectId:", projectId);
-  console.log("🚀 ~ createTask ~ data:", data);
-  
   const requestData = {
     ...data,
     projectId
@@ -18,7 +14,6 @@ export const createTask = async (projectId: number, data: TaskCreateData) => {
 
   try {
     const response = await apiClient.post(`/tasks/createTask/${projectId}`, requestData);
-    console.log("🚀 ~ createTask ~ response:", response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating task:', error);
@@ -37,7 +32,6 @@ export const createTask = async (projectId: number, data: TaskCreateData) => {
 export const getUserTasks = async () => {
   try {
     const response = await apiClient.get('/tasks/getUserTasks');
-    console.log("🚀 ~ getUserTasks ~ response:", response)
     return {
       tasks: response.data.Users_tasks || []
     };

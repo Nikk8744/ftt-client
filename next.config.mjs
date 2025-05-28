@@ -2,13 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['images.unsplash.com'],
+    domains: ['images.unsplash.com', "randomuser.me"],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'randomuser.me/api',
+        pathname: '**',
+      }
     ],
   },
   async rewrites() {

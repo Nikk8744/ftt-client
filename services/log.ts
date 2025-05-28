@@ -134,4 +134,17 @@ export const createTimeLog = async (data: TimeLogCreateData) => {
     console.error('Error creating time log:', error);
     throw error;
   }
+};
+
+/**
+ * Get total time logged today for the current user
+ */
+export const getTotalTimeToday = async () => {
+  try {
+    const response = await apiClient.get('/logs/totalTimeToday');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching total time today:', error);
+    throw error;
+  }
 }; 
