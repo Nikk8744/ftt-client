@@ -629,9 +629,8 @@ export default function LogsPage() {
                         : "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {log.duration
-                        ? formatDuration(log.duration)
-                        : "In Progress"}
+                      {log.duration ? formatDuration(log.duration) : 
+                       log.timeSpent ? formatDuration(log.timeSpent) : "In Progress"}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                       {log.description || "-"}
@@ -646,7 +645,7 @@ export default function LogsPage() {
                           Edit
                         </Button>
                         <Button
-                          variant="danger"
+                          variant="destructive"
                           size="sm"
                           onClick={() => openDeleteModal(log.id)}
                         >
@@ -673,7 +672,7 @@ export default function LogsPage() {
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleSubmit(onSubmit)}
               isLoading={updateLogMutation.isPending}
             >

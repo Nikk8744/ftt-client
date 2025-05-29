@@ -13,10 +13,10 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
-import TaskList from "@/components/feature/TaskList";
+import { TasksTable } from "@/components/feature/TasksTable";
 import TeamMembers from "@/components/TeamMembers";
 import { getProjectById, updateProject } from "@/services/project";
-import { getTasksByProject } from "@/services/task";
+import { getTasksByProject, updateTask, deleteTask } from "@/services/task";
 import {
   addMemberToProject,
   removeMemberFromProject,
@@ -25,6 +25,8 @@ import {
 import useAuth from "@/lib/hooks/useAuth";
 import { formatDate, formatRelativeTime } from "@/lib/utils";
 import TaskForm from "@/components/feature/TaskForm";
+import { ConfirmModal } from "@/components/ui/Modal";
+import { Task } from "@/types";
 
 // Form validation schemas
 const projectSchema = z.object({
@@ -57,6 +59,9 @@ export default function ProjectDetailsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [removeModalState, setRemoveModalState] = useState<{
     isOpen: boolean;
     userId: number | null;
@@ -82,7 +87,6 @@ export default function ProjectDetailsPage() {
   const {
     data: tasksData,
     isLoading: tasksLoading,
-    error: tasksError,
   } = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: () => getTasksByProject(Number(projectId)),
@@ -126,6 +130,26 @@ export default function ProjectDetailsPage() {
       queryClient.invalidateQueries({ queryKey: ["members", projectId] });
       queryClient.invalidateQueries({ queryKey: ["team-members", projectId] });
       setRemoveModalState({ isOpen: false, userId: null });
+    },
+  });
+
+  // Update task status mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: (data: {
+      id: number;
+      status: "Pending" | "In-Progress" | "Done";
+    }) => updateTask(data.id, { status: data.status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+    },
+  });
+
+  // Delete task mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: (id: number) => deleteTask(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+      setIsDeleteTaskModalOpen(false);
     },
   });
 
@@ -204,6 +228,26 @@ export default function ProjectDetailsPage() {
     }
   };
 
+  // Handle status change
+  const handleStatusChange = (task: Task, newStatus: string) => {
+    updateTaskMutation.mutate({
+      id: task.id,
+      status: newStatus as "Pending" | "In-Progress" | "Done",
+    });
+  };
+
+  // Open edit task modal
+  const openEditTaskModal = (task: Task) => {
+    setSelectedTask(task);
+    setIsEditTaskModalOpen(true);
+  };
+
+  // Open delete confirmation modal
+  const openDeleteTaskModal = (task: Task) => {
+    setSelectedTask(task);
+    setIsDeleteTaskModalOpen(true);
+  };
+
   const project = projectData?.project;
   const tasks = tasksData?.tasks || [];
   const teamMembers = teamData?.members || [];
@@ -247,8 +291,7 @@ export default function ProjectDetailsPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-medium text-gray-900">Tasks</h2>
                 <Button
-                  variant="primary"
-                  size="sm"
+                  variant="default"
                   onClick={() => setIsAddTaskModalOpen(true)}
                 >
                   Add Task
@@ -256,22 +299,26 @@ export default function ProjectDetailsPage() {
               </div>
 
               {tasksLoading ? (
-                <p>Loading tasks...</p>
-              ) : tasksError ? (
-                <p className="text-red-500">Error loading tasks</p>
+                <Card className="p-8 text-center">
+                  <p>Loading tasks...</p>
+                </Card>
               ) : tasks.length === 0 ? (
-                <Card>
-                  <div className="text-center py-6">
-                    <p className="text-gray-500">
-                      No tasks yet. Create your first task to get started.
-                    </p>
-                  </div>
+                <Card className="p-8 text-center">
+                  <p className="text-gray-500 mb-4">
+                    No tasks found in this project.
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Click the &quot;Add Task&quot; button to create your first
+                    task.
+                  </p>
                 </Card>
               ) : (
-                <TaskList 
-                  tasks={tasks} 
-                  projectId={Number(projectId)} 
-                  isProjectOwner={isOwner}
+                <TasksTable
+                  data={tasks}
+                  projects={[project]}
+                  onEdit={openEditTaskModal}
+                  onDelete={openDeleteTaskModal}
+                  onStatusChange={handleStatusChange}
                 />
               )}
             </div>
@@ -505,7 +552,7 @@ export default function ProjectDetailsPage() {
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleProjectSubmit(onUpdateProject)}
               isLoading={updateProjectMutation.isPending}
               disabled={updateProjectMutation.isPending}
@@ -621,7 +668,7 @@ export default function ProjectDetailsPage() {
           </div>
         </form>
       </Modal>
-      
+
       {/* Add Member Modal */}
       <Modal
         isOpen={isAddMemberModalOpen}
@@ -638,7 +685,7 @@ export default function ProjectDetailsPage() {
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleMemberSubmit(onAddMember)}
               isLoading={addMemberMutation.isPending}
               disabled={addMemberMutation.isPending}
@@ -854,25 +901,6 @@ export default function ProjectDetailsPage() {
                 </div>
               </div>
             )}
-
-            {/* Success State (if needed) */}
-            {/* {addMemberMutation.isSuccess && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-sm font-medium text-green-900 mb-1">Member Added Successfully</h4>
-              <p className="text-sm text-green-700">
-                The team member has been added and will receive a notification.
-              </p>
-            </div>
-          </div>
-        </div>
-      )} */}
           </form>
         </div>
       </Modal>
@@ -917,6 +945,31 @@ export default function ProjectDetailsPage() {
           projectId={Number(projectId)}
           isOpen={isAddTaskModalOpen}
           onClose={() => setIsAddTaskModalOpen(false)}
+        />
+      )}
+      {/* Edit Task Modal */}
+      {isEditTaskModalOpen && selectedTask && (
+        <TaskForm
+          projectId={Number(projectId)}
+          task={selectedTask}
+          isOpen={isEditTaskModalOpen}
+          onClose={() => setIsEditTaskModalOpen(false)}
+        />
+      )}
+      {/* Delete Task Confirmation Modal */}
+      {isDeleteTaskModalOpen && selectedTask && (
+        <ConfirmModal
+          isOpen={isDeleteTaskModalOpen}
+          onClose={() => setIsDeleteTaskModalOpen(false)}
+          onConfirm={() => deleteTaskMutation.mutate(selectedTask.id)}
+          title="Delete Task"
+          message={`Are you sure you want to delete "${
+            selectedTask.name || selectedTask.subject
+          }"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+          isLoading={deleteTaskMutation.isPending}
         />
       )}
     </PageWrapper>

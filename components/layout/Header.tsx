@@ -88,7 +88,7 @@ const Header: React.FC = () => {
               {/* Timer Control Button */}
               {isRunning ? (
                 <Button
-                  variant="danger"
+                  variant="default"
                   size="sm"
                   onClick={() => setIsStopTimerModalOpen(true)}
                   isLoading={timerIsLoading}
@@ -102,7 +102,7 @@ const Header: React.FC = () => {
                 </Button>
               ) : (
                 <Button
-                  variant="success"
+                  variant="default"
                   size="sm"
                   onClick={startTimer}
                   isLoading={timerIsLoading}
@@ -164,7 +164,7 @@ const Header: React.FC = () => {
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="destructive"
               onClick={handleStopTimer}
               isLoading={timerIsLoading}
               disabled={timerIsLoading || !selectedProject || !selectedTask}

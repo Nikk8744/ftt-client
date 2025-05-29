@@ -134,7 +134,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
           />
           <Button
             type="submit"
-            variant="primary"
+            variant="default"
             isLoading={addItemMutation.isPending}
             disabled={addItemMutation.isPending || !newItemText.trim()}
           >
@@ -161,7 +161,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                   />
                   <Button
                     type="submit"
-                    variant="primary"
+                    variant="default"
                     size="sm"
                     isLoading={updateItemMutation.isPending}
                     disabled={updateItemMutation.isPending || !editingItem.text.trim()}
@@ -202,7 +202,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                         Edit
                       </Button>
                       <Button
-                        variant="danger"
+                        variant="destructive"
                         size="sm"
                         onClick={() => openDeleteModal(item.id)}
                         disabled={deleteItemMutation.isPending}

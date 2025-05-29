@@ -44,7 +44,7 @@ export default function TeamMembers({
         </div>
         {onAddMember && (
           <Button 
-            variant="primary" 
+            variant="default" 
             size="sm" 
             onClick={onAddMember}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 shadow-sm"
@@ -148,7 +148,7 @@ export default function TeamMembers({
             </p>
             {onAddMember && (
               <Button 
-                variant="primary" 
+                variant="default" 
                 size="sm" 
                 onClick={onAddMember}
                 className="text-xs px-4 py-2 flex items-center gap-2"

@@ -12,9 +12,10 @@ interface ModalProps {
   title?: string;
   children: ReactNode;
   footer?: ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
   closeOnClickOutside?: boolean;
   showCloseButton?: boolean;
+  description?: string;
 }
 
 export default function Modal({
@@ -26,17 +27,29 @@ export default function Modal({
   maxWidth = 'md',
   closeOnClickOutside = true,
   showCloseButton = true,
+  description,
 }: ModalProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
-    
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      // Trigger animation after mount
+      requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
+    } else {
+      document.body.style.overflow = 'auto';
+      setIsVisible(false);
     }
-    
+
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -49,9 +62,47 @@ export default function Modal({
       }
     };
 
+    // Focus trap
+    const handleTab = (e: KeyboardEvent) => {
+      if (!modalRef.current || e.key !== 'Tab') return;
+
+      const focusableElements = modalRef.current.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0] as HTMLElement;
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
     document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleTab);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleTab);
+    };
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      const focusableElement = modalRef.current.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) as HTMLElement;
+      if (focusableElement) {
+        focusableElement.focus();
+      }
+    }
+  }, [isOpen]);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (closeOnClickOutside && backdropRef.current === e.target) {
@@ -60,37 +111,68 @@ export default function Modal({
   };
 
   const widthClasses = {
+    xs: 'max-w-xs',
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-xl',
     '2xl': 'max-w-2xl',
-    full: 'max-w-full mx-4',
+    full: 'max-w-[calc(100%-2rem)]',
   };
 
-  if (!isMounted || !isOpen) return null;
+  if (!isMounted) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4"
+      className={cn(
+        "fixed inset-0 z-[110] flex items-center justify-center overflow-y-auto bg-black/50 p-4 transition-opacity duration-300",
+        isVisible ? "opacity-100" : "opacity-0",
+        !isOpen && "pointer-events-none"
+      )}
       ref={backdropRef}
       onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? "modal-title" : undefined}
+      aria-describedby={description ? "modal-description" : undefined}
     >
       <div
+        ref={modalRef}
         className={cn(
-          "relative w-full rounded-lg bg-white shadow-xl transition-all duration-200",
-          widthClasses[maxWidth]
+          "relative w-full rounded-lg bg-white shadow-xl transition-all duration-300",
+          widthClasses[maxWidth],
+          isVisible 
+            ? "translate-y-0 opacity-100" 
+            : "translate-y-4 opacity-0"
         )}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between border-b px-6 py-4">
-            {title && <h3 className="text-lg font-medium text-gray-900">{title}</h3>}
+          <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+            <div>
+              {title && (
+                <h3 
+                  id="modal-title"
+                  className="text-lg font-medium text-gray-900"
+                >
+                  {title}
+                </h3>
+              )}
+              {description && (
+                <p 
+                  id="modal-description"
+                  className="mt-1 text-sm text-gray-500"
+                >
+                  {description}
+                </p>
+              )}
+            </div>
             {showCloseButton && (
               <button 
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none"
+                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                aria-label="Close modal"
               >
                 <XMarkIcon className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -99,11 +181,15 @@ export default function Modal({
         )}
         
         {/* Body */}
-        <div className="px-6 py-4">{children}</div>
+        <div className="px-6 py-4 max-h-[calc(100vh-16rem)] overflow-y-auto">
+          {children}
+        </div>
         
         {/* Footer */}
         {footer && (
-          <div className="border-t px-6 py-4 flex justify-end space-x-2">{footer}</div>
+          <div className="border-t border-gray-200 px-6 py-4">
+            {footer}
+          </div>
         )}
       </div>
     </div>,
@@ -134,24 +220,39 @@ export function ConfirmModal({
   isLoading = false,
   variant = 'primary',
 }: ConfirmModalProps) {
+  // Map the variant to Button component variants
+  const getButtonVariant = (variant: 'primary' | 'danger' | 'warning') => {
+    switch (variant) {
+      case 'danger':
+        return 'destructive';
+      case 'warning':
+        return 'secondary';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={title}
+      maxWidth="sm"
       footer={
         <Fragment>
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isLoading}
+            className="min-w-[80px] mx-2"
           >
             {cancelText}
           </Button>
           <Button
-            variant={variant}
+            variant={getButtonVariant(variant)}
             onClick={onConfirm}
             isLoading={isLoading}
+            className="min-w-[80px]"
           >
             {confirmText}
           </Button>
@@ -161,4 +262,4 @@ export function ConfirmModal({
       <p className="text-gray-700">{message}</p>
     </Modal>
   );
-} 
+}

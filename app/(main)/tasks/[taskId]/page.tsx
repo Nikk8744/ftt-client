@@ -11,10 +11,11 @@ import {
   addTaskFollower,
   removeTaskFollower,
 } from "@/services/taskMembers";
+import { getTaskLogs, updateTimeLog, deleteTimeLog } from "@/services/log";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
-import { ConfirmModal } from "@/components/ui/Modal";
+import Modal, { ConfirmModal } from "@/components/ui/Modal";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { formatDate, formatDuration } from "@/lib/utils";
 import TaskForm from "@/components/feature/TaskForm";
@@ -22,7 +23,7 @@ import TaskChecklist from "@/components/feature/TaskChecklist";
 import Link from "next/link";
 import useTimer from "@/lib/hooks/useTimer";
 import Avatar from "@/components/ui/Avatar";
-import { User } from "@/types";
+import { User, TimeLog, TimeLogUpdateData } from "@/types";
 import { getCurrentUser } from "@/services/user";
 
 export default function TaskDetailsPage() {
@@ -34,6 +35,9 @@ export default function TaskDetailsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deleteModalState, setDeleteModalState] = useState({ isOpen: false });
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [editLogModalOpen, setEditLogModalOpen] = useState(false);
+  const [deleteLogModalOpen, setDeleteLogModalOpen] = useState(false);
+  const [selectedLog, setSelectedLog] = useState<TimeLog | null>(null);
 
   // Get current user
   const { data: userData } = useQuery({
@@ -80,6 +84,13 @@ export default function TaskDetailsPage() {
     enabled: !!taskId,
   });
 
+  // Get task logs
+  const { data: logsData, isLoading: logsLoading } = useQuery({
+    queryKey: ["taskLogs", taskId],
+    queryFn: () => getTaskLogs(Number(taskId)),
+    enabled: !!taskId,
+  });
+
   // Add follower mutation
   const addFollowerMutation = useMutation({
     mutationFn: (userId: number) => addTaskFollower(Number(taskId), userId),
@@ -105,10 +116,32 @@ export default function TaskDetailsPage() {
     },
   });
 
+  // Update log mutation
+  const updateLogMutation = useMutation({
+    mutationFn: (data: { id: number; updateData: TimeLogUpdateData }) =>
+      updateTimeLog(data.id, data.updateData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["taskLogs", taskId] });
+      setEditLogModalOpen(false);
+      setSelectedLog(null);
+    },
+  });
+
+  // Delete log mutation
+  const deleteLogMutation = useMutation({
+    mutationFn: (id: number) => deleteTimeLog(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["taskLogs", taskId] });
+      setDeleteLogModalOpen(false);
+      setSelectedLog(null);
+    },
+  });
+
   const task = taskData?.task;
   const project = projectData?.project;
   const assignee = assigneeData?.user;
   const followers = followersData?.users || [];
+  const logs = logsData?.data || [];
 
   // Check if current user is following this task
   const isUserFollowing = currentUser
@@ -151,6 +184,18 @@ export default function TaskDetailsPage() {
     deleteTaskMutation.mutate();
   };
 
+  // Open edit log modal
+  const openEditLogModal = (log: TimeLog) => {
+    setSelectedLog(log);
+    setEditLogModalOpen(true);
+  };
+
+  // Open delete log modal
+  const openDeleteLogModal = (log: TimeLog) => {
+    setSelectedLog(log);
+    setDeleteLogModalOpen(true);
+  };
+
   if (taskLoading) {
     return <div>Loading task details...</div>;
   }
@@ -166,23 +211,28 @@ export default function TaskDetailsPage() {
       actions={
         <div className="flex flex-wrap gap-2">
           <Button
-            variant="success"
+            variant="default"
             onClick={handleStartTimer}
             size="sm"
             className="flex items-center gap-1.5"
           >
             <svg
-              className="w-3 h-3"
+              className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <polygon points="5 3 19 12 5 21 5 3" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             Start Timer
           </Button>
           <Button
-            variant={isUserFollowing ? "outline" : "primary"}
+            variant={isUserFollowing ? "outline" : "outline"}
             onClick={handleFollowToggle}
             isLoading={
               addFollowerMutation.isPending || removeFollowerMutation.isPending
@@ -236,7 +286,7 @@ export default function TaskDetailsPage() {
             Edit
           </Button>
           <Button
-            variant="danger"
+            variant="destructive"
             onClick={() => setDeleteModalState({ isOpen: true })}
             size="sm"
             className="flex items-center gap-1.5"
@@ -319,6 +369,182 @@ export default function TaskDetailsPage() {
             {/* Task Checklist */}
             <Card className="hover:shadow-md transition-shadow duration-200">
               <TaskChecklist taskId={Number(taskId)} />
+            </Card>
+
+            {/* Time Logs Section */}
+            <Card className="hover:shadow-md transition-shadow duration-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="w-5 h-5 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Time Logs
+                  </h3>
+                </div>
+                <Button
+                  variant="default"
+                  onClick={handleStartTimer}
+                  size="sm"
+                  className="flex items-center gap-1.5"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Start Timer
+                </Button>
+              </div>
+
+              {logsLoading ? (
+                <div className="text-center py-8">
+                  <p>Loading time logs...</p>
+                </div>
+              ) : logs.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">
+                    No time logs yet
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    Start the timer to begin tracking time for this task
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Time
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Duration
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Description
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {logs.map((log: TimeLog) => (
+                        <tr key={log.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {formatDate(log.startTime)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(log.startTime).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                            {log.endTime &&
+                              ` - ${new Date(log.endTime).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}`}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {log.timeSpent
+                              ? formatDuration(log.timeSpent)
+                              : "In Progress"}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                            {log.description || "-"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            {log.userId === currentUser?.id && (
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openEditLogModal(log)}
+                                  className="text-blue-600 hover:text-blue-700"
+                                >
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openDeleteLogModal(log)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </Button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </Card>
           </div>
 
@@ -431,7 +657,7 @@ export default function TaskDetailsPage() {
                 )}
 
                 {/* Time Spent */}
-                {task.totalTimeSpent && (
+                {task && (
                   <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                     <div className="flex items-center gap-2">
                       <svg
@@ -662,6 +888,137 @@ export default function TaskDetailsPage() {
         isLoading={deleteTaskMutation.isPending}
         variant="danger"
       />
+
+      {/* Edit Log Modal */}
+      {editLogModalOpen && selectedLog && (
+        <Modal
+          isOpen={editLogModalOpen}
+          onClose={() => {
+            setEditLogModalOpen(false);
+            setSelectedLog(null);
+          }}
+          title="Edit Time Log"
+          footer={
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditLogModalOpen(false);
+                  setSelectedLog(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                onClick={() => {
+                  if (!selectedLog) return;
+                  updateLogMutation.mutate({
+                    id: selectedLog.id,
+                    updateData: {
+                      description: selectedLog.description || undefined,
+                      startTime: selectedLog.startTime,
+                      endTime: selectedLog.endTime || undefined,
+                    },
+                  });
+                }}
+                isLoading={updateLogMutation.isPending}
+              >
+                Save Changes
+              </Button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                rows={3}
+                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                value={selectedLog.description || ""}
+                onChange={(e) =>
+                  setSelectedLog({
+                    ...selectedLog,
+                    description: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="startTime"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Start Time
+                </label>
+                <input
+                  type="datetime-local"
+                  id="startTime"
+                  className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  value={new Date(selectedLog.startTime)
+                    .toISOString()
+                    .slice(0, 16)}
+                  onChange={(e) =>
+                    setSelectedLog({
+                      ...selectedLog,
+                      startTime: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="endTime"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  End Time
+                </label>
+                <input
+                  type="datetime-local"
+                  id="endTime"
+                  className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  value={
+                    selectedLog.endTime
+                      ? new Date(selectedLog.endTime).toISOString().slice(0, 16)
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setSelectedLog({
+                      ...selectedLog,
+                      endTime: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Delete Log Modal */}
+      {deleteLogModalOpen && selectedLog && (
+        <ConfirmModal
+          isOpen={deleteLogModalOpen}
+          onClose={() => {
+            setDeleteLogModalOpen(false);
+            setSelectedLog(null);
+          }}
+          onConfirm={() => deleteLogMutation.mutate(selectedLog.id)}
+          title="Delete Time Log"
+          message="Are you sure you want to delete this time log? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="danger"
+          isLoading={deleteLogMutation.isPending}
+        />
+      )}
     </PageWrapper>
   );
 }

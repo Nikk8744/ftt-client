@@ -212,7 +212,7 @@ export default function DashboardPage() {
                         {tasks.find((t: Task) => t.id === log.taskId)?.subject || 'No Task'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {log.duration ? formatDuration(log.duration) : 'In Progress'}
+                        {log.timeSpent ? formatDuration(log.timeSpent) : 'In Progress'}
                       </td>
                     </tr>
                   ))}

@@ -78,7 +78,7 @@ export default function RegisterPage() {
           <p className="mt-2 text-gray-600">Your account has been created successfully.</p>
           <div className="mt-6">
             <Link href="/login">
-              <Button variant="primary" fullWidth>
+              <Button variant="secondary" >
                 Sign In
               </Button>
             </Link>
@@ -183,13 +183,13 @@ export default function RegisterPage() {
               {...register('confirmPassword')}
             />
 
-            <div>
+            <div className="w-full">
               <Button
                 type="submit"
-                variant="primary"
-                fullWidth
+                variant="default"
                 isLoading={isSubmitting}
                 disabled={isSubmitting}
+                className="w-full"
               >
                 Create Account
               </Button>

@@ -1,22 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAllProjectsOfUser, createProject, deleteProject } from '@/services/project';
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
-import { ProjectCreateData, Project } from '@/types';
+import { ProjectCreateData } from '@/types';
 import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
 import { ConfirmModal } from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
-import Badge from '@/components/ui/Badge';
 import PageWrapper from '@/components/layout/PageWrapper';
-import { formatDate } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { ProjectsTable } from '@/components/feature/ProjectsTable';
+import { Plus } from 'lucide-react';
 
 // Form validation schema
 const projectSchema = z.object({
@@ -116,14 +114,11 @@ export default function ProjectsPage() {
       description="Manage your projects and collaborations"
       actions={
         <Button
-          variant="primary"
-          leftIcon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-          }
+          variant="default"
+          // leftIcon={<Plus className="h-5 w-5" />}
           onClick={() => setIsCreateModalOpen(true)}
         >
+          <Plus className="h-4 w-4" />
           Create Project
         </Button>
       }
@@ -158,8 +153,6 @@ export default function ProjectsPage() {
           <>
             {ownedProjectsLoading ? (
               <p>Loading projects...</p>
-            ) : ownedProjectsError ? (
-              <p className="text-red-500">Error loading projects</p>
             ) : ownedProjects.length === 0 ? (
               <div className="text-center py-12">
                 <svg
@@ -180,59 +173,32 @@ export default function ProjectsPage() {
                 <p className="mt-1 text-sm text-gray-500">Get started by creating a new project.</p>
                 <div className="mt-6">
                   <Button
-                    variant="primary"
-                    leftIcon={
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                      </svg>
-                    }
+                    variant="default"
+                    // leftIcon={
+                      
+                    // }
                     onClick={() => setIsCreateModalOpen(true)}
                   >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
                     New Project
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {ownedProjects.map((project: Project) => (
-                  <div key={project.id} className="relative">
-                    <Link href={`/projects/${project.id}`}>
-                      <Card className="h-full hover:shadow-md transition-shadow">
-                        <h3 className="text-lg font-medium text-gray-900">{project.name}</h3>
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.description}</p>
-                        
-                        <div className="mt-4 flex items-center justify-between">
-                          <Badge variant="primary" rounded>
-                            Owner
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            Created {formatDate(project.createdAt)}
-                          </span>
-                        </div>
-                      </Card>
-                    </Link>
-                    <button
-                      className="absolute top-2 right-2 p-1 rounded-full bg-white shadow hover:bg-gray-100"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        openDeleteModal(project.id);
-                      }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
+            ) : ownedProjectsError ? (
+              <p className="text-red-500">Error loading projects</p>
+            )  : (
+              <ProjectsTable
+                data={ownedProjects}
+                onDelete={openDeleteModal}
+              />
             )}
           </>
         ) : (
           <>
             {memberProjectsLoading ? (
               <p>Loading projects...</p>
-            ) : memberProjectsError ? (
-              <p className="text-red-500">Error loading projects</p>
             ) : memberProjects.length === 0 ? (
               <div className="text-center py-12">
                 <svg
@@ -252,26 +218,13 @@ export default function ProjectsPage() {
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No memberships</h3>
                 <p className="mt-1 text-sm text-gray-500">You&apos;re not a member of any projects yet.</p>
               </div>
+            ) : memberProjectsError ? (
+              <p className="text-red-500">Error loading projects</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {memberProjects.map((project: Project) => (
-                  <Link href={`/projects/${project.id}`} key={project.id}>
-                    <Card className="h-full hover:shadow-md transition-shadow">
-                      <h3 className="text-lg font-medium text-gray-900">{project.name}</h3>
-                      <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.description}</p>
-                      
-                      <div className="mt-4 flex items-center justify-between">
-                        <Badge variant="secondary" rounded>
-                          Member
-                        </Badge>
-                        <span className="text-xs text-gray-500">
-                          Created {formatDate(project.createdAt)}
-                        </span>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
+              <ProjectsTable
+                data={memberProjects}
+                onDelete={openDeleteModal}
+              />
             )}
           </>
         )}
@@ -288,7 +241,7 @@ export default function ProjectsPage() {
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleSubmit(onSubmit)}
               isLoading={createProjectMutation.isPending}
               disabled={createProjectMutation.isPending}
