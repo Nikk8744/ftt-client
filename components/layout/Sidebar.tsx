@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
@@ -69,6 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const initialRender = useRef(true);
 
   // Handle screen resize
   useEffect(() => {
@@ -93,8 +94,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Notify parent when sidebar state changes
+  // Notify parent when sidebar state changes, but only after initial render
   useEffect(() => {
+    // Skip the first render to avoid an initial update loop
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+    
+    // Only call onSidebarChange if it exists
     if (onSidebarChange) {
       onSidebarChange(isOpen, isMobile);
     }

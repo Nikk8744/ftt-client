@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
@@ -14,9 +14,16 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
     isMobile: false
   });
 
-  const handleSidebarChange = (isOpen: boolean, isMobile: boolean) => {
-    setSidebarState({ isOpen, isMobile });
-  };
+  // Use useCallback to prevent recreation of this function on every render
+  const handleSidebarChange = useCallback((isOpen: boolean, isMobile: boolean) => {
+    setSidebarState(prevState => {
+      // Only update state if values actually changed
+      if (prevState.isOpen !== isOpen || prevState.isMobile !== isMobile) {
+        return { isOpen, isMobile };
+      }
+      return prevState;
+    });
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-50">
