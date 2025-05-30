@@ -225,9 +225,6 @@ export default function ProjectDetailsPage() {
       endDate: data.endDate,
     };
 
-    // Log the data being sent to make sure it's correct
-    console.log("Update project data:", formattedData);
-
     updateProjectMutation.mutate(formattedData);
   };
 
@@ -269,11 +266,9 @@ export default function ProjectDetailsPage() {
   };
 
   const project = projectData?.project;
-  console.log("🚀 ~ ProjectDetailsPage ~ project:", project)
   const tasks = tasksData?.tasks || [];
   const teamMembers = teamData?.members || [];
   const projectOwner = ownerData?.user;
-  console.log("🚀 ~ ProjectDetailsPage ~ projectOwner:", projectOwner)
 
   // Check if current user is the project owner
   const isOwner = project && user ? project.ownerId === user.id : false;
