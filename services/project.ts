@@ -1,6 +1,7 @@
 import { ProjectCreateData, ProjectUpdateData } from '@/types';
 import apiClient from './api-client';
 import axios from 'axios';
+import { getUserById } from './user';
 
 /**
  * Create a new project
@@ -27,6 +28,9 @@ export const getProjectById = async (id: number) => {
     throw error;
   }
 };
+
+
+export const getProjectOwner = getUserById;
 
 /**
  * Get all projects owned by the authenticated user

@@ -15,7 +15,7 @@ import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
 import { TasksTable } from "@/components/feature/TasksTable";
 import TeamMembers from "@/components/TeamMembers";
-import { getProjectById, updateProject } from "@/services/project";
+import { getProjectById, updateProject, getProjectOwner } from "@/services/project";
 import { getTasksByProject, updateTask, deleteTask } from "@/services/task";
 import {
   addMemberToProject,
@@ -69,8 +69,7 @@ export default function ProjectDetailsPage() {
     isOpen: false,
     userId: null,
   });
-  const [showInfo, setShowInfo] = useState(false);
-  const [showTips, setShowTips] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   // Get project details
   const {
@@ -81,6 +80,16 @@ export default function ProjectDetailsPage() {
     queryKey: ["project", projectId],
     queryFn: () => getProjectById(Number(projectId)),
     enabled: !!projectId,
+  });
+
+  // Get project owner information
+  const {
+    data: ownerData,
+    isLoading: ownerLoading,
+  } = useQuery({
+    queryKey: ["project-owner", projectData?.project?.userId],
+    queryFn: () => getProjectOwner(Number(projectData?.project?.userId)),
+    enabled: !!projectData?.project?.userId,
   });
 
   // Get project tasks
@@ -118,8 +127,18 @@ export default function ProjectDetailsPage() {
       queryClient.invalidateQueries({ queryKey: ["members", projectId] });
       queryClient.invalidateQueries({ queryKey: ["team-members", projectId] });
       setIsAddMemberModalOpen(false);
+      setApiError(null);
       reset();
     },
+    onError: (error: Error | { response?: { data?: { msg?: string } } }) => {
+      const errorMessage = 
+        typeof error === 'object' && error !== null && 'response' in error
+          ? error.response?.data?.msg || "Failed to add member. Please try again."
+          : error instanceof Error
+            ? error.message
+            : "Failed to add member. Please try again.";
+      setApiError(errorMessage);
+    }
   });
 
   // Remove member mutation
@@ -213,6 +232,7 @@ export default function ProjectDetailsPage() {
   };
 
   const onAddMember = (data: MemberFormData) => {
+    setApiError(null);
     addMemberMutation.mutate(data);
   };
 
@@ -249,11 +269,14 @@ export default function ProjectDetailsPage() {
   };
 
   const project = projectData?.project;
+  console.log("🚀 ~ ProjectDetailsPage ~ project:", project)
   const tasks = tasksData?.tasks || [];
   const teamMembers = teamData?.members || [];
+  const projectOwner = ownerData?.user;
+  console.log("🚀 ~ ProjectDetailsPage ~ projectOwner:", projectOwner)
 
   // Check if current user is the project owner
-  const isOwner = project && user ? project.userId === user.id : false;
+  const isOwner = project && user ? project.ownerId === user.id : false;
 
   if (projectLoading) {
     return <div>Loading project details...</div>;
@@ -370,10 +393,10 @@ export default function ProjectDetailsPage() {
                         Owner
                       </p>
                       <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                        {isOwner ? `${user?.name} (You)` : "Another User"}
+                        {isOwner ? `${user?.name} (You)` : (ownerLoading ? "Loading..." : projectOwner?.name || "Unknown User")}
                       </p>
                     </div>
-                  </div>
+                  </div>  
 
                   {/* Status */}
                   <div className="flex items-start gap-3">
@@ -533,9 +556,7 @@ export default function ProjectDetailsPage() {
                   // addedAt: member.addedAt
                 })
               )}
-              onAddMember={
-                isOwner ? () => setIsAddMemberModalOpen(true) : undefined
-              }
+              onAddMember={() => setIsAddMemberModalOpen(true)}
               onRemoveMember={isOwner ? handleRemoveMember : undefined}
             />
           </div>
@@ -547,8 +568,12 @@ export default function ProjectDetailsPage() {
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Project"
         footer={
-          <>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+          <div className="flex justify-end gap-3 w-full">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditModalOpen(false)}
+              className="px-4 py-2"
+            >
               Cancel
             </Button>
             <Button
@@ -556,129 +581,158 @@ export default function ProjectDetailsPage() {
               onClick={handleProjectSubmit(onUpdateProject)}
               isLoading={updateProjectMutation.isPending}
               disabled={updateProjectMutation.isPending}
+              className="px-4 py-2"
             >
               Save Changes
             </Button>
-          </>
+          </div>
         }
       >
         <form
           onSubmit={handleProjectSubmit(onUpdateProject)}
-          className="space-y-4"
+          className="space-y-5 py-2"
         >
-          <Input
-            id="name"
-            label="Project Name"
-            error={projectErrors.name?.message}
-            {...registerProject("name")}
-          />
+          <div className="space-y-1.5">
+            <Input
+              id="name"
+              label="Project Name"
+              placeholder="Enter project name"
+              error={projectErrors.name?.message}
+              {...registerProject("name")}
+              className="focus:ring-2 focus:ring-primary-500/30"
+            />
+          </div>
 
-          <div>
+          <div className="space-y-1.5">
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700"
             >
               Description
             </label>
             <textarea
               id="description"
-              rows={3}
+              rows={4}
+              placeholder="Enter project description"
               className={`w-full rounded-md border ${
                 projectErrors.description ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:border-primary-500 focus:ring-primary-500`}
+              } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 px-3 py-2 text-sm`}
               {...registerProject("description")}
             ></textarea>
             {projectErrors.description && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-xs text-red-600">
                 {projectErrors.description.message}
               </p>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
               <label
                 htmlFor="startDate"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700"
               >
                 Start Date
               </label>
-              <input
-                type="date"
-                id="startDate"
-                className={`w-full rounded-md border ${
-                  projectErrors.startDate ? "border-red-500" : "border-gray-300"
-                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                {...registerProject("startDate")}
-              />
-              {projectErrors.startDate && (
-                <p className="mt-1 text-sm text-red-600">
-                  {projectErrors.startDate.message}
-                </p>
-              )}
+              <div className="relative">
+                <input
+                  type="date"
+                  id="startDate"
+                  className={`w-full rounded-md border ${
+                    projectErrors.startDate ? "border-red-500" : "border-gray-300"
+                  } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 py-2 px-3 text-sm`}
+                  {...registerProject("startDate")}
+                />
+                {projectErrors.startDate && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {projectErrors.startDate.message}
+                  </p>
+                )}
+              </div>
             </div>
 
-            <div>
+            <div className="space-y-1.5">
               <label
                 htmlFor="endDate"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700"
               >
                 End Date
               </label>
-              <input
-                type="date"
-                id="endDate"
+              <div className="relative">
+                <input
+                  type="date"
+                  id="endDate"
+                  className={`w-full rounded-md border ${
+                    projectErrors.endDate ? "border-red-500" : "border-gray-300"
+                  } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 py-2 px-3 text-sm`}
+                  {...registerProject("endDate")}
+                />
+                {projectErrors.endDate && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {projectErrors.endDate.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label
+              htmlFor="status"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Status
+            </label>
+            <div className="relative">
+              <select
+                id="status"
                 className={`w-full rounded-md border ${
-                  projectErrors.endDate ? "border-red-500" : "border-gray-300"
-                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                {...registerProject("endDate")}
-              />
-              {projectErrors.endDate && (
-                <p className="mt-1 text-sm text-red-600">
-                  {projectErrors.endDate.message}
+                  projectErrors.status ? "border-red-500" : "border-gray-300"
+                } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 py-2 px-3 text-sm bg-white appearance-none`}
+                {...registerProject("status")}
+              >
+                <option value="">Select Status</option>
+                <option value="Pending">Pending</option>
+                <option value="In-Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
+              {projectErrors.status && (
+                <p className="mt-1 text-xs text-red-600">
+                  {projectErrors.status.message}
                 </p>
               )}
             </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="status"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Status
-            </label>
-            <select
-              id="status"
-              className={`w-full rounded-md border ${
-                projectErrors.status ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-              {...registerProject("status")}
-            >
-              <option value="">Select Status</option>
-              <option value="Pending">Pending</option>
-              <option value="In-Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-            </select>
-            {projectErrors.status && (
-              <p className="mt-1 text-sm text-red-600">
-                {projectErrors.status.message}
-              </p>
-            )}
-          </div>
+          {updateProjectMutation.isError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">Failed to update project. Please try again.</p>
+            </div>
+          )}
         </form>
       </Modal>
 
       {/* Add Member Modal */}
       <Modal
         isOpen={isAddMemberModalOpen}
-        onClose={() => setIsAddMemberModalOpen(false)}
+        onClose={() => {
+          setIsAddMemberModalOpen(false);
+          setApiError(null);
+        }}
         title="Add Team Member"
         footer={
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <Button
               variant="outline"
-              onClick={() => setIsAddMemberModalOpen(false)}
+              onClick={() => {
+                setIsAddMemberModalOpen(false);
+                setApiError(null);
+              }}
               className="px-4 py-2 text-sm"
               disabled={addMemberMutation.isPending}
             >
@@ -687,222 +741,34 @@ export default function ProjectDetailsPage() {
             <Button
               variant="default"
               onClick={handleMemberSubmit(onAddMember)}
+              className="px-4 py-2 text-sm"
               isLoading={addMemberMutation.isPending}
               disabled={addMemberMutation.isPending}
-              className="px-6 py-2 text-sm flex items-center gap-2"
             >
-              {addMemberMutation.isPending ? (
-                <>
-                  <svg
-                    className="w-4 h-4 animate-spin"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                  Adding...
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  Add Member
-                </>
-              )}
+              Add Member
             </Button>
           </div>
         }
       >
-        <div className="py-4">
-          <form
-            onSubmit={handleMemberSubmit(onAddMember)}
-            className="space-y-6"
-          >
-            {/* Info Section */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setShowInfo(!showInfo)}
-                className="w-full p-4 flex items-center justify-between hover:bg-blue-100 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0">
-                    <svg
-                      className="w-5 h-5 text-blue-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="text-sm font-medium text-blue-900">
-                    Adding Team Members
-                  </h4>
-                </div>
-                <svg
-                  className={`w-4 h-4 text-blue-600 transition-transform ${
-                    showInfo ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              {showInfo && (
-                <div className="px-4 pb-4 border-t border-blue-200">
-                  <p className="text-sm text-blue-700 mt-3">
-                    Enter the User ID of the person you want to add to your
-                    team. They will be notified and gain access to this project.
-                  </p>
-                </div>
-              )}
+        <form onSubmit={handleMemberSubmit(onAddMember)} className="space-y-4">
+          <Input
+            id="userId"
+            label="User ID"
+            placeholder="Enter user ID to add"
+            error={memberErrors.userId?.message}
+            {...registerMember("userId")}
+          />
+          
+          {apiError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">{apiError}</p>
             </div>
-
-            {/* Input Field */}
-            <div className="space-y-2">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                    />
-                  </svg>
-                </div>
-                <Input
-                  id="userId"
-                  label="User ID"
-                  error={memberErrors.userId?.message}
-                  helperText="Enter the unique user ID (e.g., 12345)"
-                  placeholder="Enter user ID..."
-                  className="pl-10"
-                  {...registerMember("userId")}
-                />
-              </div>
-            </div>
-
-            {/* Search/Suggestion Section (Optional Enhancement) */}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setShowTips(!showTips)}
-                className="w-full p-4 flex items-center justify-between hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-gray-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                  <span className="text-sm font-medium text-gray-700">
-                    Quick Tips
-                  </span>
-                </div>
-                <svg
-                  className={`w-4 h-4 text-gray-500 transition-transform ${
-                    showTips ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              {showTips && (
-                <div className="px-4 pb-4 border-t border-gray-200">
-                  <ul className="text-xs text-gray-600 space-y-1 mt-3">
-                    <li>• User IDs are typically numeric (e.g., 12345)</li>
-                    <li>• Make sure the user has an active account</li>
-                    <li>• The user will receive a notification when added</li>
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* Error Display */}
-            {addMemberMutation.isError && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0">
-                    <svg
-                      className="w-5 h-5 text-red-600 mt-0.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-red-900 mb-1">
-                      Failed to Add Member
-                    </h4>
-                    <p className="text-sm text-red-700">
-                      Unable to add the team member. Please check if the user ID
-                      is valid and try again.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </form>
-        </div>
+          )}
+          
+          <div className="text-sm text-gray-500 bg-blue-50 p-3 rounded-md border border-blue-100">
+            <p>Note: You need to know the user ID to add them to this project. {!isOwner && "Only the project owner can add members."}</p>
+          </div>
+        </form>
       </Modal>
       {/* Remove Member Confirmation Modal */}
       <Modal
