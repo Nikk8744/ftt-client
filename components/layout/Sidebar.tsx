@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
@@ -9,6 +9,11 @@ interface NavItem {
   name: string;
   href: string;
   icon: React.ReactNode;
+}
+
+interface SidebarProps {
+  className?: string;
+  onSidebarChange?: (isOpen: boolean, isMobile: boolean) => void;
 }
 
 const navigation: NavItem[] = [
@@ -60,9 +65,44 @@ const navigation: NavItem[] = [
   },
 ];
 
-const Sidebar: React.FC<{ className?: string }> = ({ className = '' }) => {
+const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) => {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Handle screen resize
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 1024; // lg breakpoint in Tailwind
+      setIsMobile(mobile);
+      // Auto close sidebar on mobile
+      if (mobile) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
+    };
+
+    // Check on mount
+    checkMobile();
+
+    // Set up resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Notify parent when sidebar state changes
+  useEffect(() => {
+    if (onSidebarChange) {
+      onSidebarChange(isOpen, isMobile);
+    }
+  }, [isOpen, isMobile, onSidebarChange]);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <>
@@ -71,18 +111,18 @@ const Sidebar: React.FC<{ className?: string }> = ({ className = '' }) => {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onClick={toggleSidebar}
           className="bg-white shadow-md hover:bg-gray-50"
         >
-          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </div>
 
       {/* Backdrop */}
-      {isMobileMenuOpen && (
+      {isOpen && isMobile && (
         <div 
           className="fixed inset-0 bg-black/50 z-[85] lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
+          onClick={() => setIsOpen(false)}
         />
       )}
 
@@ -93,7 +133,7 @@ const Sidebar: React.FC<{ className?: string }> = ({ className = '' }) => {
           w-[280px] bg-gradient-to-b from-white to-indigo-50 border-r border-indigo-100 shadow-lg
           transition-all duration-300 ease-in-out
           lg:translate-x-0 lg:static lg:z-0
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           ${className}
         `}
       >
@@ -124,7 +164,7 @@ const Sidebar: React.FC<{ className?: string }> = ({ className = '' }) => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => isMobile && setIsOpen(false)}
                   className={`
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out
                     group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50

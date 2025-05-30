@@ -292,7 +292,7 @@ export default function ProjectDetailsPage() {
       description={`Created ${formatRelativeTime(project.createdAt)}`}
       actions={
         isOwner && (
-          <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
+          <Button variant="outline" className="bg-green-400 rounded-3xl" onClick={() => setIsEditModalOpen(true)} >
             Edit Project
           </Button>
         )
