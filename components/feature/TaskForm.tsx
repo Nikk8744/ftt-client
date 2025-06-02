@@ -18,6 +18,8 @@ import Avatar from "@/components/ui/Avatar";
 import axios from "axios";
 import React, { ReactNode } from 'react';
 import { cn } from "@/lib/utils";
+import { assignUserToTask, getTaskAssignees } from "@/services/taskMembers";
+import { getAllMembersOfProject } from "@/services/projectMember";
 
 // Form validation schema
 const taskSchema = z.object({
@@ -34,7 +36,6 @@ const taskSchema = z.object({
     })
     .transform((val) => (val ? new Date(val).toISOString() : undefined))
     .optional(),
-  assignedUserId: z.number().int().positive().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -70,6 +71,11 @@ const TaskForm = ({
     { id: string; text: string; isCompleted: boolean }[]
   >([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  
+  // Assignee state
+  const [assignUserModalOpen, setAssignUserModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [filterText, setFilterText] = useState('');
 
   // Get current user
   const { data: userData } = useQuery({
@@ -84,12 +90,31 @@ const TaskForm = ({
     }
   }, [userData]);
 
+  // Get task assignees if in edit mode
+  const { data: assigneeData } = useQuery({
+    queryKey: ["taskAssignee", task?.id],
+    queryFn: () => getTaskAssignees(Number(task?.id)),
+    enabled: !!task?.id && isOpen,
+  });
+
+  // Get project members for assignee selection
+  const { data: projectMembersData, isLoading: projectMembersLoading } = useQuery({
+    queryKey: ["projectMembers", projectId],
+    queryFn: async () => {
+      return getAllMembersOfProject(projectId);
+    },
+    enabled: isOpen && assignUserModalOpen,
+  });
+
+  // Current assignees
+  const assignees = assigneeData?.data || [];
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
+    // setValue,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -97,16 +122,8 @@ const TaskForm = ({
       description: task?.description || "",
       status: task?.status || "Pending",
       dueDate: task?.dueDate ? task.dueDate : "",
-      assignedUserId: task?.assignedUserId || currentUser?.id,
     },
   });
-
-  // Set default assignee after current user is loaded
-  useEffect(() => {
-    if (currentUser && !isEditMode) {
-      setValue("assignedUserId", currentUser.id);
-    }
-  }, [currentUser, isEditMode, setValue]);
 
   // Fetch existing checklist items if editing a task
   const { data: checklistData, isLoading: checklistLoading } = useQuery<{ checklist: ChecklistItem[] }, Error>({
@@ -137,13 +154,7 @@ const TaskForm = ({
         dueDate: data.dueDate
           ? new Date(data.dueDate).toISOString()
           : undefined,
-        assignedUserId: data.assignedUserId || currentUser?.id,
       };
-
-      // Log the data being sent
-      // console.log('Creating task with form data:', data);
-      // console.log('Creating task with formatted data:', taskData);
-      // console.log('Current user:', currentUser);
 
       try {
         const response = await createTask(projectId, taskData);
@@ -157,6 +168,12 @@ const TaskForm = ({
           );
           await Promise.all(promises);
         }
+
+        // Assign the current user to the task by default
+        if (response.task && currentUser) {
+          await assignUserToTask(response.task.id, currentUser.id);
+        }
+
         return response;
       } catch (error) {
         console.error("Error in task creation:", error);
@@ -172,6 +189,7 @@ const TaskForm = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["assignedTasks"] });
       onClose();
       reset();
       setTemporaryItems([]);
@@ -189,8 +207,19 @@ const TaskForm = ({
     mutationFn: (data: TaskFormData) => updateTask(task!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["assignedTasks"] });
       queryClient.invalidateQueries({ queryKey: ["checklist", task!.id] });
       onClose();
+    },
+  });
+
+  // Assign user mutation
+  const assignUserMutation = useMutation({
+    mutationFn: (userId: number) => assignUserToTask(Number(task?.id), userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["taskAssignee", task?.id] });
+      setAssignUserModalOpen(false);
+      setSelectedUserId(null);
     },
   });
 
@@ -272,6 +301,13 @@ const TaskForm = ({
     } else if (typeof id === "string") {
       // Delete temporary item
       setTemporaryItems(temporaryItems.filter((item) => item.id !== id));
+    }
+  };
+
+  // Handle assign user
+  const handleAssignUser = () => {
+    if (selectedUserId && isEditMode) {
+      assignUserMutation.mutate(selectedUserId);
     }
   };
 
@@ -386,22 +422,66 @@ const TaskForm = ({
           </div>
         </div>
 
-        {/* Assignee */}
-        {currentUser && (
-          <div className="space-y-1.5">
+        {/* Assignees Section */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
             <label className="block text-sm font-medium text-gray-900">
-              Assignee
+              Assignees
             </label>
-            <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5">
-              <Avatar name={currentUser.name} size="sm" />
-              <span className="text-sm font-medium text-gray-900">{currentUser.name}</span>
-            </div>
-            <input
-              type="hidden"
-              {...register("assignedUserId", { valueAsNumber: true })}
-            />
+            {isEditMode && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAssignUserModalOpen(true)}
+                className="text-xs"
+              >
+                {assignees.length > 0 ? "Add More" : "Assign"}
+              </Button>
+            )}
           </div>
-        )}
+          
+          {isEditMode ? (
+            assignees.length > 0 ? (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {assignees.map((assignee: User) => (
+                  <div key={assignee.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5">
+                    <Avatar name={assignee.name} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {assignee.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {assignee.email}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
+                <p className="text-sm text-gray-500">
+                  No assignees yet. Click &quot;Assign&quot; to add users.
+                </p>
+              </div>
+            )
+          ) : (
+            // For new tasks, show the current user as the default assignee
+            currentUser && (
+              <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5">
+                <Avatar name={currentUser.name} size="sm" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {currentUser.email}
+                  </p>
+                </div>
+                <p className="text-xs text-gray-500">(Default)</p>
+              </div>
+            )
+          )}
+        </div>
 
         {/* Checklist */}
         <div className="space-y-3">
@@ -557,6 +637,106 @@ const TaskForm = ({
           </div>
         )}
       </form>
+
+      {/* Assign User Modal */}
+      {isEditMode && (
+        <Modal
+          isOpen={assignUserModalOpen}
+          onClose={() => {
+            setAssignUserModalOpen(false);
+            setSelectedUserId(null);
+            setFilterText('');
+          }}
+          title="Assign User to Task"
+          footer={
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setAssignUserModalOpen(false);
+                  setSelectedUserId(null);
+                  setFilterText('');
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                onClick={handleAssignUser}
+                disabled={!selectedUserId || assignUserMutation.isPending}
+                isLoading={assignUserMutation.isPending}
+              >
+                Assign
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                Filter Users
+              </label>
+              <input
+                type="text"
+                id="search"
+                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                placeholder="Filter by name or email..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+              />
+            </div>
+            
+            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
+              {projectMembersLoading ? (
+                <div className="p-4 space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 animate-pulse">
+                      <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-3 bg-gray-200 rounded mb-1"></div>
+                        <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : projectMembersData?.members && projectMembersData.members.length > 0 ? (
+                <div className="divide-y divide-gray-100">
+                  {projectMembersData.members
+                    .filter((user: User) => 
+                      !filterText || 
+                      user.name.toLowerCase().includes(filterText.toLowerCase()) || 
+                      user.email.toLowerCase().includes(filterText.toLowerCase())
+                    )
+                    .map((user: User) => (
+                      <div 
+                        key={user.id}
+                        className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedUserId === user.id ? 'bg-blue-50' : ''}`}
+                        onClick={() => setSelectedUserId(user.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar name={user.name} size="sm" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                            <p className="text-xs text-gray-500">{user.email}</p>
+                          </div>
+                        </div>
+                        {selectedUserId === user.id && (
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  <p>No project members found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Modal>
+      )}
     </Modal>
   );
 };

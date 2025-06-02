@@ -16,9 +16,10 @@ import Link from "next/link";
 interface ProjectRowActionsProps {
   row: Row<Project>;
   onDelete: (projectId: number) => void;
+  onEdit: (project: Project) => void;
 }
 
-export function ProjectRowActions({ row, onDelete }: ProjectRowActionsProps) {
+export function ProjectRowActions({ row, onDelete, onEdit }: ProjectRowActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,7 +35,7 @@ export function ProjectRowActions({ row, onDelete }: ProjectRowActionsProps) {
           <Link href={`/projects/${row.original.id}`}>
             <DropdownMenuItem>View Details</DropdownMenuItem>
           </Link>
-          <DropdownMenuItem>Edit Project</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onEdit(row.original)}>Edit Project</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

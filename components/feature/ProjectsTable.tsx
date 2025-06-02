@@ -72,6 +72,7 @@ import { formatDate } from "@/lib/utils";
 interface ProjectsTableProps {
   data: Project[];
   onDelete: (projectId: number) => void;
+  onEdit: (project: Project) => void;
 }
 
 // Custom filter function for multi-column searching
@@ -87,7 +88,7 @@ const statusFilterFn: FilterFn<Project> = (row, columnId, filterValue: string[])
   return filterValue.includes(status);
 };
 
-export function ProjectsTable({ data, onDelete }: ProjectsTableProps) {
+export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -185,7 +186,7 @@ export function ProjectsTable({ data, onDelete }: ProjectsTableProps) {
     {
       id: "actions",
       header: () => <span className="sr-only">Actions</span>,
-      cell: ({ row }) => <ProjectRowActions row={row} onDelete={onDelete} />,
+      cell: ({ row }) => <ProjectRowActions row={row} onDelete={onDelete} onEdit={onEdit} />,
       size: 60,
       enableHiding: false,
     },
@@ -320,7 +321,7 @@ export function ProjectsTable({ data, onDelete }: ProjectsTableProps) {
                         className="flex grow justify-between gap-2 font-normal"
                       >
                         {value}{" "}
-                        <span className="ms-2 text-xs text-muted-foreground">
+                        <span className="ms-2 text-xs ted-foreground">
                           {statusCounts.get(value)}
                         </span>
                       </Label>

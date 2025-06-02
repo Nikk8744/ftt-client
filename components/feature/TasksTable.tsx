@@ -64,7 +64,7 @@ interface TasksTableProps {
   onStatusChange: (task: Task, status: string) => void;
 }
 
-export function TasksTable({ data, projects, onEdit, onDelete, onStatusChange }: TasksTableProps) {
+export function   TasksTable({ data, projects, onEdit, onDelete, onStatusChange }: TasksTableProps) {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});

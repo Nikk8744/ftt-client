@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllProjectsOfUser, createProject, deleteProject } from '@/services/project';
+import { getAllProjectsOfUser, createProject, deleteProject, updateProject } from '@/services/project';
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
-import { ProjectCreateData } from '@/types';
+import { ProjectCreateData, Project } from '@/types';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import { ConfirmModal } from '@/components/ui/Modal';
@@ -32,6 +32,8 @@ export default function ProjectsPage() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'owned' | 'member'>('owned');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [deleteModalState, setDeleteModalState] = useState<{ isOpen: boolean; projectId: number | null }>({
     isOpen: false,
     projectId: null,
@@ -67,6 +69,17 @@ export default function ProjectsPage() {
     },
   });
 
+  // Update project mutation
+  const updateProjectMutation = useMutation({
+    mutationFn: (data: { id: number; project: ProjectFormData }) => 
+      updateProject(data.id, data.project),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects', 'owned'] });
+      setIsEditModalOpen(false);
+      setSelectedProject(null);
+    },
+  });
+
   // Delete project mutation
   const deleteProjectMutation = useMutation({
     mutationFn: (id: number) => deleteProject(id),
@@ -81,6 +94,7 @@ export default function ProjectsPage() {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -98,6 +112,26 @@ export default function ProjectsPage() {
 
   const openDeleteModal = (projectId: number) => {
     setDeleteModalState({ isOpen: true, projectId });
+  };
+
+  const openEditModal = (project: Project) => {
+    setSelectedProject(project);
+    // Set form values based on the selected project
+    setValue('name', project.name);
+    setValue('description', project.description);
+    setValue('startDate', project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '');
+    setValue('endDate', project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '');
+    setValue('status', project.status || 'Pending');
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateProject = (data: ProjectFormData) => {
+    if (selectedProject) {
+      updateProjectMutation.mutate({
+        id: selectedProject.id,
+        project: data
+      });
+    }
   };
 
   const handleDeleteProject = () => {
@@ -203,6 +237,7 @@ export default function ProjectsPage() {
               <ProjectsTable
                 data={ownedProjects}
                 onDelete={openDeleteModal}
+                onEdit={openEditModal}
               />
             )}
           </>
@@ -235,6 +270,7 @@ export default function ProjectsPage() {
               <ProjectsTable
                 data={memberProjects}
                 onDelete={openDeleteModal}
+                onEdit={openEditModal}
               />
             )}
           </>
@@ -344,6 +380,128 @@ export default function ProjectsPage() {
             )}
           </div>
         </form>
+      </Modal>
+
+      {/* Edit Project Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedProject(null);
+        }}
+        title="Edit Project"
+        footer={
+          <>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsEditModalOpen(false);
+                setSelectedProject(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={handleSubmit(handleUpdateProject)}
+              isLoading={updateProjectMutation.isPending}
+              disabled={updateProjectMutation.isPending}
+            >
+              Save Changes
+            </Button>
+          </>
+        }
+      >
+        {selectedProject && (
+          <form onSubmit={handleSubmit(handleUpdateProject)} className="space-y-4">
+            <Input
+              id="edit-name"
+              label="Project Name"
+              fullWidth
+              error={errors.name?.message}
+              {...register('name')}
+            />
+
+            <div>
+              <label htmlFor="edit-description" className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                id="edit-description"
+                rows={4}
+                className={`w-full rounded-md border ${
+                  errors.description ? 'border-red-500' : 'border-gray-300'
+                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
+                {...register('description')}
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="edit-startDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  id="edit-startDate"
+                  className={`w-full rounded-md border ${
+                    errors.startDate ? 'border-red-500' : 'border-gray-300'
+                  } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
+                  {...register('startDate')}
+                />
+                {errors.startDate && (
+                  <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+                )}
+              </div>
+              
+              <div>
+                <label htmlFor="edit-endDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  id="edit-endDate"
+                  className={`w-full rounded-md border ${
+                    errors.endDate ? 'border-red-500' : 'border-gray-300'
+                  } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
+                  {...register('endDate')}
+                />
+                {errors.endDate && (
+                  <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <label htmlFor="edit-status" className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                id="edit-status"
+                className={`w-full rounded-md border ${
+                  errors.status ? 'border-red-500' : 'border-gray-300'
+                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
+                {...register('status')}
+              >
+                <option value="Pending">Pending</option>
+                <option value="In-Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+              {errors.status && (
+                <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
+              )}
+            </div>
+
+            {updateProjectMutation.isError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">Failed to update project. Please try again.</p>
+              </div>
+            )}
+          </form>
+        )}
       </Modal>
 
       {/* Delete Confirmation Modal */}
