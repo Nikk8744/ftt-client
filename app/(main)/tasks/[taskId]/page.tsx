@@ -6,10 +6,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTaskById, deleteTask } from "@/services/task";
 import { getProjectById } from "@/services/project";
 import {
-  getTaskAssignee,
+  // getTaskAssignee,
   getTaskFollowers,
   addTaskFollower,
   removeTaskFollower,
+  assignUserToTask,
+  unassignUserFromTask,
+  getTaskAssignees,
 } from "@/services/taskMembers";
 import { getTaskLogs, updateTimeLog, deleteTimeLog } from "@/services/log";
 import Button from "@/components/ui/Button";
@@ -24,7 +27,8 @@ import Link from "next/link";
 import useTimer from "@/lib/hooks/useTimer";
 import Avatar from "@/components/ui/Avatar";
 import { User, TimeLog, TimeLogUpdateData } from "@/types";
-import { getCurrentUser } from "@/services/user";
+import { getCurrentUser, getUserById } from "@/services/user";
+import { getAllMembersOfProject } from "@/services/projectMember";
 
 export default function TaskDetailsPage() {
   const { taskId } = useParams();
@@ -38,6 +42,9 @@ export default function TaskDetailsPage() {
   const [editLogModalOpen, setEditLogModalOpen] = useState(false);
   const [deleteLogModalOpen, setDeleteLogModalOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState<TimeLog | null>(null);
+  const [assignUserModalOpen, setAssignUserModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [filterText, setFilterText] = useState('');
 
   // Get current user
   const { data: userData } = useQuery({
@@ -70,10 +77,21 @@ export default function TaskDetailsPage() {
     enabled: !!taskData?.task?.projectId,
   });
 
+  // Get task creator details
+  const { data: creatorData, isLoading: creatorLoading } = useQuery({
+    queryKey: ["taskCreator", taskData?.task?.ownerId],
+    queryFn: async () => {
+      if (!taskData?.task?.ownerId) return { user: null };
+      const response = await getUserById(taskData.task.ownerId);
+      return response;
+    },
+    enabled: !!taskData?.task?.ownerId,
+  });
+
   // Get task assignee
   const { data: assigneeData, isLoading: assigneeLoading } = useQuery({
     queryKey: ["taskAssignee", taskId],
-    queryFn: () => getTaskAssignee(Number(taskId)),
+    queryFn: () => getTaskAssignees(Number(taskId)),
     enabled: !!taskId,
   });
 
@@ -137,9 +155,38 @@ export default function TaskDetailsPage() {
     },
   });
 
+  // Assign user mutation
+  const assignUserMutation = useMutation({
+    mutationFn: (userId: number) => assignUserToTask(Number(taskId), userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["taskAssignee", taskId] });
+      setAssignUserModalOpen(false);
+      setSelectedUserId(null);
+    },
+  }); 
+
+  // Unassign user mutation
+  const unassignUserMutation = useMutation({
+    mutationFn: (userId: number) => unassignUserFromTask(Number(taskId), userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["taskAssignee", taskId] });
+    },
+  });
+
+  // Get project members instead of searching users
+  const { data: projectMembersData, isLoading: projectMembersLoading } = useQuery({
+    queryKey: ["projectMembers", taskData?.task?.projectId],
+    queryFn: async () => {
+      if (!taskData?.task?.projectId) return { members: [] };
+      // Use the proper service function to get project members
+      return getAllMembersOfProject(taskData.task.projectId);
+    },
+    enabled: !!taskData?.task?.projectId && assignUserModalOpen,
+  });
+  
   const task = taskData?.task;
   const project = projectData?.project;
-  const assignee = assigneeData?.user;
+  const assignees = assigneeData?.data || [];
   const followers = followersData?.users || [];
   const logs = logsData?.data || [];
 
@@ -194,6 +241,18 @@ export default function TaskDetailsPage() {
   const openDeleteLogModal = (log: TimeLog) => {
     setSelectedLog(log);
     setDeleteLogModalOpen(true);
+  };
+
+  // Handle assign user
+  const handleAssignUser = () => {
+    if (selectedUserId) {
+      assignUserMutation.mutate(selectedUserId);
+    }
+  };
+
+  // Handle unassign user
+  const handleUnassignUser = (userId: number) => {
+    unassignUserMutation.mutate(userId);
   };
 
   if (taskLoading) {
@@ -571,7 +630,42 @@ export default function TaskDetailsPage() {
                 </h3>
               </div>
               <div className="space-y-4">
-                {/* Status */}
+                {/* Created By */}
+                <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4 text-indigo-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-700">
+                      Created By
+                    </span>
+                  </div>
+                  {creatorLoading ? (
+                    <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  ) : creatorData?.user ? (
+                    <div className="flex items-center gap-2">
+                      <Avatar name={creatorData.user.name} size="xs" />
+                      <span className="text-sm font-medium text-gray-900">
+                        {creatorData.user.name}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm font-medium text-gray-500">
+                      Unknown
+                    </span>
+                  )}
+                </div>
+                {/* Status */} 
                 <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                   <div className="flex items-center gap-2">
                     <svg
@@ -712,23 +806,38 @@ export default function TaskDetailsPage() {
 
             {/* Assignee Section */}
             <Card className="hover:shadow-md transition-shadow duration-200">
-              <div className="flex items-center gap-2 mb-4">
-                <svg
-                  className="w-5 h-5 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="w-5 h-5 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Assignees
+                  </h3>
+                  {assignees.length > 0 && (
+                    <Badge variant="secondary" className="text-xs">
+                      {assignees.length}
+                    </Badge>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAssignUserModalOpen(true)}
+                  className="text-xs"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Assignee
-                </h3>
+                  {assignees.length > 0 ? "Add More" : "Assign"}
+                </Button>
               </div>
               {assigneeLoading ? (
                 <div className="flex items-center gap-3 animate-pulse">
@@ -738,17 +847,34 @@ export default function TaskDetailsPage() {
                     <div className="h-3 bg-gray-200 rounded w-2/3"></div>
                   </div>
                 </div>
-              ) : assignee ? (
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Avatar name={assignee.name} size="sm" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
-                      {assignee.name}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {assignee.email}
-                    </p>
-                  </div>
+              ) : assignees.length > 0 ? (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {assignees.map((assignee: User) => (
+                    <div key={assignee.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={assignee.name} size="sm" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {assignee.name}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {assignee.email}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleUnassignUser(assignee.id)}
+                        disabled={unassignUserMutation.isPending}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-6">
@@ -768,7 +894,7 @@ export default function TaskDetailsPage() {
                     </svg>
                   </div>
                   <p className="text-sm font-medium text-gray-500 mb-1">
-                    No assignee
+                    No assignees
                   </p>
                   <p className="text-xs text-gray-400">
                     This task hasn&apos;t been assigned yet
@@ -1019,6 +1145,104 @@ export default function TaskDetailsPage() {
           isLoading={deleteLogMutation.isPending}
         />
       )}
+
+      {/* Assign User Modal */}
+      <Modal
+        isOpen={assignUserModalOpen}
+        onClose={() => {
+          setAssignUserModalOpen(false);
+          setSelectedUserId(null);
+          setFilterText('');
+        }}
+        title="Assign User to Task"
+        footer={
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setAssignUserModalOpen(false);
+                setSelectedUserId(null);
+                setFilterText('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={handleAssignUser}
+              disabled={!selectedUserId || assignUserMutation.isPending}
+              isLoading={assignUserMutation.isPending}
+            >
+              Assign
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+              Filter Users
+            </label>
+            <input
+              type="text"
+              id="search"
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              placeholder="Filter by name or email..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+            />
+          </div>
+          
+          <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
+            {projectMembersLoading ? (
+              <div className="p-4 space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-3 animate-pulse">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-3 bg-gray-200 rounded mb-1"></div>
+                      <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : projectMembersData?.members && projectMembersData.members.length > 0 ? (
+              <div className="divide-y divide-gray-100">
+                {projectMembersData.members
+                  .filter((user: User) => 
+                    !filterText || 
+                    user.name.toLowerCase().includes(filterText.toLowerCase()) || 
+                    user.email.toLowerCase().includes(filterText.toLowerCase())
+                  )
+                  .map((user: User) => (
+                    <div 
+                      key={user.id}
+                      className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedUserId === user.id ? 'bg-blue-50' : ''}`}
+                      onClick={() => setSelectedUserId(user.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar name={user.name} size="sm" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                          <p className="text-xs text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                      {selectedUserId === user.id && (
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                <p>No project members found</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal>
     </PageWrapper>
   );
 }

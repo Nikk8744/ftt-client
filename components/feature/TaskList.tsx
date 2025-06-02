@@ -10,8 +10,8 @@ import TaskForm from './TaskForm';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import Avatar from '@/components/ui/Avatar';
-import { getTaskAssignee } from '@/services/taskMembers';
 import useAuth from '@/lib/hooks/useAuth';
+import { getTaskAssignees } from '@/services/taskMembers';
 
 interface TaskListProps {
   tasks: Task[];
@@ -89,7 +89,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, projectId, isProjectOwner })
   const TaskAssignee = ({ taskId }: { taskId: number }) => {
     const { data, isLoading } = useQuery({
       queryKey: ['taskAssignee', taskId],
-      queryFn: () => getTaskAssignee(taskId),
+      queryFn: () => getTaskAssignees(taskId),
       staleTime: 1000 * 60 * 5, // 5 minutes
     });
 
