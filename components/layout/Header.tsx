@@ -9,6 +9,8 @@ import { getAllProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
 import { useQuery } from '@tanstack/react-query';
 import { Project, Task } from '@/types';
+import NotificationBell from '@/components/feature/NotificationBell';
+import { useNotifications } from '@/lib/hooks/useNotifications';
 
 interface HeaderProps {
   sidebarOpen: boolean;
@@ -16,6 +18,9 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ sidebarOpen, isMobile }) => {
+  // Initialize notifications
+  useNotifications();
+  
   const { user, logout } = useAuth();
   const { 
     isRunning, 
@@ -116,6 +121,11 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, isMobile }) => {
                 <span className="hidden sm:inline">Start</span>
               </Button>
             )}
+          </div>
+
+          {/* Notification Bell */}
+          <div className="ml-3">
+            <NotificationBell />
           </div>
 
           {/* User Menu */}

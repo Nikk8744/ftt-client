@@ -33,7 +33,7 @@ export const getUserTasks = async () => {
   try {
     const response = await apiClient.get('/tasks/getUserTasks');
     return {
-      tasks: response.data.Users_tasks || []
+      tasks: response.data.tasks || []
     };
   } catch (error) {
     console.error('Error fetching user tasks:', error);

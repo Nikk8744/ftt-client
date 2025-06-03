@@ -651,7 +651,7 @@ Handles task creation, retrieval, updates, and deletion, usually within the cont
     ```json
     {
       "msg": "Tasks retrieved successfully",
-      "ALL_tasks": [
+      "tasks": [
          // ... Array of Task objects similar to 4.3
       ]
     }
@@ -675,7 +675,7 @@ Handles task creation, retrieval, updates, and deletion, usually within the cont
     ```json
     {
       "msg": "Tasks retrieved successfully",
-      "Users_tasks": [
+      "tasks": [
          // ... Array of Task objects assigned to the user
       ]
     }
