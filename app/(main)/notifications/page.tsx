@@ -18,7 +18,6 @@ export default function NotificationsPage() {
   const notificationStore = useNotificationStore();
   const { unreadCount, markAsRead: markAsReadStore, markAllAsRead: markAllAsReadStore, deleteNotification: deleteNotificationStore } = notificationStore;
   const [selectedNotifications, setSelectedNotifications] = useState<number[]>([]);
-  console.log("🚀 ~ NotificationsPage ~ unreadCount:", unreadCount)
 
   // Fetch notifications with infinite query
   const {
@@ -122,9 +121,7 @@ export default function NotificationsPage() {
   };
 
   // Flatten notifications from all pages
-  // console.log("🚀 ~ NotificationsPage ~ data:", data)
   const notifications = data?.pages.flatMap(page => page?.data.notifications) || [];
-  console.log("🚀 ~ NotificationsPage ~ notifications:", notifications)
   const totalCount = data?.pages[0]?.data.notifications.length || 0;
 
   // Get notification icon based on type

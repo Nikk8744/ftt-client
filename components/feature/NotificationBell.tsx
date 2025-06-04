@@ -36,7 +36,6 @@ export default function NotificationBell() {
     markAsRead, 
     markAllAsRead 
   } = useNotificationStore();
-    console.log("🚀 ~ NotificationBell ~ notifications:", notifications)
 
   const handleNotificationClick = (id: number) => {
     markAsRead(id);

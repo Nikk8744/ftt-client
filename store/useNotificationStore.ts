@@ -50,7 +50,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     
     // Set up event listeners
     socketInstance.on('notification', (notification: Notification) => {
-      console.log("🚀 ~ socketInstance.on ~ notification:", notification)
       get().addNotification(notification);
       
       // Show toast notification
