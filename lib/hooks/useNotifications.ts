@@ -5,7 +5,7 @@ import { parseCookies } from 'nookies';
 
 export function useNotifications() {
   const { isAuthenticated, user } = useAuthStore();
-  const { initializeSocket, cleanup } = useNotificationStore();
+  const { initializeSocket, cleanup, fetchRecentNotifications } = useNotificationStore();
 
   useEffect(() => {
     // Only initialize if authenticated
@@ -17,6 +17,9 @@ export function useNotifications() {
       if (token) {
         console.log('Initializing notification socket with token');
         initializeSocket(token);
+        
+        // Also fetch recent notifications to ensure we have both read and unread
+        fetchRecentNotifications();
       } else {
         console.error('No authentication token available in cookies');
       }
@@ -26,7 +29,7 @@ export function useNotifications() {
     return () => {
       cleanup();
     };
-  }, [isAuthenticated, user, initializeSocket, cleanup]);
+  }, [isAuthenticated, user, initializeSocket, cleanup, fetchRecentNotifications]);
 
   // Return the store for convenience
   return useNotificationStore;

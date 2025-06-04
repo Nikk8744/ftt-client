@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
-import { Notification, getUnreadCount } from '@/services/notification';
+import { Notification, getNotifications, getUnreadCount } from '@/services/notification';
 import { toast } from '@/components/ui/use-toast';
 
 interface NotificationState {
@@ -17,6 +17,7 @@ interface NotificationState {
   markAllAsRead: () => void;
   deleteNotification: (notificationId: number) => void;
   fetchUnreadCount: () => Promise<void>;
+  fetchRecentNotifications: () => Promise<void>;
   addNotification: (notification: Notification) => void;
   setUnreadCount: (count: number) => void;
   cleanup: () => void;
@@ -49,6 +50,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     
     // Set up event listeners
     socketInstance.on('notification', (notification: Notification) => {
+      console.log("🚀 ~ socketInstance.on ~ notification:", notification)
       get().addNotification(notification);
       
       // Show toast notification
@@ -66,8 +68,27 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     // Store the socket instance
     set({ socket: socketInstance });
     
-    // Fetch initial unread count
+    // Fetch initial unread count and recent notifications
     get().fetchUnreadCount();
+    get().fetchRecentNotifications();
+  },
+  
+  // Fetch recent notifications (both read and unread)
+  fetchRecentNotifications: async () => {
+    try {
+      set({ isLoading: true });
+      const response = await getNotifications(1, 10);
+      if (response.data && response.data.notifications) {
+        set({ 
+          notifications: response.data.notifications,
+          hasMore: response.data.hasMore
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch recent notifications:', error);
+    } finally {
+      set({ isLoading: false });
+    }
   },
   
   // Add a new notification to the list
@@ -103,7 +124,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     // Optimistically update UI
     set((state) => ({
       notifications: state.notifications.map(notif => 
-        notif.id === notificationId ? { ...notif, isRead: true } : notif
+        notif.id === notificationId ? { ...notif, isRead: 1 } : notif
       ),
       unreadCount: Math.max(0, state.unreadCount - 1)
     }));
@@ -118,7 +139,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     
     // Optimistically update UI
     set((state) => ({
-      notifications: state.notifications.map(notif => ({ ...notif, isRead: true })),
+      notifications: state.notifications.map(notif => ({ ...notif, isRead: 1 })),
       unreadCount: 0
     }));
   },

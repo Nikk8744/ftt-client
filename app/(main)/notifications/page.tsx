@@ -18,6 +18,7 @@ export default function NotificationsPage() {
   const notificationStore = useNotificationStore();
   const { unreadCount, markAsRead: markAsReadStore, markAllAsRead: markAllAsReadStore, deleteNotification: deleteNotificationStore } = notificationStore;
   const [selectedNotifications, setSelectedNotifications] = useState<number[]>([]);
+  console.log("🚀 ~ NotificationsPage ~ unreadCount:", unreadCount)
 
   // Fetch notifications with infinite query
   const {
@@ -32,7 +33,7 @@ export default function NotificationsPage() {
     queryFn: ({ pageParam = 1 }) => getNotifications(pageParam as number, 10),
     initialPageParam: 1,
     getNextPageParam: (lastPage: NotificationResponse, allPages) => {
-      return lastPage.hasMore ? allPages.length + 1 : undefined;
+      return lastPage.data.hasMore ? allPages.length + 1 : undefined;
     },
     enabled: isAuthenticated,
   });
@@ -121,8 +122,10 @@ export default function NotificationsPage() {
   };
 
   // Flatten notifications from all pages
-  const notifications = data?.pages.flatMap(page => page.notifications) || [];
-  const totalCount = data?.pages[0]?.totalCount || 0;
+  // console.log("🚀 ~ NotificationsPage ~ data:", data)
+  const notifications = data?.pages.flatMap(page => page?.data.notifications) || [];
+  console.log("🚀 ~ NotificationsPage ~ notifications:", notifications)
+  const totalCount = data?.pages[0]?.data.notifications.length || 0;
 
   // Get notification icon based on type
   const getNotificationIcon = (type: string) => {
@@ -234,7 +237,7 @@ export default function NotificationsPage() {
                 {notifications.filter(notification => notification && notification.id).map((notification: Notification) => (
                   <li key={notification.id} className={cn(
                     "px-4 py-4 hover:bg-gray-50 transition-colors",
-                    notification && notification.isRead === false && "bg-blue-50/30"
+                    notification.isRead === 0 && "bg-blue-50/30"
                   )}>
                     <div className="flex items-start">
                       <div className="flex-shrink-0 mr-3">
@@ -254,7 +257,7 @@ export default function NotificationsPage() {
                             href={`/${notification.entityType?.toLowerCase() || 'tasks'}/${notification.entityId || ''}`}
                             className={cn(
                               "text-sm",
-                              notification && notification.isRead === false ? "font-medium text-gray-900" : "text-gray-700"
+                              notification.isRead === 0 ? "font-medium text-gray-900" : "text-gray-700"
                             )}
                           >
                             {notification.title}
@@ -265,7 +268,7 @@ export default function NotificationsPage() {
                         </div>
                         <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
                         <div className="mt-2 flex items-center gap-2">
-                          {notification && notification.isRead === false && (
+                          {notification.isRead === 0 && (
                             <button
                               onClick={() => handleMarkAsRead(notification.id)}
                               className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center"

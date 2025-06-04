@@ -5,15 +5,17 @@ import { useRouter } from 'next/navigation';
 import ClientLayout from '@/components/layout/ClientLayout';
 import useAuthStore from '@/store/auth';
 import { parseCookies } from 'nookies';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const { fetchRecentNotifications } = useNotificationStore();
 
   useEffect(() => {
     // Check for authentication cookies
@@ -26,8 +28,13 @@ export default function MainLayout({
       router.push('/login');
     }
     
+    // Fetch recent notifications if authenticated
+    if (isAuthenticated && user) {
+      fetchRecentNotifications();
+    }
+    
     setIsLoading(false);
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, user, fetchRecentNotifications]);
 
   // Don't render anything during loading to prevent flash of content
   if (isLoading) {

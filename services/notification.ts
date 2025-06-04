@@ -9,14 +9,16 @@ export interface Notification {
   entityType: string;  // 'TASK', 'PROJECT', etc.
   entityId: number;    // ID for navigation
   initiatorId: number; // User who triggered the notification
-  isRead: boolean;
+  isRead: number;      // 0 for unread, 1 for read
   createdAt: Date;
 }
 
 export interface NotificationResponse {
-  notifications: Notification[];
-  totalCount: number;
-  hasMore: boolean;
+  data: {
+    notifications: Notification[];
+    totalCount: number;
+    hasMore: boolean;
+  }
 }
 
 export interface UnreadCountResponse {
