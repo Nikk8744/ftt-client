@@ -11,19 +11,51 @@ import { formatDate, formatDuration } from '@/lib/utils';
 import useAuth from '@/lib/hooks/useAuth';
 import Link from 'next/link';
 import { Project, Task, TimeLog } from '@/types';
+import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
+import { getUserAssignedTasks } from '@/services/taskMembers';
+import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [debugMode, setDebugMode] = useState(false);
 
-  // Fetch data for d ashboard
+  // Turn debug mode on/off with keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'D' && e.altKey) {
+        setDebugMode(prev => !prev);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Fetch data for dashboard
+  // Own projects
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: getAllProjectsOfUser,
   });
 
+  // Projects user is a member of
+  const { data: memberProjectsData, isLoading: memberProjectsLoading } = useQuery({
+    queryKey: ['memberProjects'],
+    queryFn: getAllProjectsUserIsMemberOf,
+  });
+
+  // Tasks created by user
   const { data: tasksData, isLoading: tasksLoading } = useQuery({
     queryKey: ['tasks'],
     queryFn: getUserTasks,
+  });
+
+  // Tasks assigned to user
+  const { data: assignedTasksData, isLoading: assignedTasksLoading } = useQuery({
+    queryKey: ['assignedTasks'],
+    queryFn: () => user ? getUserAssignedTasks(user.id) : Promise.resolve({ tasks: [] }),
+    enabled: !!user,
   });
 
   const { data: logsData, isLoading: logsLoading } = useQuery({
@@ -36,16 +68,66 @@ export default function DashboardPage() {
     queryFn: getTotalTimeToday,
   });
 
-  const projects = projectsData?.projects || [];
-  const tasks = tasksData?.tasks || [];
+  // Combine owned projects and projects user is a member of
+  const ownedProjects = projectsData?.projects || [];
+  const memberProjects = memberProjectsData?.projects || [];
+  
+  // Filter out duplicates (projects that user both owns and is a member of)
+  const memberProjectsFiltered = memberProjects.filter(
+    (memberProject: Project) => !ownedProjects.some((ownedProject: Project) => ownedProject.id === memberProject.id)
+  );
+  
+  // All unique projects
+  const allProjects = [...ownedProjects, ...memberProjectsFiltered];
+  
+  // Tasks created by user and tasks assigned to user
+  const createdTasks = tasksData?.tasks || [];
+  
+  // Extract assigned tasks based on API response structure
+  // Handle different possible data structures from the API
+  let assignedTasks: Task[] = [];
+  if (assignedTasksData) {
+    // Handle the specific structure we found: assignedTasksData.tasks.data
+    if (assignedTasksData.tasks?.data && Array.isArray(assignedTasksData.tasks.data)) {
+      assignedTasks = assignedTasksData.tasks.data;
+    }
+    // Handle other possible structures
+    else if (Array.isArray(assignedTasksData)) {
+      assignedTasks = assignedTasksData;
+    }
+    else if (assignedTasksData.tasks && Array.isArray(assignedTasksData.tasks)) {
+      assignedTasks = assignedTasksData.tasks;
+    }
+    else if (typeof assignedTasksData === 'object') {
+      // Try to get tasks from any property that looks like an array of tasks
+      const possibleTaskArrays = Object.values(assignedTasksData)
+        .filter(value => Array.isArray(value));
+      
+      if (possibleTaskArrays.length > 0) {
+        // Use the first array property found (likely to be tasks)
+        assignedTasks = possibleTaskArrays[0] as Task[];
+      }
+    }
+  }
+  
+  // Filter out duplicates (tasks that user both created and is assigned to)
+  const assignedTasksFiltered = Array.isArray(assignedTasks) 
+    ? assignedTasks.filter(
+        (assignedTask: Task) => !createdTasks.some((createdTask: Task) => createdTask.id === assignedTask.id)
+      )
+    : [];
+  
+  // All unique tasks
+  const allTasks = [...createdTasks, ...assignedTasksFiltered];
+  
   const logs = logsData?.logs || [];
   const totalTimeToday = totalTimeTodayData?.data.totalTimeSpent || 0;
 
   // Filter recent logs based on time frame
   const recentLogs = logs.slice(0, 5);
   
-  // Get recent tasks that are not done
-  const recentTasks = tasks
+  // Get recent tasks that are not done - make sure it includes BOTH created and assigned tasks
+  const recentTasks = allTasks
     .filter((task: Task) => task.status !== 'Done')
     .slice(0, 3);
     
@@ -55,6 +137,7 @@ export default function DashboardPage() {
     
     switch (status) {
       case 'Not Started':
+      case 'Pending':
         return 'secondary';
       case 'In Progress':
       case 'In-Progress':
@@ -77,11 +160,47 @@ export default function DashboardPage() {
     }
   };
   
+  // Loading state for all project-related data
+  const projectsDataLoading = projectsLoading || memberProjectsLoading;
+  
+  // Loading state for all task-related data
+  const tasksDataLoading = tasksLoading || assignedTasksLoading;
+  
   return (
     <PageWrapper
       title={`Welcome, ${user?.name || 'User'}`}
       description="Track your time and manage your projects"
     >
+      {/* Debug section (press Alt+D to toggle) */}
+      {debugMode && (
+        <div className="bg-gray-100 p-4 mb-4 rounded-md border border-gray-300">
+          <h3 className="text-md font-bold mb-2">Debug Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-sm font-semibold">Projects:</h4>
+              <p className="text-xs">Owned: {ownedProjects.length}</p>
+              <p className="text-xs">Member: {memberProjectsFiltered.length}</p>
+              <p className="text-xs">Total: {allProjects.length}</p>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold">Tasks:</h4>
+              <p className="text-xs">Created: {createdTasks.length}</p>
+              <p className="text-xs">Assigned: {assignedTasksFiltered.length}</p>
+              <p className="text-xs">Total: {allTasks.length}</p>
+            </div>
+          </div>
+          {assignedTasks.length > 0 && (
+            <div className="mt-3">
+              <h4 className="text-sm font-semibold">Assigned Tasks Raw Data:</h4>
+              <pre className="text-xs p-2 bg-gray-200 mt-1 max-h-40 overflow-auto">
+                {JSON.stringify(assignedTasksData, null, 2)}
+              </pre>
+            </div>
+          )}
+          <p className="text-xs text-gray-500 mt-2">Press Alt+D to hide debug info</p>
+        </div>
+      )}
+      
       <div className="p-6">
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -91,8 +210,14 @@ export default function DashboardPage() {
                 Total Projects
               </h3>
               <div className="mt-2 text-3xl font-bold text-gray-900">
-                {projectsLoading ? '...' : projects.length}
+                {projectsDataLoading ? '...' : allProjects.length}
               </div>
+              {!projectsDataLoading && (
+                <div className="mt-1 text-xs text-gray-500">
+                  <span className="text-primary-600">{ownedProjects.length}</span> owned, 
+                  <span className="text-indigo-500 ml-1">{memberProjectsFiltered.length}</span> member
+                </div>
+              )}
             </div>
           </Card>
 
@@ -102,8 +227,18 @@ export default function DashboardPage() {
                 Active Tasks
               </h3>
               <div className="mt-2 text-3xl font-bold text-gray-900">
-                {tasksLoading ? '...' : tasks.filter((task: Task) => task.status !== 'Done').length}
+                {tasksDataLoading ? '...' : allTasks.filter((task: Task) => task.status !== 'Done').length}
               </div>
+              {!tasksDataLoading && (
+                <div className="mt-1 text-xs text-gray-500">
+                  <span className="text-primary-600">
+                    {createdTasks.filter((task: Task) => task.status !== 'Done').length}
+                  </span> created, 
+                  <span className="text-indigo-500 ml-1">
+                    {assignedTasksFiltered.filter((task: Task) => task.status !== 'Done').length}
+                  </span> assigned
+                </div>
+              )}
             </div>
           </Card>
 
@@ -128,7 +263,7 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {tasksLoading ? (
+          {tasksDataLoading ? (
             <Card className="p-8 text-center">
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
@@ -178,13 +313,19 @@ export default function DashboardPage() {
                     </p>
                     <div className="mt-4 flex items-center justify-between">
                       <span className="text-xs text-gray-500">
-                        Project: {projects.find((p: Project) => p.id === task.projectId)?.name || 'Unknown'}
+                        Project: {allProjects.find((p: Project) => p.id === task.projectId)?.name || 'Unknown'}
                       </span>
                       {task.dueDate && (
                         <span className="text-xs font-medium text-gray-500">
                           Due: {formatDate(task.dueDate)}
                         </span>
                       )}
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      {createdTasks.some((t: Task) => t.id === task.id) ? 
+                        <Badge variant="default" className="text-xs">Created</Badge> : 
+                        <Badge variant="secondary" className="text-xs">Assigned</Badge>
+                      }
                     </div>
                   </div>
                 </Card>
@@ -258,10 +399,10 @@ export default function DashboardPage() {
                         {formatDate(log.startTime)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {projects.find((p: Project) => p.id === log.projectId)?.name || 'No Project'}
+                        {allProjects.find((p: Project) => p.id === log.projectId)?.name || 'No Project'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {tasks.find((t: Task) => t.id === log.taskId)?.subject || 'No Task'}
+                        {allTasks.find((t: Task) => t.id === log.taskId)?.subject || 'No Task'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {log.timeSpent ? formatDuration(log.timeSpent) : 'In Progress'}
@@ -283,7 +424,7 @@ export default function DashboardPage() {
             </Link>
           </div>
           
-          {projectsLoading ? (
+          {projectsDataLoading ? (
             <Card className="p-8 text-center">
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
@@ -295,7 +436,7 @@ export default function DashboardPage() {
                 <div className="w-24 h-2 bg-gray-200 rounded animate-pulse"></div>
               </div>
             </Card>
-          ) : projects.length === 0 ? (
+          ) : allProjects.length === 0 ? (
             <Card className="p-8 text-center">
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -315,14 +456,20 @@ export default function DashboardPage() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {projects.slice(0, 3).map((project: Project) => (
+              {allProjects.slice(0, 3).map((project: Project) => (
                 <Link href={`/projects/${project.id}`} key={project.id}>
                   <Card className="h-full hover:shadow-md transition-shadow">
-                    <h3 className="text-md font-medium text-gray-900">{project.name}</h3>
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-md font-medium text-gray-900">{project.name}</h3>
+                      {ownedProjects.some((p: Project) => p.id === project.id) ? 
+                        <Badge variant="primary" className="text-xs">Owner</Badge> : 
+                        <Badge variant="secondary" className="text-xs">Member</Badge>
+                      }
+                    </div>
                     <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.description}</p>
                     <div className="mt-4 flex items-center justify-between">
                       <Badge variant="primary" rounded>
-                        {tasks.filter((t: Task) => t.projectId === project.id).length} Tasks
+                        {allTasks.filter((t: Task) => t.projectId === project.id).length} Tasks
                       </Badge>
                       <span className="text-xs text-gray-500">
                         Created {formatDate(project.createdAt)}

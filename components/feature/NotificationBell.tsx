@@ -3,7 +3,7 @@
 import Badge  from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Bell, Check } from "lucide-react";
+import { Bell, CheckCircle, Circle } from "lucide-react";
 // import { useState } from "react";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import useAuthStore from "@/store/auth";
@@ -11,22 +11,6 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Notification } from "@/services/notification";
 import { cn } from "@/lib/utils";
-
-function Dot({ className }: { className?: string }) {
-  return (
-    <svg
-      width="6"
-      height="6"
-      fill="currentColor"
-      viewBox="0 0 6 6"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      <circle cx="3" cy="3" r="3" />
-    </svg>
-  );
-}
 
 export default function NotificationBell() {
   const { isAuthenticated } = useAuthStore();
@@ -36,6 +20,7 @@ export default function NotificationBell() {
     markAsRead, 
     markAllAsRead 
   } = useNotificationStore();
+    console.log("🚀 ~ NotificationBell ~ unreadCount:", unreadCount)
 
   const handleNotificationClick = (id: number) => {
     markAsRead(id);
@@ -67,7 +52,7 @@ export default function NotificationBell() {
       <PopoverTrigger asChild>
         <Button size="icon" variant="outline" className="relative" aria-label="Open notifications">
           <Bell size={16} strokeWidth={2} aria-hidden="true" />
-          {unreadCount > 0 && (
+          {unreadCount  && (
             <Badge className="absolute -top-2 left-full min-w-5 -translate-x-1/2 px-1">
               {unreadCount > 99 ? "99+" : unreadCount}
             </Badge>
@@ -101,19 +86,36 @@ export default function NotificationBell() {
               key={notification.id}
               className={cn(
                 "rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent",
-                notification.isRead === 0 && "bg-blue-50/30"
+                notification.isRead === 0 ? "bg-blue-50" : "bg-transparent"
               )}
             >
               <div className="relative flex items-start pe-3">
+                <div className="flex-shrink-0 mt-1 mr-2">
+                  <button 
+                    onClick={(e) => handleMarkAsRead(e, notification.id)}
+                    className={cn(
+                      "flex items-center justify-center w-5 h-5 rounded-sm hover:bg-gray-100",
+                      notification.isRead === 0 ? "text-primary-600" : "text-gray-400"
+                    )}
+                    title={notification.isRead === 0 ? "Mark as read" : "Already read"}
+                  >
+                    {notification.isRead === 0 ? (
+                      <Circle size={16} className="text-primary-600" />
+                    ) : (
+                      <CheckCircle size={16} className="text-gray-500" />
+                    )}
+                  </button>
+                </div>
+                
                 <div className="flex-1 space-y-1">
                   <Link
                     href={`/${notification.entityType?.toLowerCase() || 'tasks'}/${notification.entityId || ''}`}
-                    className="text-left text-foreground/80 after:absolute after:inset-0"
+                    className="text-left text-foreground/80 after:absolute after:inset-0 z-10"
                     onClick={() => handleNotificationClick(notification.id)}
                   >
                     <span className={cn(
                       "font-medium hover:underline",
-                      notification.isRead === 0 ? "text-foreground" : "text-foreground/80"
+                      notification.isRead === 0 ? "text-foreground font-semibold" : "text-foreground/80"
                     )}>
                       {notification.title}
                     </span>
@@ -125,23 +127,8 @@ export default function NotificationBell() {
                     <div className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                     </div>
-                    {notification.isRead === 0 && (
-                      <button 
-                        onClick={(e) => handleMarkAsRead(e, notification.id)}
-                        className="text-xs text-primary-600 hover:text-primary-700 flex items-center p-1 rounded-sm hover:bg-primary-50"
-                        title="Mark as read"
-                      >
-                        <Check size={14} />
-                      </button>
-                    )}
                   </div>
                 </div>
-                {notification.isRead === 0 && (
-                  <div className="absolute end-0 top-1">
-                    <span className="sr-only">Unread</span>
-                    <Dot className="text-red-600" />
-                  </div>
-                )}
               </div>
             </div>
           ))
