@@ -20,8 +20,7 @@ export default function NotificationBell() {
     markAsRead, 
     markAllAsRead 
   } = useNotificationStore();
-    console.log("🚀 ~ NotificationBell ~ unreadCount:", unreadCount)
-
+  
   const handleNotificationClick = (id: number) => {
     markAsRead(id);
   };
@@ -49,7 +48,7 @@ export default function NotificationBell() {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild>  
         <Button size="icon" variant="outline" className="relative" aria-label="Open notifications">
           <Bell size={16} strokeWidth={2} aria-hidden="true" />
           {unreadCount  && (

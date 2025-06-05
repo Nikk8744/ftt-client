@@ -109,6 +109,16 @@ const TaskForm = ({
   // Current assignees
   const assignees = assigneeData?.data || [];
 
+  // For new tasks, store selected assignees until task is created
+  const [selectedAssignees, setSelectedAssignees] = useState<User[]>([]);
+  
+  useEffect(() => {
+    // Add current user as default assignee for new tasks
+    if (!isEditMode && currentUser && selectedAssignees.length === 0) {
+      setSelectedAssignees([currentUser]);
+    }
+  }, [currentUser, isEditMode, selectedAssignees.length]);
+
   const {
     register,
     handleSubmit,
@@ -169,9 +179,13 @@ const TaskForm = ({
           await Promise.all(promises);
         }
 
-        // Assign the current user to the task by default
-        if (response.task && currentUser) {
-          await assignUserToTask(response.task.id, currentUser.id);
+        // Assign all selected users to the task
+        if (response.task && selectedAssignees.length > 0) {
+          const newTaskId = response.task.id;
+          const assignPromises = selectedAssignees.map(user => 
+            assignUserToTask(newTaskId, user.id)
+          );
+          await Promise.all(assignPromises);
         }
 
         return response;
@@ -193,6 +207,7 @@ const TaskForm = ({
       onClose();
       reset();
       setTemporaryItems([]);
+      setSelectedAssignees([]);
     },
     onError: (error) => {
       console.error("Error creating task:", error);
@@ -306,8 +321,31 @@ const TaskForm = ({
 
   // Handle assign user
   const handleAssignUser = () => {
-    if (selectedUserId && isEditMode) {
-      assignUserMutation.mutate(selectedUserId);
+    if (selectedUserId) {
+      if (isEditMode) {
+        // For edit mode, use API to assign user
+        assignUserMutation.mutate(selectedUserId);
+      } else {
+        // For create mode, store in local state until task is created
+        const userToAdd = projectMembersData?.members?.find(
+          (member: User) => member.id === selectedUserId
+        );
+        
+        if (userToAdd && !selectedAssignees.some(user => user.id === userToAdd.id)) {
+          setSelectedAssignees([...selectedAssignees, userToAdd]);
+        }
+        
+        setAssignUserModalOpen(false);
+        setSelectedUserId(null);
+        setFilterText('');
+      }
+    }
+  };
+
+  // Remove assigned user (only for create mode)
+  const handleRemoveAssignee = (userId: number) => {
+    if (!isEditMode) {
+      setSelectedAssignees(selectedAssignees.filter(user => user.id !== userId));
     }
   };
 
@@ -428,16 +466,16 @@ const TaskForm = ({
             <label className="block text-sm font-medium text-gray-900">
               Assignees
             </label>
-            {isEditMode && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setAssignUserModalOpen(true)}
-                className="text-xs"
-              >
-                {assignees.length > 0 ? "Add More" : "Assign"}
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setAssignUserModalOpen(true)}
+              className="text-xs"
+            >
+              {isEditMode 
+                ? (assignees.length > 0 ? "Add More" : "Assign") 
+                : (selectedAssignees.length > 0 ? "Add More" : "Assign")}
+            </Button>
           </div>
           
           {isEditMode ? (
@@ -465,19 +503,50 @@ const TaskForm = ({
               </div>
             )
           ) : (
-            // For new tasks, show the current user as the default assignee
-            currentUser && (
-              <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5">
-                <Avatar name={currentUser.name} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-gray-900 truncate">
-                    {currentUser.name}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {currentUser.email}
-                  </p>
-                </div>
-                <p className="text-xs text-gray-500">(Default)</p>
+            // For new tasks, show selected assignees
+            selectedAssignees.length > 0 ? (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {selectedAssignees.map((assignee: User) => (
+                  <div key={assignee.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5">
+                    <Avatar name={assignee.name} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {assignee.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {assignee.email}
+                      </p>
+                    </div>
+                    {selectedAssignees.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveAssignee(assignee.id)}
+                        className="text-gray-400 hover:text-gray-500"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
+                <p className="text-sm text-gray-500">
+                  No assignees yet. Click &quot;Assign&quot; to add users.
+                </p>
               </div>
             )
           )}
@@ -639,104 +708,106 @@ const TaskForm = ({
       </form>
 
       {/* Assign User Modal */}
-      {isEditMode && (
-        <Modal
-          isOpen={assignUserModalOpen}
-          onClose={() => {
-            setAssignUserModalOpen(false);
-            setSelectedUserId(null);
-            setFilterText('');
-          }}
-          title="Assign User to Task"
-          footer={
-            <div className="flex justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setAssignUserModalOpen(false);
-                  setSelectedUserId(null);
-                  setFilterText('');
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                onClick={handleAssignUser}
-                disabled={!selectedUserId || assignUserMutation.isPending}
-                isLoading={assignUserMutation.isPending}
-              >
-                Assign
-              </Button>
-            </div>
-          }
-        >
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-                Filter Users
-              </label>
-              <input
-                type="text"
-                id="search"
-                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                placeholder="Filter by name or email..."
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
-              />
-            </div>
-            
-            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
-              {projectMembersLoading ? (
-                <div className="p-4 space-y-2">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center gap-3 animate-pulse">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                      <div className="flex-1">
-                        <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                        <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+      <Modal
+        isOpen={assignUserModalOpen}
+        onClose={() => {
+          setAssignUserModalOpen(false);
+          setSelectedUserId(null);
+          setFilterText('');
+        }}
+        title="Assign User to Task"
+        footer={
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setAssignUserModalOpen(false);
+                setSelectedUserId(null);
+                setFilterText('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={handleAssignUser}
+              disabled={!selectedUserId || (isEditMode && assignUserMutation.isPending)}
+              isLoading={isEditMode && assignUserMutation.isPending}
+            >
+              Assign
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+              Filter Users
+            </label>
+            <input
+              type="text"
+              id="search"
+              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              placeholder="Filter by name or email..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+            />
+          </div>
+          
+          <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
+            {projectMembersLoading ? (
+              <div className="p-4 space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-3 animate-pulse">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-3 bg-gray-200 rounded mb-1"></div>
+                      <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : projectMembersData?.members && projectMembersData.members.length > 0 ? (
+              <div className="divide-y divide-gray-100">
+                {projectMembersData.members
+                  .filter((user: User) => 
+                    !filterText || 
+                    user.name.toLowerCase().includes(filterText.toLowerCase()) || 
+                    user.email.toLowerCase().includes(filterText.toLowerCase())
+                  )
+                  // For create mode, exclude already selected users
+                  .filter((user: User) => 
+                    isEditMode || !selectedAssignees.some(assignee => assignee.id === user.id)
+                  )
+                  .map((user: User) => (
+                    <div 
+                      key={user.id}
+                      className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedUserId === user.id ? 'bg-blue-50' : ''}`}
+                      onClick={() => setSelectedUserId(user.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar name={user.name} size="sm" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                          <p className="text-xs text-gray-500">{user.email}</p>
+                        </div>
                       </div>
+                      {selectedUserId === user.id && (
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
                     </div>
                   ))}
-                </div>
-              ) : projectMembersData?.members && projectMembersData.members.length > 0 ? (
-                <div className="divide-y divide-gray-100">
-                  {projectMembersData.members
-                    .filter((user: User) => 
-                      !filterText || 
-                      user.name.toLowerCase().includes(filterText.toLowerCase()) || 
-                      user.email.toLowerCase().includes(filterText.toLowerCase())
-                    )
-                    .map((user: User) => (
-                      <div 
-                        key={user.id}
-                        className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedUserId === user.id ? 'bg-blue-50' : ''}`}
-                        onClick={() => setSelectedUserId(user.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar name={user.name} size="sm" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                            <p className="text-xs text-gray-500">{user.email}</p>
-                          </div>
-                        </div>
-                        {selectedUserId === user.id && (
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <div className="p-4 text-center text-gray-500">
-                  <p>No project members found</p>
-                </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                <p>No project members found</p>
+              </div>
+            )}
           </div>
-        </Modal>
-      )}
+        </div>
+      </Modal>
     </Modal>
   );
 };
