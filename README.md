@@ -2,7 +2,7 @@
 
 
 ## Todos:
-- change the landing page of website and also solve the slow rendering issue.
+- change the landing page of website and also solve the slow rendering issue. 
 - in the project / task modal add the option to add users. ✔️
 - change the sidebar in dashboard.
 - change the login and register page

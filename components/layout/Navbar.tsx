@@ -44,7 +44,7 @@ export default function Navbar() {
                 Testimonials
               </Link>
               <Link href="#pricing" className="text-black hover:text-blue-500 text-sm transition-colors">
-                Pricing
+                FAQs
               </Link>
             </div>
           </div>

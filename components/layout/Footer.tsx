@@ -40,7 +40,7 @@ const FooterLink = ({ href, children }: { href: string; children: React.ReactNod
 const SocialLink = ({ href, label, children }: { href: string; label: string; children: React.ReactNode }) => (
   <a 
     href={href} 
-    className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-blue-600/30 hover:text-blue-300 transition-all duration-300 ease-in-out hover:-translate-y-1 transform"
+    className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 hover:text-blue-300 transition-all duration-300 ease-in-out hover:-translate-y-1 transform"
     aria-label={label}
   >
     {children}
