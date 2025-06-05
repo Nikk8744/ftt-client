@@ -153,9 +153,9 @@ export default function HowItWorksSection() {
   return (
     <section ref={sectionRef} className="py-32 px-6 max-w-7xl mx-auto relative" id="how-it-works">
       <h2 className="text-4xl font-bold text-slate-50 text-center mb-6">
-        How <span className="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">TimeTracker</span> Works
+        How <span className="text-lime-500 bg-clip-text">TimeTracker</span> Works
       </h2>
-      <p className="text-xl text-slate-300 text-center max-w-2xl mx-auto mb-20">
+      <p className="text-xl text-lime-500 text-center max-w-2xl mx-auto mb-20">
         Our simple 4-step process helps you track time efficiently and get paid faster
       </p>
       

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import HeroSection from '@/components/feature/HeroSection';
 import FlowingFeaturesSection from '@/components/feature/FlowingFeaturesSection';
 import TestimonialsSection from '@/components/feature/TestimonialsSection';
-import PricingSection from '@/components/feature/PricingSection';
+import FAQSection from '@/components/feature/FAQSection';
 import HowItWorksSection from '@/components/feature/HowItWorksSection';
 import CTASection from '@/components/feature/CTASection';
 import Navbar from '@/components/layout/Navbar';
@@ -95,8 +95,8 @@ export default function Home() {
           <FlowingFeaturesSection />
         </div>
         
-        <div id="how-it-works" className="fade-in">
-          <HowItWorksSection />
+        <div id="how-it-works" className="fade-in bg-[#0a0a0a]">
+          <HowItWorksSection />s
         </div>
         
         <div id="testimonials" className="fade-in">
@@ -104,7 +104,8 @@ export default function Home() {
         </div>
         
         <div id="pricing" className="fade-in">
-          <PricingSection />
+          {/* <PricingSection /> */}
+          <FAQSection />
         </div>
         
         <div className="fade-in">

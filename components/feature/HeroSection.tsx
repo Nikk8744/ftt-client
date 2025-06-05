@@ -534,7 +534,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <div className="relative bg-[#5580dd] overflow-hidden pt-16">
+    <div className="relative bg-[#0a0a0a] overflow-hidden pt-16">
       {/* Aurora background effect */}
       <div className="absolute inset-0 z-0">
         <Aurora 

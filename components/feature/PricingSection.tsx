@@ -55,14 +55,14 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-24 bg-gray-50">
+    <section id="pricing" className="py-24 bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
-          <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Pricing</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-base text-white font-semibold tracking-wide uppercase">Pricing</h2>
+          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-lime-400 sm:text-4xl">
             Plans for teams of all sizes
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+          <p className="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
             Choose the perfect plan for your needs. Start with our free tier and upgrade as you grow.
           </p>
           

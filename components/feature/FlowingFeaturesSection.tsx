@@ -41,11 +41,11 @@ export default function FlowingFeaturesSection() {
     <section id="features" className="py-24 bg-neutral-950">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center mb-16 max-w-5xl mx-auto">
-          <h2 className="text-base text-indigo-400 font-semibold tracking-wide uppercase">Features</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-base text-white font-semibold tracking-wide uppercase">Features</h2>
+          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-lime-500 sm:text-4xl">
             Everything you need to manage your time
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-400 lg:mx-auto">
+          <p className="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
             Our comprehensive set of features helps freelancers and teams track time, manage projects, and improve productivity.
           </p>
         </div>

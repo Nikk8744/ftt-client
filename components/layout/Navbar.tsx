@@ -8,7 +8,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 bg-[#0c1e36] h-16`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 bg-lime-500 h-16`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 h-full">
         <div className="flex items-center h-full">
           {/* Left - Logo */}
@@ -27,23 +27,23 @@ export default function Navbar() {
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg> */}
-              <span className="text-lg font-semibold text-white font-serif">TimeTracker</span>
+              <span className="text-lg font-semibold text-black font-serif">TimeTracker</span>
             </Link>
           </div>
 
           {/* Center - Navigation Links */}
           <div className="flex-grow hidden md:flex justify-center font-serif">
             <div className="flex space-x-10">
-              <Link href="#features" className="text-gray-300 hover:text-blue-500 text-sm transition-colors">
+              <Link href="#features" className="text-black hover:text-blue-500 text-sm transition-colors">
                 Features
               </Link>
-              <Link href="#how-it-works" className="text-gray-300 hover:text-blue-500 text-sm transition-colors">
+              <Link href="#how-it-works" className="text-black hover:text-blue-500 text-sm transition-colors">
                 How It Works
               </Link>
-              <Link href="#testimonials" className="text-gray-300 hover:text-blue-500 text-sm transition-colors">
+              <Link href="#testimonials" className="text-black hover:text-blue-500 text-sm transition-colors">
                 Testimonials
               </Link>
-              <Link href="#pricing" className="text-gray-300 hover:text-blue-500 text-sm transition-colors">
+              <Link href="#pricing" className="text-black hover:text-blue-500 text-sm transition-colors">
                 Pricing
               </Link>
             </div>
@@ -53,7 +53,7 @@ export default function Navbar() {
           <div className="flex-none w-40 hidden md:flex justify-end">
             <Link 
               href="/login" 
-              className="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="px-5 py-2 rounded-xl bg-black text-white text-sm font-medium hover:bg-blue-700 transition-colors"
             >
               Log in
             </Link>
