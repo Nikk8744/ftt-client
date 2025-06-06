@@ -561,7 +561,7 @@ export default function HeroSection() {
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
                   href="/register"
-                  className="inline-block px-6 py-3 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-block px-6 py-3 rounded-md bg-atlantis-400 text-slate-900 font-medium hover:bg-atlantis-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Get Started - It&apos;s Free
                 </Link>

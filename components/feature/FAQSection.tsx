@@ -47,7 +47,7 @@ const faqData = [
 
 export default function FAQSection() {
   return (
-    <section className="py-24 bg-[#0a0a0a] relative overflow-hidden">
+    <section className="py-24 bg-[#0a0a0a] overflow-hidden">
       {/* Background decoration */}
       {/* <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.1),transparent_50%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(56,189,248,0.1),transparent_50%)]"></div> */}
@@ -75,7 +75,7 @@ export default function FAQSection() {
                 value={faq.id}
                 className="rounded-lg backdrop-blur-sm transition-all duration-300"
               >
-                <AccordionTrigger className="text-left bg-lime-400 text-black px-6 py-4 text-lg font-medium">
+                <AccordionTrigger className="text-left bg-lime-400/100 text-black px-6 py-4 text-lg font-medium">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-slate-900 px-6 pb-4 text-base leading-relaxed">

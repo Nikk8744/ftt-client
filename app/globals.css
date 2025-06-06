@@ -57,6 +57,18 @@ html, body {
     --base-font-weight: 500;
     --heading-font-weight: 700;
     --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
+    /* Atlantis color palette */
+    --color-atlantis-50: #f5fee7;
+    --color-atlantis-100: #e9fccb;
+    --color-atlantis-200: #d5f99d;
+    --color-atlantis-300: #baf264;
+    --color-atlantis-400: #a0e635;
+    --color-atlantis-500: #84cc16;
+    --color-atlantis-600: #68a30d;
+    --color-atlantis-700: #517c0f;
+    --color-atlantis-800: #426212;
+    --color-atlantis-900: #3a5314;
+    --color-atlantis-950: #1e2e05;
   }
   .dark {
     --background: 0 0% 3.9%;

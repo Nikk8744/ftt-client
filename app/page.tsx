@@ -58,14 +58,14 @@ export default function Home() {
       left: '10%',
       width: '300px',
       height: '300px',
-      background: 'rgba(56, 189, 248, 0.15)',
+      background: 'rgba(186, 242, 100, 0.15)', // Using atlantis-300 with low opacity
     },
     orb2: {
       bottom: '20%',
       right: '10%',
       width: '400px',
       height: '400px',
-      background: 'rgba(168, 85, 247, 0.1)',
+      background: 'rgba(160, 230, 53, 0.1)', // Using atlantis-400 with low opacity
     },
     clockIcon: {
       display: 'inline-block',
@@ -82,8 +82,7 @@ export default function Home() {
   return (
     <div style={styles.container}>
       <div style={{...styles.orb, ...styles.orb1}}></div>
-      <div style={{...styles.orb, ...styles.orb2}}></div>
-      
+      <div style={{...styles.orb, ...styles.orb2}}></div>  
       <Navbar />
       
       <main style={styles.main}>
@@ -96,7 +95,7 @@ export default function Home() {
         </div>
         
         <div id="how-it-works" className="fade-in bg-[#0a0a0a]">
-          <HowItWorksSection />s
+          <HowItWorksSection />
         </div>
         
         <div id="testimonials" className="fade-in">

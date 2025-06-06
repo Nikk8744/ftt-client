@@ -1,14 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [prevScrollPos, setPrevScrollPos] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollPos = window.pageYOffset;
+      
+      // True if scrolling up, false if scrolling down
+      const visible = prevScrollPos > currentScrollPos || currentScrollPos < 10;
+      
+      setPrevScrollPos(currentScrollPos);
+      setIsVisible(visible);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [prevScrollPos]);
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 bg-lime-500 h-16`}>
+    <nav 
+      className={`w-full z-50 transition-all duration-500 rounded-b-3xl border-b-2 border-atlantis-500 rounded-t-md bg-black h-20 fixed top-0 transform ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 h-full">
         <div className="flex items-center h-full">
           {/* Left - Logo */}
@@ -27,23 +48,23 @@ export default function Navbar() {
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg> */}
-              <span className="text-lg font-semibold text-black font-serif">TimeTracker</span>
+              <span className="text-lg font-semibold text-white font-serif border-2 border-atlantis-500 px-7 py-3 rounded-xl">TimeTracker</span>
             </Link>
           </div>
 
           {/* Center - Navigation Links */}
-          <div className="flex-grow hidden md:flex justify-center font-serif">
-            <div className="flex space-x-10">
-              <Link href="#features" className="text-black hover:text-blue-500 text-sm transition-colors">
+          <div className="flex-grow hidden md:flex justify-center font-serif text-xl tracking-wider">
+            <div className="flex ">
+              <Link href="#features" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
                 Features
               </Link>
-              <Link href="#how-it-works" className="text-black hover:text-blue-500 text-sm transition-colors">
+              <Link href="#how-it-works" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
                 How It Works
               </Link>
-              <Link href="#testimonials" className="text-black hover:text-blue-500 text-sm transition-colors">
+              <Link href="#testimonials" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
                 Testimonials
               </Link>
-              <Link href="#pricing" className="text-black hover:text-blue-500 text-sm transition-colors">
+              <Link href="#pricing" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
                 FAQs
               </Link>
             </div>
@@ -53,7 +74,7 @@ export default function Navbar() {
           <div className="flex-none w-40 hidden md:flex justify-end">
             <Link 
               href="/login" 
-              className="px-5 py-2 rounded-xl bg-black text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="px-5 py-3 rounded-xl border-2 border-atlantis-500 text-white text-base font-medium hover:bg-atlantis-500 transition-colors"
             >
               Log in
             </Link>
@@ -63,7 +84,7 @@ export default function Navbar() {
           <div className="ml-auto md:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700/50"
+              className="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-atlantis-600/50"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <span className="sr-only">Open main menu</span>
@@ -91,21 +112,21 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden bg-[#0c1e36] border-t border-gray-700 absolute w-full`}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          <Link href="#features" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" onClick={() => setIsMenuOpen(false)}>
+      <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden bg-atlantis-400 border-t-2 border-atlantis-600/50 rounded-3xl absolute w-full`}>
+        <div className="px-2 pt-2 pb-3 space-y-1 text-center font-mono text-lg tracking-wider">
+          <Link href="#features" className="block px-3 py-2 text-slate-900 hover:text-white hover:bg-atlantis-600 rounded-md" onClick={() => setIsMenuOpen(false)}>
             Features
           </Link>
-          <Link href="#how-it-works" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" onClick={() => setIsMenuOpen(false)}>
+          <Link href="#how-it-works" className="block px-3 py-2 text-slate-900 hover:text-white hover:bg-atlantis-600 rounded-md" onClick={() => setIsMenuOpen(false)}>
             How It Works
           </Link>
-          <Link href="#testimonials" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" onClick={() => setIsMenuOpen(false)}>
+          <Link href="#testimonials" className="block px-3 py-2 text-slate-900 hover:text-white hover:bg-atlantis-600 rounded-md" onClick={() => setIsMenuOpen(false)}>
             Testimonials
           </Link>
-          <Link href="#pricing" className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md" onClick={() => setIsMenuOpen(false)}>
-            Pricing
+          <Link href="#pricing" className="block px-3 py-2 text-slate-900 hover:text-white hover:bg-atlantis-600 rounded-md" onClick={() => setIsMenuOpen(false)}>
+            FAQs
           </Link>
-          <Link href="/login" className="block px-3 py-2 mt-2 text-center text-white bg-blue-600 hover:bg-blue-700 rounded-md" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/login" className="block px-3 py-2 mt-2 text-center border-2 text-black  hover:bg-atlantis-700 rounded-2xl" onClick={() => setIsMenuOpen(false)}>
             Log in
           </Link>
         </div>

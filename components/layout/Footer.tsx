@@ -30,7 +30,7 @@ const GitHubIcon = () => (
 const FooterLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <Link 
     href={href} 
-    className="text-black font-mono hover:text-rose-500 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
+    className="text-slate-900 font-mono hover:text-atlantis-700 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
   >
     {children}
   </Link>
@@ -62,7 +62,7 @@ export default function Footer() {
   
   return (
     <div className="px-4 md:px-6 lg:px-12 xl:px-12 pb-6 md:pb-12 pt-6 md:pt-12 bg-[#0a0a0a]">
-      <div className={`relative py-12 md:py-16 px-5 md:px-8 bg-lime-500 border border-slate-800/50 rounded-3xl overflow-hidden transition-opacity duration-1000 ${visible ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`relative py-12 md:py-16 px-5 md:px-8 bg-atlantis-400 border border-atlantis-500/50 rounded-3xl overflow-hidden transition-opacity duration-1000 ${visible ? 'opacity-100' : 'opacity-0'}`}>
         {/* Threads animation background */}
         {/* <div className="absolute inset-0 overflow-hidden rounded-3xl">
           <Threads 
@@ -75,10 +75,10 @@ export default function Footer() {
         
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Contact Us Header - Similar to reference image */}
-          <div className="mb-10 pb-4 border-b border-slate-700/50">
+          <div className="mb-10 pb-4 border-b border-atlantis-600/50">
             <h2 className="text-xl md:text-3xl font-mono text-black flex items-center">
               CONTACT US
-              <span className="ml-2 flex items-center justify-center w-6 h-6 rounded-md bg-blue-100/20 text-black">
+              <span className="ml-2 flex items-center justify-center w-6 h-6 rounded-md bg-atlantis-200 text-atlantis-800">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
@@ -95,9 +95,9 @@ export default function Footer() {
                 <div className="w-8 h-8 rounded-md bg-gradient-to-br flex items-center justify-center">
                     <Clock className="w-7 h-7 text-black" />
                 </div>
-                <h3 className="text-xl font-bold text-black font-mono tracking-wider">TimeTracker</h3>
+                <h3 className="text-xl font-bold text-slate-900 font-mono tracking-wider">TimeTracker</h3>
               </div>
-              <p className="text-slate-900 font-mono tracking-wider text-sm">The best time tracking solution for freelancers and small teams. Track time, manage projects, and get paid.</p>
+              <p className="text-slate-800 font-mono tracking-wider text-sm">The best time tracking solution for freelancers and small teams. Track time, manage projects, and get paid.</p>
               
               {/* Social links */}
               <div className="flex space-x-3 pt-2">
@@ -115,7 +115,7 @@ export default function Footer() {
             
             {/* Product column */}
             <div className="space-y-4">
-              <h3 className="text-md font-bold uppercase text-black tracking-wider">Product</h3>
+              <h3 className="text-md font-bold uppercase text-slate-900 tracking-wider">Product</h3>
               <div className="flex flex-col space-y-2">
                 <FooterLink href="#features">Features</FooterLink>
                 <FooterLink href="#pricing">Pricing</FooterLink>
@@ -126,7 +126,7 @@ export default function Footer() {
             
             {/* Resources column */}
             <div className="space-y-4">
-              <h3 className="text-md font-bold uppercase text-black tracking-wider">Resources</h3>
+              <h3 className="text-md font-bold uppercase text-slate-900 tracking-wider">Resources</h3>
               <div className="flex flex-col space-y-2">
                 <FooterLink href="#">Blog</FooterLink>
                 <FooterLink href="#">Help Center</FooterLink>
@@ -170,7 +170,7 @@ export default function Footer() {
           </div> */}
           
           {/* Bottom bar with copyright and Back to Top */}
-          <div className="mt-12 pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center text-slate-900 text-sm">
+          <div className="mt-12 pt-8 border-t border-atlantis-600/50 flex flex-col md:flex-row justify-between items-center text-slate-800 text-sm">
             <div className="mb-4 md:mb-0">
               © {new Date().getFullYear()} TimeTracker. All rights reserved.
             </div>
@@ -180,7 +180,7 @@ export default function Footer() {
               <FooterLink href="#">Cookies</FooterLink>
               <a 
                 href="#top" 
-                className="ml-4 text-black hover:text-red-500 transition-colors duration-300 flex items-center gap-1.5 font-medium"
+                className="ml-4 text-slate-900 hover:text-atlantis-700 transition-colors duration-300 flex items-center gap-1.5 font-medium"
               >
                 GO BACK TO TOP
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
