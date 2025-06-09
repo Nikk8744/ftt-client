@@ -9,3 +9,4 @@
 - add dark mode(in dashboard)
 - also remove the unwanted code from pages and components.
 - improve the extra code that we have written.
+

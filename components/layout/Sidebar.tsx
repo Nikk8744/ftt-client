@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Home, FolderOpen, CheckCircle, Clock, Settings, ExternalLink } from 'lucide-react';
+import { Menu, X, Home, FolderOpen, CheckCircle, Clock, Settings, ExternalLink, BarChart2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
     
 interface NavItem {
@@ -36,6 +36,11 @@ const navigation: NavItem[] = [
     name: 'Time Logs',
     href: '/logs',
     icon: <Clock className="w-5 h-5" />,
+  },
+  {
+    name: 'Reports',
+    href: '/reports',
+    icon: <BarChart2 className="w-5 h-5" />,
   },
   {
     name: 'Settings',
@@ -154,8 +159,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out
                     group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50
                     ${isActive 
-                      ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 shadow-sm' 
-                      : 'text-gray-600 hover:text-indigo-700'
+                      ? 'bg-[#ecf3ff] text-[#5364c5] font-semibold shadow-sm' 
+                      : 'text-gray-700 font-semibold hover:text-indigo-700'
                     }
                   `}
                 >

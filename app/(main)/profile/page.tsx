@@ -309,7 +309,7 @@ export default function ProfilePage() {
                     </span>
                   </div>
                 </div>
-              </Card>
+              </Card> 
             </div>
           </div>
         </div>
