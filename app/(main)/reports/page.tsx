@@ -21,7 +21,10 @@ import {
   RiskAssessment,
   TaskCompletionTrend,
   ProjectSummary,
-  TaskStatusSummary
+  TaskStatusSummary,
+  getProjectReportPdf,
+  getTasksReportPdf,
+  getAllProjectsReportPdf
 } from '@/services/reports';
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
 import { getAllProjectsOfUser } from '@/services/project';
@@ -272,9 +275,42 @@ export default function ReportsPage() {
     fetchRiskData();
   }, [activeTab, risksProjectId]);
 
-  const handleExport = (format: 'pdf' | 'csv' | 'excel') => {
-    console.log(`Exporting report as ${format}`);
-    // In a real implementation, this would call an API endpoint to generate and download the report
+  const handleExport = () => {
+    // Determine which report to export based on active tab
+    switch (activeTab) {
+      case 'overview':
+        // For overview tab, export all projects summary report
+        getAllProjectsReportPdf();
+        break;
+      case 'projects':
+        // For projects tab, export all projects summary report
+        getAllProjectsReportPdf();
+        break;
+      case 'tasks':
+        // For tasks tab, export tasks report with project filter if selected
+        getTasksReportPdf(tasksProjectId !== 'all' ? tasksProjectId : undefined);
+        break;
+      case 'team':
+        // For team tab, export project report for the selected project
+        if (teamProjectId !== 'all') {
+          getProjectReportPdf(teamProjectId);
+        } else {
+          // If no project selected, show message
+          console.log('Please select a project to export team report');
+        }
+        break;
+      case 'risks':
+        // For risks tab, export project report for the selected project
+        if (risksProjectId !== 'all') {
+          getProjectReportPdf(risksProjectId);
+        } else {
+          // If no project selected, show message
+          console.log('Please select a project to export risks report');
+        }
+        break;
+      default:
+        break;
+    }
   };
 
   // Map API data structure to component expected structure for TeamWorkloadChart
@@ -308,7 +344,10 @@ export default function ReportsPage() {
               <DateRangePicker onChange={setDateRange} />
             </div>
           )}
-          <ExportButton onExport={handleExport} />
+          <ExportButton 
+            onExport={handleExport} 
+            disabled={isLoading || (activeTab === 'team' && teamProjectId === 'all') || (activeTab === 'risks' && risksProjectId === 'all')}
+          />
         </div>
       </div>
 
@@ -360,9 +399,13 @@ export default function ReportsPage() {
                   title="Project Status Distribution" 
                   description="Overview of project statuses across your organization"
                   actions={
-                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => getAllProjectsReportPdf()}
+                    >
                       <Download className="h-4 w-4 mr-1" />
-                      Export
+                      Export PDF
                     </Button>
                   }
                 >
@@ -375,9 +418,13 @@ export default function ReportsPage() {
                   title="Task Status Distribution" 
                   description="Overview of task statuses"
                   actions={
-                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => getTasksReportPdf()}
+                    >
                       <Download className="h-4 w-4 mr-1" />
-                      Export
+                      Export PDF
                     </Button>
                   }
                 >
@@ -390,9 +437,13 @@ export default function ReportsPage() {
                   title="Task Completion Trend" 
                   description="Trend of tasks completed over time"
                   actions={
-                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleExport()}
+                    >
                       <Download className="h-4 w-4 mr-1" />
-                      Export
+                      Export PDF
                     </Button>
                   }
                 >
@@ -463,7 +514,7 @@ export default function ReportsPage() {
                   title="Project Status Distribution" 
                   description="Overview of project statuses across your organization"
                   actions={
-                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                    <Button variant="ghost" size="sm" onClick={() => handleExport()}>
                       <Download className="h-4 w-4 mr-1" />
                       Export
                     </Button>
@@ -517,7 +568,7 @@ export default function ReportsPage() {
                   title="Task Status Distribution" 
                   description="Overview of task statuses"
                   actions={
-                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                    <Button variant="ghost" size="sm" onClick={() => handleExport()}>
                       <Download className="h-4 w-4 mr-1" />
                       Export
                     </Button>
@@ -530,9 +581,13 @@ export default function ReportsPage() {
                   title="Task Completion Trend" 
                   description="Trend of tasks completed over time"
                   actions={
-                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleExport()}
+                    >
                       <Download className="h-4 w-4 mr-1" />
-                      Export
+                      Export PDF
                     </Button>
                   }
                 >
@@ -562,9 +617,14 @@ export default function ReportsPage() {
                   title="Team Workload" 
                   description="Task distribution and completion by team member"
                   actions={
-                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => teamProjectId !== 'all' ? getProjectReportPdf(teamProjectId) : null}
+                      disabled={teamProjectId === 'all'}
+                    >
                       <Download className="h-4 w-4 mr-1" />
-                      Export
+                      Export PDF
                     </Button>
                   }
                 >
@@ -596,12 +656,17 @@ export default function ReportsPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 gap-6">
-                <Card className="p-4">
+                <Card className="p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium">Risk Assessment</h3>
-                    <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
+                    <h3 className="text-lg font-medium">Project Risk Assessment</h3>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => risksProjectId !== 'all' ? getProjectReportPdf(risksProjectId) : null}
+                      disabled={risksProjectId === 'all'}
+                    >
                       <Download className="h-4 w-4 mr-1" />
-                      Export
+                      Export PDF
                     </Button>
                   </div>
                   {riskAssessmentData.length > 0 ? (

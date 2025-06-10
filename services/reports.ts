@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiGet } from './api-client';
+import axios from 'axios';
 
 export interface ProjectSummary {
   totalProjects: number;
@@ -235,14 +236,120 @@ export const getTaskCompletionTrend = async (projectId?: string, days: number = 
   }
 };
 
-// Get project report PDF
+// Get project report PDF for a specific project
 export const getProjectReportPdf = async (projectId: string) => {
-  const endpoint = `/reports/project/${projectId}/pdf`;
-  window.open(endpoint, '_blank');
+  try {
+    // Ensure projectId is valid
+    if (!projectId || projectId === 'all') {
+      console.error('Invalid project ID for project report');
+      return;
+    }
+    
+    // Use the correct API path that will be properly routed through Next.js
+    const endpoint = `http://localhost:5000/api/v1/reports/project/${projectId}/pdf`;
+    
+    console.log('Downloading PDF from:', endpoint);
+    
+    // Use axios to make a direct request with proper blob handling
+    const response = await axios.get(endpoint, {
+      responseType: 'blob',
+      withCredentials: true,
+      headers: {
+        'Accept': 'application/pdf',
+      }
+    });
+    
+    // Create a blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `project-${projectId}-report.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+    
+    console.log(`Project report for project ${projectId} downloaded successfully`);
+  } catch (error) {
+    console.error('Error downloading project report:', error);
+    alert('Failed to download report. Please try again later.');
+  }
 };
 
-// Get tasks report PDF
+// Get tasks report PDF (can be filtered by project)
 export const getTasksReportPdf = async (projectId?: string) => {
-  const endpoint = `/reports/tasks/pdf${projectId ? `?projectId=${projectId}` : ''}`;
-  window.open(endpoint, '_blank');
+  try {
+    // Use the correct API path that will be properly routed through Next.js
+    const endpoint = `http://localhost:5000/api/v1/reports/tasks/pdf${projectId ? `?projectId=${projectId}` : ''}`;
+    
+    console.log('Downloading PDF from:', endpoint);
+    
+    // Use axios to make a direct request with proper blob handling
+    const response = await axios.get(endpoint, {
+      responseType: 'blob',
+      withCredentials: true,
+      headers: {
+        'Accept': 'application/pdf',
+      }
+    });
+    
+    // Create a blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `tasks${projectId ? `-project-${projectId}` : ''}-report.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+    
+    console.log(`Tasks report ${projectId ? `for project ${projectId}` : 'for all projects'} downloaded successfully`);
+  } catch (error) {
+    console.error('Error downloading tasks report:', error);
+    alert('Failed to download report. Please try again later.');
+  }
+};
+
+// Get all projects summary report PDF
+export const getAllProjectsReportPdf = async () => {
+  try {
+    // Use the correct API path that will be properly routed through Next.js
+    const endpoint = 'http://localhost:5000/api/v1/reports/project/summary/all/pdf';
+    
+    console.log('Downloading PDF from:', endpoint);
+    
+    // Use axios to make a direct request with proper blob handling
+    const response = await axios.get(endpoint, {
+      responseType: 'blob',
+      withCredentials: true,
+      headers: {
+        'Accept': 'application/pdf',
+      }
+    });
+    console.log("🚀 ~ getAllProjectsReportPdf ~ response:", response)
+    
+    // Create a blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'all-projects-report.pdf');
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+    
+    console.log('All projects summary report downloaded successfully');
+  } catch (error) {
+    console.error('Error downloading all projects report:', error);
+    alert('Failed to download report. Please try again later.');
+  }
 };

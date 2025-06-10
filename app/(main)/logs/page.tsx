@@ -14,7 +14,7 @@ import Button from "@/components/ui/Button";
 import Modal, { ConfirmModal } from "@/components/ui/Modal";
 import { formatDate, formatDuration } from "@/lib/utils";
 import { Project, Task, TimeLog, TimeLogUpdateData } from "@/types";
-import { Pencil, Trash2 } from "lucide-react";
+import { Calendar, Check, ChevronDown, FilterIcon, FolderOpenDot, Pencil, Trash2, X, Zap } from "lucide-react";
 
 // Form validation schema
 const timeLogSchema = z.object({
@@ -229,19 +229,7 @@ export default function LogsPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                  />
-                </svg>
+                <FilterIcon className="w-5 h-5" />
                 <h3 className="text-base font-semibold text-gray-900">
                   Filters
                 </h3>
@@ -271,19 +259,7 @@ export default function LogsPage() {
                     }}
                     className="text-xs px-2 py-1 flex items-center gap-1"
                   >
-                    <svg
-                      className="w-3 h-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                   <X color="red" className="w-3 h-3" />
                     Clear All
                   </Button>
                 </div>
@@ -298,19 +274,7 @@ export default function LogsPage() {
                   htmlFor="project-filter"
                   className="flex items-center gap-2 text-sm font-medium text-gray-700"
                 >
-                  <svg
-                    className="w-4 h-4 text-gray-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
-                  </svg>
+                  <FolderOpenDot color="blue" className="w-4 h-4" />
                   Project
                 </label>
                 <div className="relative">
@@ -328,36 +292,12 @@ export default function LogsPage() {
                     ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <svg
-                      className="w-4 h-4 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                    <ChevronDown color="blue" className="w-4 h-4" />
                   </div>
                 </div>
                 {selectedProjectId && (
                   <div className="flex items-center gap-1 text-xs text-blue-600">
-                    <svg
-                      className="w-3 h-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <Check color="blue" className="w-3 h-3" />
                     Project filter applied
                   </div>
                 )}
@@ -369,19 +309,7 @@ export default function LogsPage() {
                   htmlFor="startDate"
                   className="flex items-center gap-2 text-sm font-medium text-gray-700"
                 >
-                  <svg
-                    className="w-4 h-4 text-gray-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
+                  <Calendar color="blue" className="w-4 h-4" />
                   From Date
                 </label>
                 <div className="relative">
@@ -397,19 +325,7 @@ export default function LogsPage() {
                 </div>
                 {dateRange.startDate && (
                   <div className="flex items-center gap-1 text-xs text-blue-600">
-                    <svg
-                      className="w-3 h-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <Check color="blue" className="w-3 h-3" />
                     Start date set
                   </div>
                 )}
@@ -421,19 +337,7 @@ export default function LogsPage() {
                   htmlFor="endDate"
                   className="flex items-center gap-2 text-sm font-medium text-gray-700"
                 >
-                  <svg
-                    className="w-4 h-4 text-gray-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
+                  <Calendar color="blue" className="w-4 h-4" />
                   To Date
                 </label>
                 <div className="relative">
@@ -450,19 +354,7 @@ export default function LogsPage() {
                 </div>
                 {dateRange.endDate && (
                   <div className="flex items-center gap-1 text-xs text-blue-600">
-                    <svg
-                      className="w-3 h-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <Check color="blue" className="w-3 h-3" />
                     End date set
                   </div>
                 )}
@@ -472,19 +364,7 @@ export default function LogsPage() {
             {/* Quick Filter Options */}
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-2 mb-2">
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
+                <Zap color="blue" className="w-4 h-4" />
                 <span className="text-sm font-medium text-gray-700">
                   Quick Filters
                 </span>
