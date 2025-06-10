@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { RiskAssessment } from '@/services/reports';
 import {
   Table,
   TableBody,
@@ -9,62 +10,56 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import Badge  from '@/components/ui/Badge';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
-
-interface Risk {
-  projectName: string;
-  riskLevel: 'High' | 'Medium' | 'Low';
-  description: string;
-  mitigationPlan: string;
-}
 
 interface RiskAssessmentTableProps {
-  data: Risk[];
+  data: RiskAssessment[];
 }
 
 const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({ data }) => {
-  const getRiskBadgeVariant = (risk: string) => {
-    switch (risk.toLowerCase()) {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No risk assessment data available</p>
+      </div>
+    );
+  }
+
+  // Function to get color based on risk level
+  const getRiskLevelColor = (level: string) => {
+    switch (level.toLowerCase()) {
       case 'high':
-        return 'destructive';
+        return 'bg-red-100 text-red-800';
       case 'medium':
-        return 'warning';
+        return 'bg-yellow-100 text-yellow-800';
       case 'low':
-        return 'outline';
+        return 'bg-green-100 text-green-800';
       default:
-        return 'secondary';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="w-full overflow-auto">
+    <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Project</TableHead>
+            <TableHead>Risk Name</TableHead>
             <TableHead>Risk Level</TableHead>
-            <TableHead className="hidden md:table-cell">Description</TableHead>
-            <TableHead className="hidden lg:table-cell">Mitigation Plan</TableHead>
+            <TableHead>Impact</TableHead>
+            <TableHead>Mitigation Plan</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((risk, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">{risk.projectName}</TableCell>
+            <TableRow key={risk.id || index}>
+              <TableCell className="font-medium">{risk.name}</TableCell>
               <TableCell>
-                <Badge variant={getRiskBadgeVariant(risk.riskLevel)}>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskLevelColor(risk.riskLevel)}`}>
                   {risk.riskLevel}
-                </Badge>
+                </span>
               </TableCell>
-              <TableCell className="hidden md:table-cell">{risk.description}</TableCell>
-              <TableCell className="hidden lg:table-cell">{risk.mitigationPlan}</TableCell>
+              <TableCell>{risk.impact}</TableCell>
+              <TableCell>{risk.mitigation}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import {
@@ -12,9 +10,10 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ChartOptions,
 } from 'chart.js';
 
-// Register Chart.js components
+// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -37,7 +36,7 @@ interface TaskCompletionChartProps {
 }
 
 const TaskCompletionChart: React.FC<TaskCompletionChartProps> = ({ data }) => {
-  // Format dates to be more readable (e.g., "Jan 1" or "01/15")
+  // Format dates to be more readable
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -53,10 +52,12 @@ const TaskCompletionChart: React.FC<TaskCompletionChartProps> = ({ data }) => {
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
         fill: true,
         tension: 0.4,
-        pointRadius: 3,
+        borderWidth: 2,
         pointBackgroundColor: 'rgba(34, 197, 94, 1)',
         pointBorderColor: '#fff',
         pointBorderWidth: 1,
+        pointRadius: 3,
+        pointHoverRadius: 5,
       },
       {
         label: 'Tasks Created',
@@ -65,48 +66,75 @@ const TaskCompletionChart: React.FC<TaskCompletionChartProps> = ({ data }) => {
         backgroundColor: 'rgba(99, 102, 241, 0.1)',
         fill: true,
         tension: 0.4,
-        pointRadius: 3,
+        borderWidth: 2,
         pointBackgroundColor: 'rgba(99, 102, 241, 1)',
         pointBorderColor: '#fff',
         pointBorderWidth: 1,
+        pointRadius: 3,
+        pointHoverRadius: 5,
       },
     ],
   };
 
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(0, 0, 0, 0.05)',
-        },
-        ticks: {
-          precision: 0,
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-        },
-      },
-    },
     plugins: {
       legend: {
-        position: 'bottom' as const,
+        position: 'top',
         labels: {
-          padding: 20,
-          boxWidth: 12,
+          usePointStyle: true,
+          boxWidth: 6,
           font: {
             size: 12,
           },
         },
       },
       tooltip: {
-        mode: 'index' as const,
-        intersect: false,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        titleColor: '#333',
+        bodyColor: '#666',
+        borderColor: 'rgba(200, 200, 200, 0.5)',
+        borderWidth: 1,
+        padding: 10,
+        boxPadding: 5,
+        usePointStyle: true,
+        callbacks: {
+          label: function(context) {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            return `${label}: ${value} tasks`;
+          }
+        }
       },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          font: {
+            size: 10,
+          },
+        },
+      },
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(200, 200, 200, 0.2)',
+        },
+        ticks: {
+          precision: 0,
+          font: {
+            size: 10,
+          },
+        },
+      },
+    },
+    interaction: {
+      mode: 'index',
+      intersect: false,
     },
   };
 

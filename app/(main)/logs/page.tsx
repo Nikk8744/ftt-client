@@ -14,6 +14,7 @@ import Button from "@/components/ui/Button";
 import Modal, { ConfirmModal } from "@/components/ui/Modal";
 import { formatDate, formatDuration } from "@/lib/utils";
 import { Project, Task, TimeLog, TimeLogUpdateData } from "@/types";
+import { Pencil, Trash2 } from "lucide-react";
 
 // Form validation schema
 const timeLogSchema = z.object({
@@ -641,15 +642,16 @@ export default function LogsPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => openEditModal(log)}
+                          className="hover:text-blue-500 hover:bg-gray-100"
                         >
-                          Edit
+                          <Pencil className="w-4 h-4 o" />
                         </Button>
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => openDeleteModal(log.id)}
                         >
-                          Delete
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </td>

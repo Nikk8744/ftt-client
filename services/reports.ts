@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiGet } from './api-client';
-import { TaskCompletionData } from '@/components/feature/reports/TaskCompletionChart';
 
 export interface ProjectSummary {
   totalProjects: number;
@@ -39,6 +39,7 @@ export interface TaskStatusSummary {
 export interface TaskStatusCount {
   status: string;
   count: number;
+  percentage?: number;
 }
 
 export interface TaskStatusResponse {
@@ -47,9 +48,12 @@ export interface TaskStatusResponse {
 }
 
 export interface TeamWorkloadData {
-  memberName: string;
-  tasksAssigned: number;
-  tasksCompleted: number;
+  userId: number;
+  userName: string;
+  email: string;
+  role: string;
+  taskCount: number;
+  completedCount: number;
 }
 
 export interface RiskAssessment {
@@ -119,24 +123,35 @@ export const getProjectSummary = async (projectId?: string): Promise<ProjectSumm
 export const getTaskStatusOverview = async (projectId?: string): Promise<TaskStatusSummary> => {
   try {
     const endpoint = `/reports/tasks/status${projectId ? `?projectId=${projectId}` : ''}`;
-    const response = await apiGet<TaskStatusResponse>(endpoint);
-    console.log("🚀 ~ getTaskStatusOverview ~ response:", response)
+    const response = await apiGet<any>(endpoint);
+    console.log("🚀 ~ getTaskStatusOverview ~ response:", response);
     
     // Process the response to match our expected format
     const { data } = response;
     
-    if (!Array.isArray(data)) {
+    if (!data) {
       console.error("API returned invalid data format for task status:", response);
-      return await getTaskStatusOverviewMock();
+      return {
+        totalTasks: 0,
+        completedTasks: 0,
+        inProgressTasks: 0,
+        pendingTasks: 0,
+        overdueTasks: 0,
+        completionRate: 0,
+        tasksByStatus: []
+      };
     }
     
-    // Calculate totals from the status array
-    const completedTasks = data.find(item => item.status === "Done")?.count || 0;
-    const inProgressTasks = data.find(item => item.status === "In-Progress")?.count || 0;
-    const pendingTasks = data.find(item => item.status === "Pending")?.count || 0;
-    const overdueTasks = data.find(item => item.status === "Overdue")?.count || 0   ;
-    const totalTasks = data.reduce((sum, item) => sum + item.count, 0);
-    const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    // Map the new response structure to our expected format
+    const tasksByStatus = data.distribution || [];
+    const totalTasks = data.totalTasks || 0;
+    const completedTasks = data.completedTasks || 0;
+    const overdueTasks = data.overdueCount || 0;
+    const completionRate = data.completionRate || 0;
+    
+    // Find in-progress and pending tasks from distribution
+    const inProgressTasks = tasksByStatus.find((item: { status: string; count: number; }) => item.status === "In-Progress")?.count || 0;
+    const pendingTasks = tasksByStatus.find((item: { status: string; count: number; }) => item.status === "Pending")?.count || 0;
     
     return {
       totalTasks,
@@ -145,11 +160,19 @@ export const getTaskStatusOverview = async (projectId?: string): Promise<TaskSta
       pendingTasks,
       overdueTasks,
       completionRate,
-      tasksByStatus: data
+      tasksByStatus
     };
   } catch (error) {
     console.error("Error fetching task status overview:", error);
-    return await getTaskStatusOverviewMock();
+    return {
+      totalTasks: 0,
+      completedTasks: 0,
+      inProgressTasks: 0,
+      pendingTasks: 0,
+      overdueTasks: 0,
+      completionRate: 0,
+      tasksByStatus: []
+    };
   }
 };
 
@@ -160,7 +183,20 @@ export const getProjectTasks = async (projectId: string) => {
 
 // Get team allocation for a project
 export const getTeamWorkload = async (projectId: string): Promise<TeamWorkloadData[]> => {
-  return apiGet<TeamWorkloadData[]>(`/reports/project/${projectId}/team`);
+  try {
+    const response = await apiGet<any>(`/reports/project/${projectId}/team`);
+    
+    // Check if response has the expected structure
+    if (!response || !response.data || !Array.isArray(response.data)) {
+      console.error("API returned invalid data format for team workload:", response);
+      return [];
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching team workload for project ${projectId}:`, error);
+    return [];
+  }
 };
 
 // Get risk assessment for a project
@@ -178,18 +214,24 @@ export const getOverdueTasks = async (projectId?: string) => {
 export const getTaskCompletionTrend = async (projectId?: string, days: number = 30): Promise<TaskCompletionTrend[]> => {
   try {
     const endpoint = `/reports/tasks/completion-trend${projectId ? `?projectId=${projectId}` : ''}${projectId ? '&' : '?'}days=${days}`;
-    const response = await apiGet<TaskCompletionTrend[]>(endpoint);
+    const response = await apiGet<any>(endpoint);
+    console.log("🚀 ~ getTaskCompletionTrend ~ response:", response);
     
-    // Ensure we have an array
-    if (!Array.isArray(response)) {
-      console.error("API returned non-array response for task completion trend:", response);
-      return await getTaskCompletionTrendMock(projectId, days);
+    // Check if response has the expected structure
+    if (!response || !response.data || !Array.isArray(response.data)) {
+      console.error("API returned invalid data format for task completion trend:", response);
+      return [];
     }
     
-    return response;
+    // Map the API response to our expected format
+    return response.data.map((item: any) => ({
+      date: item.date,
+      completed: item.completed || 0,
+      created: item.created || 0
+    }));
   } catch (error) {
     console.error("Error fetching task completion trend:", error);
-    return await getTaskCompletionTrendMock(projectId, days);
+    return [];
   }
 };
 
@@ -204,178 +246,3 @@ export const getTasksReportPdf = async (projectId?: string) => {
   const endpoint = `/reports/tasks/pdf${projectId ? `?projectId=${projectId}` : ''}`;
   window.open(endpoint, '_blank');
 };
-
-/**
- * Get project summary statistics
- * @param projectId Optional project ID to filter by
- * @returns Project summary statistics
- */
-export async function getProjectSummaryMock(projectId?: string): Promise<ProjectSummary> {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Mock data
-  return {
-    totalProjects: 12,
-    completedProjects: 5,
-    inProgressProjects: 4,
-    pendingProjects: 3,
-    completionRate: 42,
-    projects: [
-      {
-        id: 1,
-        name: "Test Project 1",
-        description: "This is a test project",
-        status: "Completed",
-        startDate: "2025-01-20T00:00:00.000Z",
-        endDate: "2025-02-20T00:00:00.000Z",
-        completionPercentage: 100,
-        totalTasks: 10,
-        completedTasks: 10,
-        overdueTasks: 0,
-        approachingDeadlines: 0,
-        teamMembers: 5,
-        isOwner: true
-      },
-      {
-        id: 2,
-        name: "Test Project 2",
-        description: "This is another test project",
-        status: "In-Progress",
-        startDate: "2025-02-20T00:00:00.000Z",
-        endDate: "2025-03-20T00:00:00.000Z",
-        completionPercentage: 50,
-        totalTasks: 8,
-        completedTasks: 4,
-        overdueTasks: 1,
-        approachingDeadlines: 2,
-        teamMembers: 3,
-        isOwner: true
-      },
-      {
-        id: 3,
-        name: "Test Project 3",
-        description: "This is a third test project",
-        status: "Pending",
-        startDate: "2025-03-20T00:00:00.000Z",
-        endDate: "2025-04-20T00:00:00.000Z",
-        completionPercentage: 0,
-        totalTasks: 5,
-        completedTasks: 0,
-        overdueTasks: 0,
-        approachingDeadlines: 0,
-        teamMembers: 2,
-        isOwner: false
-      }
-    ]
-  };
-}
-
-/**
- * Get task status overview
- * @param projectId Optional project ID to filter by
- * @returns Task status statistics
- */
-export async function getTaskStatusOverviewMock(projectId?: string): Promise<TaskStatusSummary> {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Mock data
-  return {
-    totalTasks: 86,
-    completedTasks: 42,
-    inProgressTasks: 28,
-    pendingTasks: 10,
-    overdueTasks: 6,
-    completionRate: 49,
-  };
-}
-
-/**
- * Get task completion trend data
- * @param projectId Optional project ID to filter by
- * @param days Number of days to include in the trend data
- * @returns Array of task completion data points
- */
-export async function getTaskCompletionTrendMock(
-  projectId?: string,
-  days: number = 7
-): Promise<TaskCompletionData[]> {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Generate mock data for the specified number of days
-  const data: TaskCompletionData[] = [];
-  const today = new Date();
-  
-  for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    
-    // Format date as YYYY-MM-DD
-    const formattedDate = date.toISOString().split('T')[0];
-    
-    // Generate random data
-    const completed = Math.floor(Math.random() * 10) + 1;
-    const created = Math.floor(Math.random() * 10) + 1;
-    
-    data.push({
-      date: formattedDate,
-      completed,
-      created,
-    });
-  }
-  
-  return data;
-}
-
-/**
- * Get team workload data
- * @param projectId Optional project ID to filter by
- * @returns Team workload data
- */
-export async function getTeamWorkloadMock(projectId?: string) {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Mock data
-  return [
-    { name: 'John Doe', taskCount: 12, completedTaskCount: 8 },
-    { name: 'Jane Smith', taskCount: 15, completedTaskCount: 10 },
-    { name: 'Alex Johnson', taskCount: 8, completedTaskCount: 5 },
-    { name: 'Sarah Williams', taskCount: 10, completedTaskCount: 9 },
-    { name: 'Michael Brown', taskCount: 14, completedTaskCount: 7 },
-  ];
-}
-
-/**
- * Get risk assessment data
- * @param projectId Optional project ID to filter by
- * @returns Risk assessment data
- */
-export async function getRiskAssessmentMock(projectId?: string) {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Mock data
-  return [
-    { 
-      projectName: 'Website Redesign', 
-      riskLevel: 'High', 
-      description: 'Resource constraints may delay delivery',
-      mitigationPlan: 'Allocate additional resources from other projects'
-    },
-    { 
-      projectName: 'Mobile App Development', 
-      riskLevel: 'Medium', 
-      description: 'Technical challenges with API integration',
-      mitigationPlan: 'Schedule technical spike to explore solutions'
-    },
-    { 
-      projectName: 'Marketing Campaign', 
-      riskLevel: 'Low', 
-      description: 'Budget constraints for advertising',
-      mitigationPlan: 'Revise marketing strategy to focus on organic channels'
-    },
-  ];
-} 

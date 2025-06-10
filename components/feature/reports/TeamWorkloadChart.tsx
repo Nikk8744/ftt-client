@@ -85,6 +85,7 @@ const TeamWorkloadChart: React.FC<TeamWorkloadChartProps> = ({ data }) => {
       },
       tooltip: {
         callbacks: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           label: function(context: any) {
             const label = context.dataset.label || '';
             const value = context.raw || 0;

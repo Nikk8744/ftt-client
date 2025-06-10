@@ -3,7 +3,7 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { TaskStatusSummary, TaskStatusCount } from '@/services/reports';
+import { TaskStatusSummary } from '@/services/reports';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -94,6 +94,7 @@ const TaskStatusChartWrapper: React.FC<TaskStatusChartWrapperProps> = ({ data })
       },
       tooltip: {
         callbacks: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           label: function(context: any) {
             const label = context.label || '';
             const value = context.raw || 0;

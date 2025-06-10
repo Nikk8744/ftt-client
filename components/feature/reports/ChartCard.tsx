@@ -2,13 +2,7 @@
 
 import React from 'react';
 import Card from '@/components/ui/Card';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from '@/components/ui/tooltip';
-import { HelpCircle, Download } from 'lucide-react';
+import {  Download } from 'lucide-react';
 
 interface ChartCardProps {
   title: string;

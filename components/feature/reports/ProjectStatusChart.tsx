@@ -53,6 +53,7 @@ const ProjectStatusChart: React.FC<ProjectStatusChartProps> = ({ data }) => {
       },
       tooltip: {
         callbacks: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           label: function(context: any) {
             const label = context.label || '';
             const value = context.raw || 0;

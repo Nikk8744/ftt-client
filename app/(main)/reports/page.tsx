@@ -27,48 +27,22 @@ import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
 import { getAllProjectsOfUser } from '@/services/project';
 
 // Import chart components
-import dynamic from 'next/dynamic';
-
-// Dynamically import chart components to avoid SSR issues with Chart.js
-const ProjectStatusChartWrapper = dynamic(
-  () => import('@/components/feature/reports/ProjectStatusChartWrapper'),
-  { ssr: false }
-);
-
-const TaskCompletionChartWrapper = dynamic(
-  () => import('@/components/feature/reports/TaskCompletionChartWrapper'),
-  { ssr: false }
-);
-
-const TaskStatusChartWrapper = dynamic(
-  () => import('@/components/feature/reports/TaskStatusChartWrapper'),
-  { ssr: false }
-);
-
-const TeamWorkloadChart = dynamic(
-  () => import('@/components/feature/reports/TeamWorkloadChart'),
-  { ssr: false }
-);
+import ProjectStatusChartWrapper from '@/components/feature/reports/ProjectStatusChartWrapper';
+import TaskStatusChartWrapper from '@/components/feature/reports/TaskStatusChartWrapper';
+import TaskCompletionChartWrapper from '@/components/feature/reports/TaskCompletionChartWrapper';
+import TeamWorkloadChartWrapper from '@/components/feature/reports/TeamWorkloadChartWrapper';
+import StatCard from '@/components/feature/reports/StatCard';
 
 // Import filter and UI components
 import ProjectFilter from '@/components/feature/reports/ProjectFilter';
-
 import RiskAssessmentTable from '@/components/feature/reports/RiskAssessmentTable';
 import Button from '@/components/ui/Button';
-import StatusFilter from '@/components/feature/reports/StatusFilter';
 import DateRangePicker from '@/components/feature/reports/DateRangePicker';
 import ExportButton from '@/components/feature/reports/ExportButton';
 import ChartCard from '@/components/feature/reports/ChartCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Update the interfaces to match the API structure
-interface Risk {
-  projectName: string;
-  riskLevel: 'High' | 'Medium' | 'Low';
-  description: string;
-  mitigationPlan: string;
-}
-
 interface ProjectResponse {
   id: number;
   name: string;
@@ -96,10 +70,13 @@ export default function ReportsPage() {
     completionRate: 0,
     tasksByStatus: []
   });
-  console.log("🚀 ~ ReportsPage ~ taskSummary:", taskSummary)
   const [userProjects, setUserProjects] = useState<ProjectResponse[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  
+  // Separate filter states for each tab
+  const [tasksProjectId, setTasksProjectId] = useState('all');
+  const [teamProjectId, setTeamProjectId] = useState('all');
+  const [risksProjectId, setRisksProjectId] = useState('all');
+  
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
@@ -108,8 +85,38 @@ export default function ReportsPage() {
   const [teamWorkloadData, setTeamWorkloadData] = useState<TeamWorkloadData[]>([]);
   const [riskAssessmentData, setRiskAssessmentData] = useState<RiskAssessment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
   
+  // Handle project filter changes based on active tab
+  const handleProjectFilterChange = (projectId: string) => {
+    switch (activeTab) {
+      case 'tasks':
+        setTasksProjectId(projectId);
+        break;
+      case 'team':
+        setTeamProjectId(projectId);
+        break;
+      case 'risks':
+        setRisksProjectId(projectId);
+        break;
+      default:
+        break;
+    }
+  };
 
+  // Get the current project ID based on active tab
+  const getCurrentProjectId = () => {
+    switch (activeTab) {
+      case 'tasks':
+        return tasksProjectId;
+      case 'team':
+        return teamProjectId;
+      case 'risks':
+        return risksProjectId;
+      default:
+        return 'all';
+    }
+  };
 
   // Fetch all projects the user is a member of and has created
   useEffect(() => {
@@ -120,9 +127,6 @@ export default function ReportsPage() {
         
         // Fetch projects user has created
         const ownedProjects = await getAllProjectsOfUser();
-        
-        console.log("Member projects:", memberProjects);
-        console.log("Owned projects:", ownedProjects);
         
         // Extract project data
         const memberProjectsData = memberProjects.projects || [];
@@ -149,131 +153,124 @@ export default function ReportsPage() {
     fetchUserProjects();
   }, []);
 
+  // Fetch overview data (no filters needed)
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchOverviewData = async () => {
       setIsLoading(true);
       try {
-        console.log("🚀 ~ fetchData ~ selectedProjectId:", selectedProjectId);
-        
-        // Get project summary
-        let projectData: ProjectSummary;
-        let taskData: TaskStatusSummary;
-        let completionTrendData: TaskCompletionTrend[] = [];
-        let workloadData: TeamWorkloadData[] = [];
-        let riskData: RiskAssessment[] = [];
-        
-        try {
-          projectData = await getProjectSummary(
-            selectedProjectId !== 'all' ? selectedProjectId : undefined
-          );
-        } catch (error) {
-          console.error("Error fetching project summary:", error);
-          projectData = {
-            totalProjects: 0,
-            completedProjects: 0,
-            inProgressProjects: 0,
-            pendingProjects: 0,
-            completionRate: 0,
-            projects: []
-          };
-        }
-        
-        console.log("🚀 ~ fetchData ~ projectData:", projectData);
-        
-        // Get task status overview
-        try {
-          taskData = await getTaskStatusOverview(
-            selectedProjectId !== 'all' ? selectedProjectId : undefined
-          );
-          console.log("🚀 ~ fetchData ~ taskData:", taskData)
-        } catch (error) {
-          console.error("Error fetching task status:", error);
-          taskData = {
-            totalTasks: 0,
-            completedTasks: 0,
-            inProgressTasks: 0,
-            pendingTasks: 0,
-            overdueTasks: 0,
-            completionRate: 0,
-            tasksByStatus: []
-          };
-        }
-        
-        // Get task completion trend data
-        try {
-          completionTrendData = await getTaskCompletionTrend(
-            selectedProjectId !== 'all' ? selectedProjectId : undefined,
-            30
-          );
-          
-          // Ensure completionTrendData is an array
-          if (!Array.isArray(completionTrendData)) {
-            console.error("Task completion data is not an array");
-            completionTrendData = [];
-          }
-        } catch (error) {
-          console.error("Error fetching task completion trend:", error);
-          completionTrendData = [];
-        }
-        
-        console.log("🚀 ~ ReportsPage ~ taskSummary:", taskData);
-        
-        // Get team workload data and risk assessment data if a project is selected
-        if (selectedProjectId !== 'all') {
-          try {
-            workloadData = await getTeamWorkload(selectedProjectId);
-            console.log("Team workload data from API:", workloadData);
-          } catch (error) {
-            console.error("Error fetching team workload:", error);
-            workloadData = [];
-          }
-          
-          try {
-            riskData = await getProjectRisks(selectedProjectId);
-          } catch (error) {
-            console.error("Error fetching risk assessment:", error);
-            riskData = [];
-          }
-        }
-        
+        // Get project summary (all projects)
+        const projectData = await getProjectSummary();
         setProjectSummary(projectData);
+        
+        // Get task status overview (all tasks)
+        const taskData = await getTaskStatusOverview();
         setTaskSummary(taskData);
-        setTaskCompletionData(completionTrendData);
-        setTeamWorkloadData(Array.isArray(workloadData) ? workloadData : []);
-        setRiskAssessmentData(Array.isArray(riskData) ? riskData : []);
+        
+        // Get task completion trend (all tasks, last 30 days)
+        const completionTrendData = await getTaskCompletionTrend(undefined, 30);
+        setTaskCompletionData(Array.isArray(completionTrendData) ? completionTrendData : []);
       } catch (error) {
-        console.error('Error fetching report data:', error);
-        
-        // Use empty data as fallback
-        setProjectSummary({
-          totalProjects: 0,
-          completedProjects: 0,
-          inProgressProjects: 0,
-          pendingProjects: 0,
-          completionRate: 0,
-          projects: []
-        });
-        
-        setTaskSummary({
-          totalTasks: 0,
-          completedTasks: 0,
-          inProgressTasks: 0,
-          pendingTasks: 0,
-          overdueTasks: 0,
-          completionRate: 0,
-          tasksByStatus: []
-        });
-        
-        setTaskCompletionData([]);
-        setTeamWorkloadData([]);
-        setRiskAssessmentData([]);
+        console.error('Error fetching overview data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, [selectedProjectId, selectedStatus, dateRange]);
+    // Only fetch overview data when on the overview tab
+    if (activeTab === 'overview') {
+      fetchOverviewData();
+    }
+  // Remove taskCompletionData from the dependency array as it causes an infinite loop
+  }, [activeTab]);
+
+  // Fetch project-specific data when on projects tab
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      if (activeTab !== 'projects') return;
+      
+      setIsLoading(true);
+      try {
+        // Get project summary with no filters for projects tab
+        const projectData = await getProjectSummary();
+        setProjectSummary(projectData);
+      } catch (error) {
+        console.error('Error fetching project data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjectData();
+  }, [activeTab]);
+
+  // Fetch task-specific data when on tasks tab
+  useEffect(() => {
+    const fetchTaskData = async () => {
+      if (activeTab !== 'tasks') return;
+      
+      setIsLoading(true);
+      try {
+        // Get task status overview with filters
+        const taskData = await getTaskStatusOverview(
+          tasksProjectId !== 'all' ? tasksProjectId : undefined
+        );
+        setTaskSummary(taskData);
+        
+        // Get task completion trend with project filter
+        const completionTrendData = await getTaskCompletionTrend(
+          tasksProjectId !== 'all' ? tasksProjectId : undefined,
+          30
+        );
+        setTaskCompletionData(Array.isArray(completionTrendData) ? completionTrendData : []);
+      } catch (error) {
+        console.error('Error fetching task data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTaskData();
+  }, [activeTab, tasksProjectId, dateRange]);
+
+  // Fetch team-specific data when on team tab
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      if (activeTab !== 'team' || teamProjectId === 'all') return;
+      
+      setIsLoading(true);
+      try {
+        // Get team workload data for specific project
+        const workloadData = await getTeamWorkload(teamProjectId);
+        setTeamWorkloadData(Array.isArray(workloadData) ? workloadData : []);
+      } catch (error) {
+        console.error('Error fetching team data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTeamData();
+  }, [activeTab, teamProjectId]);
+
+  // Fetch risk-specific data when on risks tab
+  useEffect(() => {
+    const fetchRiskData = async () => {
+      if (activeTab !== 'risks' || risksProjectId === 'all') return;
+      
+      setIsLoading(true);
+      try {
+        // Get risk assessment data for specific project
+        const riskData = await getProjectRisks(risksProjectId);
+        setRiskAssessmentData(Array.isArray(riskData) ? riskData : []);
+      } catch (error) {
+        console.error('Error fetching risk data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRiskData();
+  }, [activeTab, risksProjectId]);
 
   const handleExport = (format: 'pdf' | 'csv' | 'excel') => {
     console.log(`Exporting report as ${format}`);
@@ -282,54 +279,40 @@ export default function ReportsPage() {
 
   // Map API data structure to component expected structure for TeamWorkloadChart
   const mappedTeamWorkloadData = teamWorkloadData.map(item => ({
-    name: item.memberName || '',
-    taskCount: item.tasksAssigned || 0,
-    completedTaskCount: item.tasksCompleted || 0
+    name: item.userName || '',
+    taskCount: item.taskCount || 0,
+    completedTaskCount: item.completedCount || 0
   }));
 
-  // Map API data structure to component expected structure for RiskAssessmentTable
-  const mappedRiskData: Risk[] = riskAssessmentData.map(item => ({
-    projectName: item.name,
-    riskLevel: item.riskLevel.charAt(0).toUpperCase() + item.riskLevel.slice(1) as 'High' | 'Medium' | 'Low',
-    description: item.impact,
-    mitigationPlan: item.mitigation
-  }));
-
-  const StatCard = ({ title, value, icon, color }: { title: string; value: number | string; icon: React.ReactNode; color: string }) => (
-    <Card className="p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <h3 className="text-2xl font-bold mt-1">{value}</h3>
-        </div>
-        <div className={`p-2 rounded-full ${color}`}>
-          {icon}
-        </div>
-      </div>
-    </Card>
-  );
-
-
+  // Show filters based on active tab
+  const showProjectFilter = activeTab === 'tasks' || activeTab === 'team' || activeTab === 'risks';
+  const showDateFilter = activeTab === 'tasks';
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold">Reports Dashboard</h1>
+        
+        {/* Show filters only when needed */}
         <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-          <div className="w-full md:w-64">
-            <ProjectFilter onChange={setSelectedProjectId} />
-          </div>
-          <div className="w-full md:w-64">
-            <StatusFilter onChange={setSelectedStatus} />
-          </div>
-          <div className="w-full md:w-72">
-            <DateRangePicker onChange={setDateRange} />
-          </div>
+          {showProjectFilter && (
+            <div className="w-full md:w-64">
+              <ProjectFilter 
+                onChange={handleProjectFilterChange} 
+                defaultValue={getCurrentProjectId()}
+              />
+            </div>
+          )}
+          {showDateFilter && (
+            <div className="w-full md:w-72">
+              <DateRangePicker onChange={setDateRange} />
+            </div>
+          )}
           <ExportButton onExport={handleExport} />
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -361,11 +344,11 @@ export default function ReportsPage() {
                 <StatCard 
                   title="Total Tasks" 
                   value={taskSummary.totalTasks || 0} 
-                  icon={<ListChecks className="h-6 w-6 text-purple-500" />} 
-                  color="bg-purple-100" 
+                  icon={<ListChecks className="h-6 w-6 text-indigo-500" />} 
+                  color="bg-indigo-100" 
                 />
                 <StatCard 
-                  title="Tasks Completion Rate" 
+                  title="Task Completion Rate" 
                   value={`${taskSummary.completionRate || 0}%`} 
                   icon={<CheckCircle2 className="h-6 w-6 text-green-500" />} 
                   color="bg-green-100" 
@@ -389,8 +372,23 @@ export default function ReportsPage() {
                 </ChartCard>
                 
                 <ChartCard 
+                  title="Task Status Distribution" 
+                  description="Overview of task statuses"
+                  actions={
+                    <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
+                      <Download className="h-4 w-4 mr-1" />
+                      Export
+                    </Button>
+                  }
+                >
+                  <TaskStatusChartWrapper data={taskSummary} />
+                </ChartCard>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <ChartCard 
                   title="Task Completion Trend" 
-                  description="Trend of tasks completed vs created over time"
+                  description="Trend of tasks completed over time"
                   actions={
                     <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
                       <Download className="h-4 w-4 mr-1" />
@@ -530,7 +528,7 @@ export default function ReportsPage() {
 
                 <ChartCard 
                   title="Task Completion Trend" 
-                  description="Trend of tasks completed vs created over time"
+                  description="Trend of tasks completed over time"
                   actions={
                     <Button variant="ghost" size="sm" onClick={() => handleExport('pdf')}>
                       <Download className="h-4 w-4 mr-1" />
@@ -550,7 +548,7 @@ export default function ReportsPage() {
             <div className="flex justify-center items-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
-          ) : selectedProjectId === 'all' ? (
+          ) : teamProjectId === 'all' ? (
             <div className="flex justify-center items-center py-20">
               <div className="text-center">
                 <h3 className="text-lg font-medium mb-2">Select a project to view team workload</h3>
@@ -571,7 +569,7 @@ export default function ReportsPage() {
                   }
                 >
                   {mappedTeamWorkloadData.length > 0 ? (
-                    <TeamWorkloadChart data={mappedTeamWorkloadData} />
+                    <TeamWorkloadChartWrapper data={mappedTeamWorkloadData} />
                   ) : (
                     <div className="flex justify-center items-center h-64">
                       <p className="text-gray-500">No team workload data available for this project</p>
@@ -588,7 +586,7 @@ export default function ReportsPage() {
             <div className="flex justify-center items-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
-          ) : selectedProjectId === 'all' ? (
+          ) : risksProjectId === 'all' ? (
             <div className="flex justify-center items-center py-20">
               <div className="text-center">
                 <h3 className="text-lg font-medium mb-2">Select a project to view risk assessment</h3>
@@ -606,8 +604,8 @@ export default function ReportsPage() {
                       Export
                     </Button>
                   </div>
-                  {mappedRiskData.length > 0 ? (
-                    <RiskAssessmentTable data={mappedRiskData} />
+                  {riskAssessmentData.length > 0 ? (
+                    <RiskAssessmentTable data={riskAssessmentData} />
                   ) : (
                     <div className="flex justify-center items-center py-10">
                       <p className="text-gray-500">No risk assessment data available for this project</p>

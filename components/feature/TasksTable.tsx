@@ -51,6 +51,8 @@ import {
   // Filter,
   ListFilter,
   CircleX,
+  SquarePen,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -196,8 +198,8 @@ export function   TasksTable({ data, projects, onEdit, onDelete, onStatusChange 
             variant="outline"
             size="sm"
             onClick={() => onEdit(row.original)}
-          >
-            Edit
+          > 
+            <SquarePen className="w-4 h-4" />
           </Button>
           {row.original.status === "Done" && (
             <Button
@@ -205,7 +207,7 @@ export function   TasksTable({ data, projects, onEdit, onDelete, onStatusChange 
               size="sm"
               onClick={() => onDelete(row.original)}
             >
-              Delete
+              <Trash2 className="w-4 h-4" />
             </Button>
           )}
         </div>

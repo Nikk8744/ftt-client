@@ -159,7 +159,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out
                     group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50
                     ${isActive 
-                      ? 'bg-[#ecf3ff] text-[#5364c5] font-semibold shadow-sm' 
+                      ? 'bg-[#ecf3ff] text-[#465fff] font-semibold shadow-sm' 
                       : 'text-gray-700 font-semibold hover:text-indigo-700'
                     }
                   `}
@@ -167,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
                   <span className={`
                     mr-3 transition-transform duration-200 ease-in-out
                     group-hover:scale-110
-                    ${isActive ? 'text-indigo-600 scale-110' : 'text-gray-400'}
+                    ${isActive ? 'text-[#465fff] scale-110' : 'text-gray-600'}
                   `}>
                     {item.icon}
                   </span>
