@@ -44,7 +44,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       return;
     }
     
-    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000', {
+    const socketInstance = io(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000', {
       auth: { token }
     });
     

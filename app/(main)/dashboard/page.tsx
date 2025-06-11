@@ -363,10 +363,7 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No active tasks found</h3>
                   <p className="text-gray-500 mb-4">Create a task to get started with your projects</p>
-                  <Link href="/tasks" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
+                  <Link href="/tasks" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#465fff] hover:bg-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                     <Plus className="w-4 h-4 mr-2" />
                     Create a Task
                   </Link>
@@ -480,13 +477,13 @@ export default function DashboardPage() {
                       <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  {/* <TableBody>
                     <TableRow>
                       <TableCell colSpan={4} className="h-24 text-center text-gray-500 bg-gray-50/30">
                         No time logs to display
                       </TableCell>
                     </TableRow>
-                  </TableBody>
+                  </TableBody> */}
                 </Table>
               </Card>
             ) : (

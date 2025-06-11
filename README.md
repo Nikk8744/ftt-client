@@ -65,7 +65,7 @@ A modern, responsive time tracking application built for freelancers and small t
 
 3. Create a `.env.local` file in the root directory with the following variables:
    ```
-   NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api/v1
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api/v1
    ```
 
 ### Development
@@ -91,6 +91,25 @@ yarn build
 # or
 pnpm build
 ```
+
+### Deployment
+
+When deploying to different environments, you'll need to configure the backend API URL:
+
+1. **For Vercel or similar platforms**:
+   - Set the `NEXT_PUBLIC_API_BASE_URL` environment variable in your deployment settings
+   - Example: `https://your-production-api.com/api/v1`
+
+2. **For Docker or self-hosted deployments**:
+   - Create a `.env.production` file with your production API URL
+   - Or set the environment variable at runtime
+
+3. **For local production testing**:
+   ```bash
+   NEXT_PUBLIC_API_BASE_URL=https://your-api.com/api/v1 npm start
+   ```
+
+This configuration ensures your frontend can connect to the appropriate backend API regardless of the environment.
 
 ## 📁 Project Structure
 

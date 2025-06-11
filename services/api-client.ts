@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Use the proxy path for API requests
+// Use the environment variable if available, otherwise use the proxy path
 const API_BASE_URL = '/api/v1';
 
 const apiClient = axios.create({

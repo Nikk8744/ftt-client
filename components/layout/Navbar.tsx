@@ -48,7 +48,7 @@ export default function Navbar() {
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg> */}
-              <span className="text-lg font-semibold text-white font-serif border-2 border-atlantis-500 px-7 py-3 rounded-xl">TimeTracker</span>
+              <span className="text-lg font-semibold text-white font-serif border-2 border-atlantis-500 px-7 py-3 rounded-xl">Tracksy</span>
             </Link>
           </div>
 

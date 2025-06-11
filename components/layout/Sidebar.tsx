@@ -1,10 +1,19 @@
-"use client"
-import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Home, FolderOpen, CheckCircle, Clock, Settings, ExternalLink, BarChart2 } from 'lucide-react';
-import Button from '@/components/ui/Button';
-    
+"use client";
+import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Menu,
+  X,
+  Home,
+  FolderOpen,
+  CheckCircle,
+  Clock,
+  Settings,
+  BarChart2,
+} from "lucide-react";
+import Button from "@/components/ui/Button";
+
 interface NavItem {
   name: string;
   href: string;
@@ -18,38 +27,41 @@ interface SidebarProps {
 
 const navigation: NavItem[] = [
   {
-    name: 'Dashboard',
-    href: '/dashboard',
+    name: "Dashboard",
+    href: "/dashboard",
     icon: <Home className="w-5 h-5" />,
   },
   {
-    name: 'Projects',
-    href: '/projects',
+    name: "Projects",
+    href: "/projects",
     icon: <FolderOpen className="w-5 h-5" />,
   },
   {
-    name: 'Tasks',
-    href: '/tasks',
+    name: "Tasks",
+    href: "/tasks",
     icon: <CheckCircle className="w-5 h-5" />,
   },
   {
-    name: 'Time Logs',
-    href: '/logs',
+    name: "Time Logs",
+    href: "/logs",
     icon: <Clock className="w-5 h-5" />,
   },
   {
-    name: 'Reports',
-    href: '/reports',
+    name: "Reports",
+    href: "/reports",
     icon: <BarChart2 className="w-5 h-5" />,
   },
   {
-    name: 'Settings',
-    href: '/settings/profile',
+    name: "Settings",
+    href: "/settings/profile",
     icon: <Settings className="w-5 h-5" />,
   },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  className = "",
+  onSidebarChange,
+}) => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -72,10 +84,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
     checkMobile();
 
     // Set up resize listener
-    window.addEventListener('resize', checkMobile);
-    
+    window.addEventListener("resize", checkMobile);
+
     // Clean up
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Notify parent when sidebar state changes, but only after initial render
@@ -85,7 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
       initialRender.current = false;
       return;
     }
-    
+
     // Only call onSidebarChange if it exists
     if (onSidebarChange) {
       onSidebarChange(isOpen, isMobile);
@@ -112,44 +124,47 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
 
       {/* Backdrop */}
       {isOpen && isMobile && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-[85] lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside 
+      <aside
         className={`
           fixed top-0 bottom-0 left-0 z-[90]
           w-[280px] bg-gradient-to-b from-white to-indigo-50 border-r border-indigo-100 shadow-lg
           transition-all duration-300 ease-in-out
           lg:translate-x-0 lg:static lg:z-0
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
           ${className}
         `}
       >
         <div className="flex flex-col h-full">
           {/* Logo and Title */}
           <div className="px-6 py-8">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="p-2 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg shadow-lg">
-                <Clock className="w-6 h-6 text-white" />
+            <div className=" mb-1">
+              <div className="flex items-center justify-normal gap-3 mb-3">
+                <div className="p-2 bg-[#465fff] rounded-lg shadow-lg">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <Link href="/dashboard" className="text-2xl font-bold text-gray-800">
+                  Tracksy
+                </Link>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold font-mono bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  TimeTracker
-                </h2>
-                <p className="text-xs text-indigo-500 font-mono">Manage your time effectively</p>
-              </div>
+              <p className="text-xs text-gray-800 font-mono">
+                Manage your time effectively
+              </p>
             </div>
           </div>
-          
+
           {/* Navigation */}
           <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-              
+              const isActive =
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
+
               return (
                 <Link
                   key={item.name}
@@ -158,17 +173,20 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
                   className={`
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out
                     group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50
-                    ${isActive 
-                      ? 'bg-[#ecf3ff] text-[#465fff] font-semibold shadow-sm' 
-                      : 'text-gray-700 font-semibold hover:text-indigo-700'
+                    ${
+                      isActive
+                        ? "bg-[#ecf3ff] text-[#465fff] font-semibold shadow-sm"
+                        : "text-gray-700 font-semibold hover:text-indigo-700"
                     }
                   `}
                 >
-                  <span className={`
+                  <span
+                    className={`
                     mr-3 transition-transform duration-200 ease-in-out
                     group-hover:scale-110
-                    ${isActive ? 'text-[#465fff] scale-110' : 'text-gray-600'}
-                  `}>
+                    ${isActive ? "text-[#465fff] scale-110" : "text-gray-600"}
+                  `}
+                  >
                     {item.icon}
                   </span>
                   {item.name}
@@ -178,7 +196,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
           </nav>
 
           {/* Help Section */}
-          <div className="px-4 py-6">
+          {/* <div className="px-4 py-6">
             <div className="bg-gradient-to-r from-indigo-100 to-purple-100 p-5 rounded-lg shadow-inner border border-indigo-200">
               <h3 className="text-sm font-medium text-indigo-700 mb-1">Need help?</h3>
               <p className="text-xs text-gray-600 mb-3">Check out our documentation or contact support</p>
@@ -192,11 +210,11 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '', onSidebarChange }) =>
                 View Documentation
               </a>
             </div>
-          </div>
+          </div> */}
         </div>
       </aside>
     </>
   );
 };
 
-export default Sidebar; 
+export default Sidebar;
