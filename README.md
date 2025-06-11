@@ -1,4 +1,4 @@
-# 🕒 Freelance Time Tracker (FTT)
+# 🕒 TRACKSY - A Freelance Time Tracker (FTT)
 
 <div align="center">
 
