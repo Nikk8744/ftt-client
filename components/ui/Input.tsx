@@ -3,7 +3,8 @@
 import { forwardRef, InputHTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+// Omit the native 'size' property and then add our custom size property
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;
   helperText?: string;
   error?: string;
