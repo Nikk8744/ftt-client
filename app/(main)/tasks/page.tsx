@@ -6,7 +6,6 @@ import { getUserTasks, updateTask, deleteTask } from "@/services/task";
 import { getAllProjectsOfUser } from "@/services/project";
 import { getUserAssignedTasks } from "@/services/taskMembers";
 import Card from "@/components/ui/Card";
-import PageWrapper from "@/components/layout/PageWrapper";
 import TaskForm from "@/components/feature/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { TasksTable } from "@/components/feature/TasksTable";
@@ -109,59 +108,70 @@ export default function TasksPage() {
   };
 
   return (
-    <PageWrapper
-      title="Tasks"
-      description="Manage your tasks across all projects"
-    >
-      <div className="p-6">
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-6 max-w-md">
-          <button
-            className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
-              activeTab === 'all'
-                ? 'bg-white shadow text-blue-700'
-                : 'text-gray-700 hover:bg-white/[0.5]'
-            }`}
-            onClick={() => setActiveTab('all')}
-          >
-            All Tasks
-          </button>
-          <button
-            className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
-              activeTab === 'assigned'
-                ? 'bg-white shadow text-blue-700'
-                : 'text-gray-700 hover:bg-white/[0.5]'
-            }`}
-            onClick={() => setActiveTab('assigned')}
-          >
-            Assigned to Me
-          </button>
+    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      <div className="border-b border-gray-400 rounded-b-3xl">
+        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+              Tasks
+            </h1>
+            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+              Manage your tasks across all projects
+            </p>
+          </div>
         </div>
+      </div>
+      <div className="flex-1 bg-gray-50">
+        <div className="p-6">
+          {/* Tab Navigation */}
+          <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-6 max-w-md">
+            <button
+              className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
+                activeTab === 'all'
+                  ? 'bg-white shadow text-blue-700'
+                  : 'text-gray-700 hover:bg-white/[0.5]'
+              }`}
+              onClick={() => setActiveTab('all')}
+            >
+              All Tasks
+            </button>
+            <button
+              className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
+                activeTab === 'assigned'
+                  ? 'bg-white shadow text-blue-700'
+                  : 'text-gray-700 hover:bg-white/[0.5]'
+              }`}
+              onClick={() => setActiveTab('assigned')}
+            >
+              Assigned to Me
+            </button>
+          </div>
 
-        {isLoading || projectsLoading ? (
-          <Card className="p-8 text-center">
-            <p>Loading tasks...</p>
-          </Card>
-        ) : displayTasks.length === 0 ? (
-          <Card className="p-8 text-center">
-            <p className="text-gray-500 mb-4">
-              {activeTab === 'all' ? 'No tasks found.' : 'No tasks assigned to you.'}
-            </p>
-            <p className="text-sm text-gray-500">
-              {activeTab === 'all' 
-                ? 'To create a new task, please go to a project and use the "Add Task" button there.'
-                : 'Tasks assigned to you will appear here.'}
-            </p>
-          </Card>
-        ) : (
-          <TasksTable
-            data={displayTasks}
-            projects={projectsData?.projects || []}
-            onEdit={openEditTaskModal}
-            onDelete={openDeleteTaskModal}
-            onStatusChange={handleStatusChange}
-          />
-        )}
+          {isLoading || projectsLoading ? (
+            <Card className="p-8 text-center">
+              <p>Loading tasks...</p>
+            </Card>
+          ) : displayTasks.length === 0 ? (
+            <Card className="p-8 text-center">
+              <p className="text-gray-500 mb-4">
+                {activeTab === 'all' ? 'No tasks found.' : 'No tasks assigned to you.'}
+              </p>
+              <p className="text-sm text-gray-500">
+                {activeTab === 'all' 
+                  ? 'To create a new task, please go to a project and use the "Add Task" button there.'
+                  : 'Tasks assigned to you will appear here.'}
+              </p>
+            </Card>
+          ) : (
+            <TasksTable
+              data={displayTasks}
+              projects={projectsData?.projects || []}
+              onEdit={openEditTaskModal}
+              onDelete={openDeleteTaskModal}
+              onStatusChange={handleStatusChange}
+            />
+          )}
+        </div>
       </div>
 
       {/* Edit Task Modal */}
@@ -193,6 +203,6 @@ export default function TasksPage() {
           isLoading={deleteTaskMutation.isPending}
         />
       )}
-    </PageWrapper>
+    </div>
   );
 }

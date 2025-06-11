@@ -281,7 +281,7 @@ export default function ReportsPage() {
       case 'overview':
         // For overview tab, export all projects summary report
         getAllProjectsReportPdf();
-        break;
+        break;  
       case 'projects':
         // For projects tab, export all projects summary report
         getAllProjectsReportPdf();

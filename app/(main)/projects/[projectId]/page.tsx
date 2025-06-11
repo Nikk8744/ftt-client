@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import PageWrapper from "@/components/layout/PageWrapper";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -23,7 +22,7 @@ import {
   getTeamMembers,
 } from "@/services/projectMember";
 import useAuth from "@/lib/hooks/useAuth";
-import { formatDate, formatRelativeTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import TaskForm from "@/components/feature/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { Task } from "@/types";
@@ -273,104 +272,123 @@ export default function ProjectDetailsPage() {
   // Check if current user is the project owner
   const isOwner = project && user ? project.ownerId === user.id : false;
 
-  if (projectLoading) {
-    return <div>Loading project details...</div>;
-  }
-
-  if (projectError || !project) {
-    return <div>Error loading project details</div>;
-  }
-
   return (
-    <PageWrapper
-      title={project.name}
-      description={`Created ${formatRelativeTime(project.createdAt)}`}
-      actions={
-        isOwner && (
-          <Button variant="outline" className="bg-green-400 rounded-3xl" onClick={() => setIsEditModalOpen(true)} >
-            Edit Project
-          </Button>
-        )
-      }
-    >
-      <div className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Project Description */}
-            <Card>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Description
-              </h3>
-              <p className="text-gray-600">{project.description}</p>
-            </Card>
-
-            {/* Tasks Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium text-gray-900">Tasks</h2>
-                <Button
-                  variant="default"
-                  onClick={() => setIsAddTaskModalOpen(true)}
-                >
-                  Add Task
-                </Button>
-              </div>
-
-              {tasksLoading ? (
-                <Card className="p-8 text-center">
-                  <p>Loading tasks...</p>
-                </Card>
-              ) : tasks.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <p className="text-gray-500 mb-4">
-                    No tasks found in this project.
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Click the &quot;Add Task&quot; button to create your first
-                    task.
-                  </p>
-                </Card>
-              ) : (
-                <TasksTable
-                  data={tasks}
-                  projects={[project]}
-                  onEdit={openEditTaskModal}
-                  onDelete={openDeleteTaskModal}
-                  onStatusChange={handleStatusChange}
-                />
-              )}
-            </div>
+    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      <div className="border-b border-gray-400 rounded-b-3xl">
+        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+              {projectLoading ? "Loading..." : projectData?.project?.name}
+            </h1>
+            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+              {projectData?.project?.description}
+            </p>
           </div>
+          <div className="flex flex-shrink-0 space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsAddMemberModalOpen(true)}
+            >
+              Add Member
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddTaskModalOpen(true)}
+            >
+              Add Task
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => {
+                if (projectData?.project) {
+                  resetProject({
+                    name: projectData.project.name,
+                    description: projectData.project.description,
+                    startDate: projectData.project.startDate
+                      ? new Date(projectData.project.startDate)
+                          .toISOString()
+                          .split("T")[0]
+                      : "",
+                    endDate: projectData.project.endDate
+                      ? new Date(projectData.project.endDate)
+                          .toISOString()
+                          .split("T")[0]
+                      : "",
+                    status: projectData.project.status as
+                      | "Pending"
+                      | "In-Progress"
+                      | "Completed"
+                      | undefined,
+                  });
+                  setIsEditModalOpen(true);
+                }
+              }}
+            >
+              Edit Project
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 bg-gray-50">
+        <div className="p-6">
+          {projectLoading ? (
+            <div className="text-center py-8">
+              <p>Loading project details...</p>
+            </div>
+          ) : projectError ? (
+            <div className="text-center py-8 text-red-500">
+              <p>Error loading project details</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                {/* Project Description */}
+                <Card>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Description
+                  </h3>
+                  <p className="text-gray-600">{project.description}</p>
+                </Card>
 
-          <div className="space-y-6">
-            {/* Project Info */}
-            <Card className="border border-gray-100 rounded-xl bg-white overflow-hidden">
-              <div className="border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white px-4 py-3">
-                <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                {/* Tasks Section */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-medium text-gray-900">Tasks</h2>
+                  </div>
+
+                  {tasksLoading ? (
+                    <Card className="p-8 text-center">
+                      <p>Loading tasks...</p>
+                    </Card>
+                  ) : tasks.length === 0 ? (
+                    <Card className="p-8 text-center">
+                      <p className="text-gray-500 mb-4">
+                        No tasks found in this project.
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Click the &quot;Add Task&quot; button to create your first
+                        task.
+                      </p>
+                    </Card>
+                  ) : (
+                    <TasksTable
+                      data={tasks}
+                      projects={[project]}
+                      onEdit={openEditTaskModal}
+                      onDelete={openDeleteTaskModal}
+                      onStatusChange={handleStatusChange}
                     />
-                  </svg>
-                  Project Info
-                </h3>
+                  )}
+                </div>
               </div>
 
-              <div className="p-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Owner */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+              <div className="space-y-6">
+                {/* Project Info */}
+                <Card className="border border-gray-100 rounded-xl bg-white overflow-hidden">
+                  <div className="border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white px-4 py-3">
+                    <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
                       <svg
-                        className="w-4 h-4 text-blue-600"
+                        className="w-4 h-4 text-gray-600"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -379,182 +397,206 @@ export default function ProjectDetailsPage() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                         />
                       </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Owner
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                        {isOwner ? `${user?.name} (You)` : (ownerLoading ? "Loading..." : projectOwner?.name || "Unknown User")}
-                      </p>
-                    </div>
-                  </div>  
+                      Project Info
+                    </h3>
+                  </div>
 
-                  {/* Status */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                      <svg
-                        className="w-4 h-4 text-green-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </p>
-                      <div className="mt-1">
-                        <Badge
-                          variant={
-                            project.status === "Completed"
-                              ? "success"
-                              : project.status === "In-Progress"
-                              ? "warning"
-                              : "primary"
-                          }
-                          className="text-xs"
-                        >
-                          {project.status || "Pending"}
-                        </Badge>
+                  <div className="p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Owner */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                          <svg
+                            className="w-4 h-4 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Owner
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            {isOwner ? `${user?.name} (You)` : (ownerLoading ? "Loading..." : projectOwner?.name || "Unknown User")}
+                          </p>
+                        </div>
+                      </div>  
+
+                      {/* Status */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
+                          <svg
+                            className="w-4 h-4 text-green-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </p>
+                          <div className="mt-1">
+                            <Badge
+                              variant={
+                                project.status === "Completed"
+                                  ? "success"
+                                  : project.status === "In-Progress"
+                                  ? "warning"
+                                  : "primary"
+                              }
+                              className="text-xs"
+                            >
+                              {project.status || "Pending"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Created Date */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
+                          <svg
+                            className="w-4 h-4 text-purple-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Created
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            {formatDate(project.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Total Hours */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mt-0.5">
+                          <svg
+                            className="w-4 h-4 text-orange-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Total Hours
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            {project.totalHours || "0"} hrs
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Start Date */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center mt-0.5">
+                          <svg
+                            className="w-4 h-4 text-teal-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Start Date
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            {formatDate(project.startDate)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* End Date */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
+                          <svg
+                            className="w-4 h-4 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            End Date
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            {formatDate(project.endDate)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
+                </Card>
 
-                  {/* Created Date */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
-                      <svg
-                        className="w-4 h-4 text-purple-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Created
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                        {formatDate(project.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Total Hours */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mt-0.5">
-                      <svg
-                        className="w-4 h-4 text-orange-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Total Hours
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                        {project.totalHours || "0"} hrs
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Start Date */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center mt-0.5">
-                      <svg
-                        className="w-4 h-4 text-teal-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Start Date
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                        {formatDate(project.startDate)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* End Date */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
-                      <svg
-                        className="w-4 h-4 text-red-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        End Date
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                        {formatDate(project.endDate)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                {/* Team Members */}
+                <TeamMembers
+                  members={teamMembers.map(
+                    (member: { id: string; name?: string }) => ({
+                      id: member.id,
+                      name: member.name || `User ${member.id}`,
+                      // addedAt: member.addedAt
+                    })
+                  )}
+                  onAddMember={() => setIsAddMemberModalOpen(true)}
+                  onRemoveMember={isOwner ? handleRemoveMember : undefined}
+                />
               </div>
-            </Card>
-
-            {/* Team Members */}
-            <TeamMembers
-              members={teamMembers.map(
-                (member: { id: string; name?: string }) => ({
-                  id: member.id,
-                  name: member.name || `User ${member.id}`,
-                  // addedAt: member.addedAt
-                })
-              )}
-              onAddMember={() => setIsAddMemberModalOpen(true)}
-              onRemoveMember={isOwner ? handleRemoveMember : undefined}
-            />
-          </div>
+            </div>
+          )}
         </div>
       </div>
       {/* Edit Project Modal */}
@@ -833,6 +875,6 @@ export default function ProjectDetailsPage() {
           isLoading={deleteTaskMutation.isPending}
         />
       )}
-    </PageWrapper>
+    </div>
   );
 }

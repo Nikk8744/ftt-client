@@ -8,7 +8,6 @@ import { getUserTasks } from "@/services/task";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import PageWrapper from "@/components/layout/PageWrapper";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Modal, { ConfirmModal } from "@/components/ui/Modal";
@@ -218,329 +217,340 @@ export default function LogsPage() {
   });
 
   return (
-    <PageWrapper
-      title="Time Logs"
-      description="View and manage your time tracking history"
-    >
-      <div className="p-6">
-        {/* Filters */}
-        <Card className="mb-6 border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-          <div className="p-4">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FilterIcon className="w-5 h-5" />
-                <h3 className="text-base font-semibold text-gray-900">
-                  Filters
-                </h3>
+    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      <div className="border-b border-gray-400 rounded-b-3xl">
+        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+              Time Logs
+            </h1>
+            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+              View and manage your time tracking history
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 bg-gray-50">
+        <div className="p-6">
+          {/* Filters */}
+          <Card className="mb-6 border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="p-4">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <FilterIcon className="w-5 h-5" />
+                  <h3 className="text-base font-semibold text-gray-900">
+                    Filters
+                  </h3>
+                </div>
+
+                {/* Active filters indicator */}
+                {(selectedProjectId ||
+                  dateRange.startDate ||
+                  dateRange.endDate) && (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {
+                        [
+                          selectedProjectId && "Project",
+                          dateRange.startDate && "From Date",
+                          dateRange.endDate && "To Date",
+                        ].filter(Boolean).length
+                      }{" "}
+                      active
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedProjectId("");
+                        setDateRange({ startDate: "", endDate: "" });
+                      }}
+                      className="text-xs px-2 py-1 flex items-center gap-1"
+                    >
+                     <X color="red" className="w-3 h-3" />
+                      Clear All
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              {/* Active filters indicator */}
-              {(selectedProjectId ||
-                dateRange.startDate ||
-                dateRange.endDate) && (
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {
-                      [
-                        selectedProjectId && "Project",
-                        dateRange.startDate && "From Date",
-                        dateRange.endDate && "To Date",
-                      ].filter(Boolean).length
-                    }{" "}
-                    active
+              {/* Filter Controls */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Project Filter */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="project-filter"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700"
+                  >
+                    <FolderOpenDot color="blue" className="w-4 h-4" />
+                    Project
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="project-filter"
+                      className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none"
+                      value={selectedProjectId}
+                      onChange={handleProjectChange}
+                    >
+                      <option value="">All Projects</option>
+                      {projects.map((project: Project) => (
+                        <option key={project.id} value={project.id}>
+                          {project.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <ChevronDown color="blue" className="w-4 h-4" />
+                    </div>
+                  </div>
+                  {selectedProjectId && (
+                    <div className="flex items-center gap-1 text-xs text-blue-600">
+                      <Check color="blue" className="w-3 h-3" />
+                      Project filter applied
+                    </div>
+                  )}
+                </div>
+
+                {/* From Date */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="startDate"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700"
+                  >
+                    <Calendar color="blue" className="w-4 h-4" />
+                    From Date
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      id="startDate"
+                      className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      value={dateRange.startDate}
+                      onChange={(e) =>
+                        setDateRange({ ...dateRange, startDate: e.target.value })
+                      }
+                    />
+                  </div>
+                  {dateRange.startDate && (
+                    <div className="flex items-center gap-1 text-xs text-blue-600">
+                      <Check color="blue" className="w-3 h-3" />
+                      Start date set
+                    </div>
+                  )}
+                </div>
+
+                {/* To Date */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="endDate"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700"
+                  >
+                    <Calendar color="blue" className="w-4 h-4" />
+                    To Date
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      id="endDate"
+                      className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      value={dateRange.endDate}
+                      onChange={(e) =>
+                        setDateRange({ ...dateRange, endDate: e.target.value })
+                      }
+                      min={dateRange.startDate || undefined}
+                    />
+                  </div>
+                  {dateRange.endDate && (
+                    <div className="flex items-center gap-1 text-xs text-blue-600">
+                      <Check color="blue" className="w-3 h-3" />
+                      End date set
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Filter Options */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap color="blue" className="w-4 h-4" />
+                  <span className="text-sm font-medium text-gray-700">
+                    Quick Filters
                   </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setSelectedProjectId("");
-                      setDateRange({ startDate: "", endDate: "" });
+                      const today = new Date().toISOString().split("T")[0];
+                      setDateRange({ startDate: today, endDate: today });
                     }}
-                    className="text-xs px-2 py-1 flex items-center gap-1"
+                    className="text-xs px-3 py-1.5"
                   >
-                   <X color="red" className="w-3 h-3" />
-                    Clear All
+                    Today
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const today = new Date();
+                      const lastWeek = new Date(
+                        today.getTime() - 7 * 24 * 60 * 60 * 1000
+                      );
+                      setDateRange({
+                        startDate: lastWeek.toISOString().split("T")[0],
+                        endDate: today.toISOString().split("T")[0],
+                      });
+                    }}
+                    className="text-xs px-3 py-1.5"
+                  >
+                    Last 7 Days
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const today = new Date();
+                      const lastMonth = new Date(
+                        today.getTime() - 30 * 24 * 60 * 60 * 1000
+                      );
+                      setDateRange({
+                        startDate: lastMonth.toISOString().split("T")[0],
+                        endDate: today.toISOString().split("T")[0],
+                      });
+                    }}
+                    className="text-xs px-3 py-1.5"
+                  >
+                    Last 30 Days
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const today = new Date();
+                      const firstDayOfMonth = new Date(
+                        today.getFullYear(),
+                        today.getMonth(),
+                        1
+                      );
+                      setDateRange({
+                        startDate: firstDayOfMonth.toISOString().split("T")[0],
+                        endDate: today.toISOString().split("T")[0],
+                      });
+                    }}
+                    className="text-xs px-3 py-1.5"
+                  >
+                    This Month
                   </Button>
                 </div>
-              )}
-            </div>
-
-            {/* Filter Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Project Filter */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="project-filter"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700"
-                >
-                  <FolderOpenDot color="blue" className="w-4 h-4" />
-                  Project
-                </label>
-                <div className="relative">
-                  <select
-                    id="project-filter"
-                    className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none"
-                    value={selectedProjectId}
-                    onChange={handleProjectChange}
-                  >
-                    <option value="">All Projects</option>
-                    {projects.map((project: Project) => (
-                      <option key={project.id} value={project.id}>
-                        {project.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown color="blue" className="w-4 h-4" />
-                  </div>
-                </div>
-                {selectedProjectId && (
-                  <div className="flex items-center gap-1 text-xs text-blue-600">
-                    <Check color="blue" className="w-3 h-3" />
-                    Project filter applied
-                  </div>
-                )}
-              </div>
-
-              {/* From Date */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="startDate"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700"
-                >
-                  <Calendar color="blue" className="w-4 h-4" />
-                  From Date
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    id="startDate"
-                    className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                    value={dateRange.startDate}
-                    onChange={(e) =>
-                      setDateRange({ ...dateRange, startDate: e.target.value })
-                    }
-                  />
-                </div>
-                {dateRange.startDate && (
-                  <div className="flex items-center gap-1 text-xs text-blue-600">
-                    <Check color="blue" className="w-3 h-3" />
-                    Start date set
-                  </div>
-                )}
-              </div>
-
-              {/* To Date */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="endDate"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700"
-                >
-                  <Calendar color="blue" className="w-4 h-4" />
-                  To Date
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    id="endDate"
-                    className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                    value={dateRange.endDate}
-                    onChange={(e) =>
-                      setDateRange({ ...dateRange, endDate: e.target.value })
-                    }
-                    min={dateRange.startDate || undefined}
-                  />
-                </div>
-                {dateRange.endDate && (
-                  <div className="flex items-center gap-1 text-xs text-blue-600">
-                    <Check color="blue" className="w-3 h-3" />
-                    End date set
-                  </div>
-                )}
               </div>
             </div>
+          </Card>
 
-            {/* Quick Filter Options */}
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap color="blue" className="w-4 h-4" />
-                <span className="text-sm font-medium text-gray-700">
-                  Quick Filters
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const today = new Date().toISOString().split("T")[0];
-                    setDateRange({ startDate: today, endDate: today });
-                  }}
-                  className="text-xs px-3 py-1.5"
-                >
-                  Today
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const today = new Date();
-                    const lastWeek = new Date(
-                      today.getTime() - 7 * 24 * 60 * 60 * 1000
-                    );
-                    setDateRange({
-                      startDate: lastWeek.toISOString().split("T")[0],
-                      endDate: today.toISOString().split("T")[0],
-                    });
-                  }}
-                  className="text-xs px-3 py-1.5"
-                >
-                  Last 7 Days
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const today = new Date();
-                    const lastMonth = new Date(
-                      today.getTime() - 30 * 24 * 60 * 60 * 1000
-                    );
-                    setDateRange({
-                      startDate: lastMonth.toISOString().split("T")[0],
-                      endDate: today.toISOString().split("T")[0],
-                    });
-                  }}
-                  className="text-xs px-3 py-1.5"
-                >
-                  Last 30 Days
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const today = new Date();
-                    const firstDayOfMonth = new Date(
-                      today.getFullYear(),
-                      today.getMonth(),
-                      1
-                    );
-                    setDateRange({
-                      startDate: firstDayOfMonth.toISOString().split("T")[0],
-                      endDate: today.toISOString().split("T")[0],
-                    });
-                  }}
-                  className="text-xs px-3 py-1.5"
-                >
-                  This Month
-                </Button>
-              </div>
+          {/* Time Logs Table */}
+          {logsLoading ? (
+            <div className="text-center py-8">
+              <p>Loading time logs...</p>
             </div>
-          </div>
-        </Card>
-
-        {/* Time Logs Table */}
-        {logsLoading ? (
-          <div className="text-center py-8">
-            <p>Loading time logs...</p>
-          </div>
-        ) : logsError ? (
-          <div className="text-center py-8 text-red-500">
-            <p>Error loading time logs</p>
-          </div>
-        ) : filteredLogs.length === 0 ? (
-          <div className="text-center py-8">
-            <p>No time logs found matching your filters</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Time
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Project
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Task
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Duration
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredLogs.map((log: TimeLog) => (
-                  <tr key={log.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(log.startTime)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(log.startTime).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                      {log.endTime &&
-                        ` - ${new Date(log.endTime).toLocaleTimeString([], {
+          ) : logsError ? (
+            <div className="text-center py-8 text-red-500">
+              <p>Error loading time logs</p>
+            </div>
+          ) : filteredLogs.length === 0 ? (
+            <div className="text-center py-8">
+              <p>No time logs found matching your filters</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Time
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Project
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Task
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Duration
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredLogs.map((log: TimeLog) => (
+                    <tr key={log.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDate(log.startTime)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(log.startTime).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
-                        })}`}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {log.projectId
-                        ? projects.find((p: Project) => p.id === log.projectId)
-                            ?.name || "Unknown Project"
-                        : "-"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {log.taskId
-                        ? tasks.find((t: Task) => t.id === log.taskId)
-                            ?.subject || "Unknown Task"
-                        : "-"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {log.duration ? formatDuration(log.duration) : 
-                       log.timeSpent ? formatDuration(log.timeSpent) : "In Progress"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                      {log.description || "-"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEditModal(log)}
-                          className="hover:text-blue-500 hover:bg-gray-100"
-                        >
-                          <Pencil className="w-4 h-4 o" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => openDeleteModal(log.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                        })}
+                        {log.endTime &&
+                          ` - ${new Date(log.endTime).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {log.projectId
+                          ? projects.find((p: Project) => p.id === log.projectId)
+                              ?.name || "Unknown Project"
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {log.taskId
+                          ? tasks.find((t: Task) => t.id === log.taskId)
+                              ?.subject || "Unknown Task"
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {log.duration ? formatDuration(log.duration) : 
+                         log.timeSpent ? formatDuration(log.timeSpent) : "In Progress"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {log.description || "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditModal(log)}
+                            className="hover:text-blue-500 hover:bg-gray-100"
+                          >
+                            <Pencil className="w-4 h-4 o" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => openDeleteModal(log.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Edit Log Modal */}
@@ -692,6 +702,6 @@ export default function LogsPage() {
         isLoading={deleteLogMutation.isPending}
         variant="danger"
       />
-    </PageWrapper>
+    </div>
   );
 }

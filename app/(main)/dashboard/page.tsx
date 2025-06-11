@@ -6,7 +6,6 @@ import { getUserTasks } from '@/services/task';
 import { getUserLogs, getTotalTimeToday } from '@/services/log';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import PageWrapper from '@/components/layout/PageWrapper';
 import { formatDate, formatDuration } from '@/lib/utils';
 import useAuth from '@/lib/hooks/useAuth';
 import Link from 'next/link';
@@ -170,423 +169,435 @@ export default function DashboardPage() {
   const tasksDataLoading = tasksLoading || assignedTasksLoading;
   
   return (
-    <PageWrapper
-      title={`Welcome, ${user?.name || 'User'}`}
-      description="Track your time and manage your projects"
-    >
-      {/* Debug section (press Alt+D to toggle) */}
-      {debugMode && (
-        <div className="bg-gray-100 p-4 mb-4 rounded-md border border-gray-300">
-          <h3 className="text-md font-bold mb-2">Debug Information</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h4 className="text-sm font-semibold">Projects:</h4>
-              <p className="text-xs">Owned: {ownedProjects.length}</p>
-              <p className="text-xs">Member: {memberProjectsFiltered.length}</p>
-              <p className="text-xs">Total: {allProjects.length}</p>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold">Tasks:</h4>
-              <p className="text-xs">Created: {createdTasks.length}</p>
-              <p className="text-xs">Assigned: {assignedTasksFiltered.length}</p>
-              <p className="text-xs">Total: {allTasks.length}</p>
-            </div>
+    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      {/* <div>
+        <div className="px-6 pt-4 pb-2 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+              Welcome, {user?.name || 'User'}
+            </h1>
+            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+              Track your time and manage your projects
+            </p>
           </div>
-          {assignedTasks.length > 0 && (
-            <div className="mt-3">
-              <h4 className="text-sm font-semibold">Assigned Tasks Raw Data:</h4>
-              <pre className="text-xs p-2 bg-gray-200 mt-1 max-h-40 overflow-auto">
-                {JSON.stringify(assignedTasksData, null, 2)}
-              </pre>
-            </div>
-          )}
-          <p className="text-xs text-gray-500 mt-2">Press Alt+D to hide debug info</p>
         </div>
-      )}
+      </div> */}
       
-      <div className="p-6">
-        {/* Stats Section */}
-        <TooltipProvider>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Total Projects
-                  </p>
-                  <div className="mt-2">
-                    <h3 className="text-3xl font-bold text-gray-900">
-                      {projectsDataLoading ? '...' : allProjects.length}
-                    </h3>
-                  </div>
-                  {!projectsDataLoading && (
-                    <div className="mt-1 text-xs text-gray-500">
-                      <span className="text-primary-600">{ownedProjects.length}</span> owned, 
-                      <span className="text-indigo-500 ml-1">{memberProjectsFiltered.length}</span> member
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-indigo-50 p-3 rounded-lg">
-                      <FolderOpenDot className="h-6 w-6 text-indigo-600" />
-                  </div>
-                </div>
+      <div className="flex-1 bg-gray-50">
+        {/* Debug section (press Alt+D to toggle) */}
+        {debugMode && (
+          <div className="bg-gray-100 p-4 mb-4 rounded-md border border-gray-300">
+            <h3 className="text-md font-bold mb-2">Debug Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-semibold">Projects:</h4>
+                <p className="text-xs">Owned: {ownedProjects.length}</p>
+                <p className="text-xs">Member: {memberProjectsFiltered.length}</p>
+                <p className="text-xs">Total: {allProjects.length}</p>
               </div>
-              <div className="absolute bottom-2 right-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="bg-indigo-100 p-1.5 rounded-full hover:bg-indigo-200 transition-colors">
-                      <Info className="h-4 w-4 text-indigo-600" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-gray-800 text-white">
-                    <p>Projects you own or are a member of</p>
-                  </TooltipContent>
-                </Tooltip>
+              <div>
+                <h4 className="text-sm font-semibold">Tasks:</h4>
+                <p className="text-xs">Created: {createdTasks.length}</p>
+                <p className="text-xs">Assigned: {assignedTasksFiltered.length}</p>
+                <p className="text-xs">Total: {allTasks.length}</p>
               </div>
-            </Card>
-
-            <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Active Tasks
-                  </p>
-                  <div className="mt-2">
-                    <h3 className="text-3xl font-bold text-gray-900">
-                      {tasksDataLoading ? '...' : allTasks.filter((task: Task) => task.status !== 'Done').length}
-                    </h3>
-                  </div>
-                  {!tasksDataLoading && (
-                    <div className="mt-1 text-xs text-gray-500">
-                      <span className="text-primary-600">
-                        {createdTasks.filter((task: Task) => task.status !== 'Done').length}
-                      </span> created, 
-                      <span className="text-indigo-500 ml-1">
-                        {assignedTasksFiltered.filter((task: Task) => task.status !== 'Done').length}
-                      </span> assigned
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <ClipboardCheck className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-              </div>
-              <div className="absolute bottom-2 right-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="bg-blue-100 p-1.5 rounded-full hover:bg-blue-200 transition-colors">
-                      <Info className="h-4 w-4 text-blue-600" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-gray-800 text-white">
-                    <p>Tasks that are not yet completed</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            </Card>
-
-            <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Time Today
-                  </p>
-                  <div className="mt-2">
-                    <h3 className="text-3xl font-bold text-gray-900">
-                      {totalTimeTodayLoading ? '...' : formatDuration(totalTimeToday)}
-                    </h3>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-green-50 p-3 rounded-lg">
-                    <Clock className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-              </div>
-              <div className="absolute bottom-2 right-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="bg-green-100 p-1.5 rounded-full hover:bg-green-200 transition-colors">
-                      <Info className="h-4 w-4 text-green-600" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-gray-800 text-white">
-                    <p>Total time tracked today</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            </Card>
-          </div>
-        </TooltipProvider>
-
-        {/* My Tasks Section */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">My Tasks</h2>
-            <Link href="/tasks" className="text-sm text-primary-600 hover:text-primary-500">
-              View all tasks
-            </Link>
-          </div>
-
-          {tasksDataLoading ? (
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                  <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-700 mb-2">Loading tasks...</h3>
-                <div className="w-24 h-2 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            </Card>
-          ) : recentTasks.length === 0 ? (
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No active tasks found</h3>
-                <p className="text-gray-500 mb-4">Create a task to get started with your projects</p>
-                <Link href="/tasks" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create a Task
-                </Link>
-              </div>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {recentTasks.map((task: Task) => (
-                <Card 
-                  key={task.id} 
-                  className="hover:shadow-md transition-all duration-200 border-l-4"
-                  style={{ borderLeftColor: getTaskBorderColor(task.status) }}
-                >
-                  <div className="flex flex-col h-full">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-md font-medium text-gray-900">{task.subject }</h3>
-                      <Badge variant={getStatusBadgeVariant(task.status)}>
-                        {task.status}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500 line-clamp-2 flex-grow">
-                      {task.description || 'No description provided'}
-                    </p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <span className="text-xs text-gray-500">
-                        Project: {allProjects.find((p: Project) => p.id === task.projectId)?.name || 'Unknown'}
-                      </span>
-                      {task.dueDate && (
-                        <span className="text-xs font-medium text-gray-500">
-                          Due: {formatDate(task.dueDate)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                      {createdTasks.some((t: Task) => t.id === task.id) ? 
-                        <Badge variant="default" className="text-xs">Created</Badge> : 
-                        <Badge variant="secondary" className="text-xs">Assigned</Badge>
-                      }
-                    </div>
-                  </div>
-                </Card>
-              ))}
             </div>
-          )}
-        </div>
-
-        {/* Recent Logs Section */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">Recent Time Logs</h2>
-            <Link href="/logs" className="text-sm text-primary-600 hover:text-primary-500">
-              View all
-            </Link>
+            {assignedTasks.length > 0 && (
+              <div className="mt-3">
+                <h4 className="text-sm font-semibold">Assigned Tasks Raw Data:</h4>
+                <pre className="text-xs p-2 bg-gray-200 mt-1 max-h-40 overflow-auto">
+                  {JSON.stringify(assignedTasksData, null, 2)}
+                </pre>
+              </div>
+            )}
+            <p className="text-xs text-gray-500 mt-2">Press Alt+D to hide debug info</p>
           </div>
-          
-          {logsLoading ? (
-            <Card className="overflow-hidden border border-gray-800 shadow-sm">
-              <Table>
-                <TableCaption className="text-gray-600 bg-gray-50 border-t border-gray-200 py-3">
-                  Loading your time tracking activities...
-                </TableCaption>
-                <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
-                  <TableRow>
-                    <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[1, 2, 3].map((i: number) => (
-                    <TableRow key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                      <TableCell>
-                        <div className="h-4 w-24 bg-indigo-100 rounded animate-pulse"></div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="h-4 w-32 bg-indigo-100 rounded animate-pulse"></div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="h-4 w-40 bg-indigo-100 rounded animate-pulse"></div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="h-4 w-16 bg-indigo-100 rounded animate-pulse"></div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-          ) : recentLogs.length === 0 ? (
-            <Card className="overflow-hidden border border-gray-200 shadow-sm">
-              <Table>
-                <TableCaption className="text-gray-600 bg-gray-50 border-t border-gray-200 py-3">
-                  <div className="flex flex-col items-center py-6">
-                    <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
-                      <Clock className="w-8 h-8 text-indigo-500" />
+        )}
+        
+        <div className="p-6">
+          {/* Stats Section */}
+          <TooltipProvider>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Total Projects
+                    </p>
+                    <div className="mt-2">
+                      <h3 className="text-3xl font-bold text-gray-900">
+                        {projectsDataLoading ? '...' : allProjects.length}
+                      </h3>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No time logs found</h3>
-                    <p className="text-gray-500 mb-4">Start tracking time to see your activity history here</p>
-                    <Link href="/logs" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                      <Clock className="w-4 h-4 mr-2" />
-                      Track Time
-                    </Link>
+                    {!projectsDataLoading && (
+                      <div className="mt-1 text-xs text-gray-500">
+                        <span className="text-primary-600">{ownedProjects.length}</span> owned, 
+                        <span className="text-indigo-500 ml-1">{memberProjectsFiltered.length}</span> member
+                      </div>
+                    )}
                   </div>
-                </TableCaption>
-                <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
-                  <TableRow>
-                    <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center text-gray-500 bg-gray-50/30">
-                      No time logs to display
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </Card>
-          ) : (
-            <Card className="overflow-hidden border border-gray-200 shadow-sm">
-              <Table className="border border-gray-800">
-                <TableCaption className="text-gray-600 bg-gray-50 border border-gray-200 py-3">
-                  Your recent time tracking activities
-                </TableCaption>
-                <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
-                  <TableRow>
-                    <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
-                    <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentLogs.map((log: TimeLog, index: number) => (
-                    <TableRow 
-                      key={log.id} 
-                      className={`hover:bg-indigo-50/40 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
-                    >
-                      <TableCell className="font-medium text-gray-700">{formatDate(log.startTime)}</TableCell>
-                      <TableCell className="text-gray-800 font-medium">
-                        {allProjects.find((p: Project) => p.id === log.projectId)?.name || 'No Project'}
-                      </TableCell>
-                      <TableCell className="text-gray-600">
-                        {allTasks.find((t: Task) => t.id === log.taskId)?.subject || 'No Task'}
-                      </TableCell>
-                      <TableCell className="flex items-center gap-1.5 text-gray-700">
-                        <Clock className="h-3.5 w-3.5 text-indigo-500" />
-                        <span className="font-medium">
-                          {log.timeSpent ? formatDuration(log.timeSpent) : 'In Progress'}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-          )}
-        </div>
-
-        {/* Projects Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium text-gray-900">Your Projects</h2>
-            <Link href="/projects" className="text-sm text-primary-600 hover:text-primary-500">
-              View all
-            </Link>
-          </div>
-          
-          {projectsDataLoading ? (
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                  <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-700 mb-2">Loading projects...</h3>
-                <div className="w-24 h-2 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            </Card>
-          ) : allProjects.length === 0 ? (
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
-                <p className="text-gray-500 mb-4">Create your first project to get started</p>
-                <Link href="/projects" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Create a Project
-                </Link>
-              </div>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {allProjects.slice(0, 3).map((project: Project) => (
-                <Link href={`/projects/${project.id}`} key={project.id}>
-                  <Card className="h-full hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-md font-medium text-gray-900">{project.name}</h3>
-                      {ownedProjects.some((p: Project) => p.id === project.id) ? 
-                        <Badge variant="primary" className="text-xs">Owner</Badge> : 
-                        <Badge variant="secondary" className="text-xs">Member</Badge>
-                      }
+                  <div className="flex items-center gap-2">
+                    <div className="bg-indigo-50 p-3 rounded-lg">
+                        <FolderOpenDot className="h-6 w-6 text-indigo-600" />
                     </div>
-                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.description}</p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <Badge variant="primary" rounded>
-                        {allTasks.filter((t: Task) => t.projectId === project.id).length} Tasks
-                      </Badge>
-                      <span className="text-xs text-gray-500">
-                        Created {formatDate(project.createdAt)}
-                      </span>
+                  </div>
+                </div>
+                <div className="absolute bottom-2 right-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button className="bg-indigo-100 p-1.5 rounded-full hover:bg-indigo-200 transition-colors">
+                        <Info className="h-4 w-4 text-indigo-600" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-gray-800 text-white">
+                      <p>Projects you own or are a member of</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </Card>
+
+              <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Active Tasks
+                    </p>
+                    <div className="mt-2">
+                      <h3 className="text-3xl font-bold text-gray-900">
+                        {tasksDataLoading ? '...' : allTasks.filter((task: Task) => task.status !== 'Done').length}
+                      </h3>
+                    </div>
+                    {!tasksDataLoading && (
+                      <div className="mt-1 text-xs text-gray-500">
+                        <span className="text-primary-600">
+                          {createdTasks.filter((task: Task) => task.status !== 'Done').length}
+                        </span> created, 
+                        <span className="text-indigo-500 ml-1">
+                          {assignedTasksFiltered.filter((task: Task) => task.status !== 'Done').length}
+                        </span> assigned
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <ClipboardCheck className="h-6 w-6 text-blue-600" />
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute bottom-2 right-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button className="bg-blue-100 p-1.5 rounded-full hover:bg-blue-200 transition-colors">
+                        <Info className="h-4 w-4 text-blue-600" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-gray-800 text-white">
+                      <p>Tasks that are not yet completed</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </Card>
+
+              <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Time Today
+                    </p>
+                    <div className="mt-2">
+                      <h3 className="text-3xl font-bold text-gray-900">
+                        {totalTimeTodayLoading ? '...' : formatDuration(totalTimeToday)}
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <Clock className="h-6 w-6 text-green-600" />
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute bottom-2 right-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button className="bg-green-100 p-1.5 rounded-full hover:bg-green-200 transition-colors">
+                        <Info className="h-4 w-4 text-green-600" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-gray-800 text-white">
+                      <p>Total time tracked today</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </Card>
+            </div>
+          </TooltipProvider>
+
+          {/* My Tasks Section */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">My Tasks</h2>
+              <Link href="/tasks" className="text-sm text-primary-600 hover:text-primary-500">
+                View all tasks
+              </Link>
+            </div>
+
+            {tasksDataLoading ? (
+              <Card className="p-8 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">Loading tasks...</h3>
+                  <div className="w-24 h-2 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </Card>
+            ) : recentTasks.length === 0 ? (
+              <Card className="p-8 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No active tasks found</h3>
+                  <p className="text-gray-500 mb-4">Create a task to get started with your projects</p>
+                  <Link href="/tasks" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create a Task
+                  </Link>
+                </div>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {recentTasks.map((task: Task) => (
+                  <Card 
+                    key={task.id} 
+                    className="hover:shadow-md transition-all duration-200 border-l-4"
+                    style={{ borderLeftColor: getTaskBorderColor(task.status) }}
+                  >
+                    <div className="flex flex-col h-full">
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-md font-medium text-gray-900">{task.subject }</h3>
+                        <Badge variant={getStatusBadgeVariant(task.status)}>
+                          {task.status}
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-sm text-gray-500 line-clamp-2 flex-grow">
+                        {task.description || 'No description provided'}
+                      </p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <span className="text-xs text-gray-500">
+                          Project: {allProjects.find((p: Project) => p.id === task.projectId)?.name || 'Unknown'}
+                        </span>
+                        {task.dueDate && (
+                          <span className="text-xs font-medium text-gray-500">
+                            Due: {formatDate(task.dueDate)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-2 text-xs text-gray-500">
+                        {createdTasks.some((t: Task) => t.id === task.id) ? 
+                          <Badge variant="default" className="text-xs">Created</Badge> : 
+                          <Badge variant="secondary" className="text-xs">Assigned</Badge>
+                        }
+                      </div>
                     </div>
                   </Card>
-                </Link>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Logs Section */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">Recent Time Logs</h2>
+              <Link href="/logs" className="text-sm text-primary-600 hover:text-primary-500">
+                View all
+              </Link>
             </div>
-          )}
+            
+            {logsLoading ? (
+              <Card className="overflow-hidden border border-gray-800 shadow-sm">
+                <Table>
+                  <TableCaption className="text-gray-600 bg-gray-50 border-t border-gray-200 py-3">
+                    Loading your time tracking activities...
+                  </TableCaption>
+                  <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
+                    <TableRow>
+                      <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[1, 2, 3].map((i: number) => (
+                      <TableRow key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                        <TableCell>
+                          <div className="h-4 w-24 bg-indigo-100 rounded animate-pulse"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-32 bg-indigo-100 rounded animate-pulse"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-40 bg-indigo-100 rounded animate-pulse"></div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="h-4 w-16 bg-indigo-100 rounded animate-pulse"></div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
+            ) : recentLogs.length === 0 ? (
+              <Card className="overflow-hidden border border-gray-200 shadow-sm">
+                <Table>
+                  <TableCaption className="text-gray-600 bg-gray-50 border-t border-gray-200 py-3">
+                    <div className="flex flex-col items-center py-6">
+                      <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                        <Clock className="w-8 h-8 text-indigo-500" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No time logs found</h3>
+                      <p className="text-gray-500 mb-4">Start tracking time to see your activity history here</p>
+                      <Link href="/logs" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <Clock className="w-4 h-4 mr-2" />
+                        Track Time
+                      </Link>
+                    </div>
+                  </TableCaption>
+                  <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
+                    <TableRow>
+                      <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-24 text-center text-gray-500 bg-gray-50/30">
+                        No time logs to display
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Card>
+            ) : (
+              <Card className="overflow-hidden border border-gray-200 shadow-sm">
+                <Table className="border border-gray-800">
+                  <TableCaption className="text-gray-600 bg-gray-50 border border-gray-200 py-3">
+                    Your recent time tracking activities
+                  </TableCaption>
+                  <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
+                    <TableRow>
+                      <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
+                      <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentLogs.map((log: TimeLog, index: number) => (
+                      <TableRow 
+                        key={log.id} 
+                        className={`hover:bg-indigo-50/40 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                      >
+                        <TableCell className="font-medium text-gray-700">{formatDate(log.startTime)}</TableCell>
+                        <TableCell className="text-gray-800 font-medium">
+                          {allProjects.find((p: Project) => p.id === log.projectId)?.name || 'No Project'}
+                        </TableCell>
+                        <TableCell className="text-gray-600">
+                          {allTasks.find((t: Task) => t.id === log.taskId)?.subject || 'No Task'}
+                        </TableCell>
+                        <TableCell className="flex items-center gap-1.5 text-gray-700">
+                          <Clock className="h-3.5 w-3.5 text-indigo-500" />
+                          <span className="font-medium">
+                            {log.timeSpent ? formatDuration(log.timeSpent) : 'In Progress'}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
+            )}
+          </div>
+
+          {/* Projects Section */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">Your Projects</h2>
+              <Link href="/projects" className="text-sm text-primary-600 hover:text-primary-500">
+                View all
+              </Link>
+            </div>
+            
+            {projectsDataLoading ? (
+              <Card className="p-8 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                    <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">Loading projects...</h3>
+                  <div className="w-24 h-2 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </Card>
+            ) : allProjects.length === 0 ? (
+              <Card className="p-8 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
+                  <p className="text-gray-500 mb-4">Create your first project to get started</p>
+                  <Link href="/projects" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Create a Project
+                  </Link>
+                </div>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {allProjects.slice(0, 3).map((project: Project) => (
+                  <Link href={`/projects/${project.id}`} key={project.id}>
+                    <Card className="h-full hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-md font-medium text-gray-900">{project.name}</h3>
+                        {ownedProjects.some((p: Project) => p.id === project.id) ? 
+                          <Badge variant="primary" className="text-xs">Owner</Badge> : 
+                          <Badge variant="secondary" className="text-xs">Member</Badge>
+                        }
+                      </div>
+                      <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.description}</p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <Badge variant="primary" rounded>
+                          {allTasks.filter((t: Task) => t.projectId === project.id).length} Tasks
+                        </Badge>
+                        <span className="text-xs text-gray-500">
+                          Created {formatDate(project.createdAt)}
+                        </span>
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </PageWrapper>
+    </div>
   );
 } 

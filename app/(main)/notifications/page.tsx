@@ -7,7 +7,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { Trash2, Check, Mail, MailOpen, Loader2, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
-import PageWrapper from '@/components/layout/PageWrapper';
 import { cn } from '@/lib/utils';
 import useAuthStore from '@/store/auth';
 import { useNotificationStore } from '@/store/useNotificationStore';
@@ -144,172 +143,183 @@ export default function NotificationsPage() {
   };
 
   return (
-    <PageWrapper
-      title="Notifications"
-      description="View and manage your notifications"
-      actions={
-        unreadCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleMarkAllAsRead}
-            disabled={markAllAsReadMutation.isPending}
-          >
-            {markAllAsReadMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <MailOpen className="h-4 w-4 mr-2" />
-            )}
-            Mark all as read
-          </Button>
-        )
-      }
-    >
-      <div className="space-y-6">
-        {/* Bulk actions */}
-        {selectedNotifications.length > 0 && (
-          <div className="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">
-              {selectedNotifications.length} notification{selectedNotifications.length > 1 ? "s" : ""} selected
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBulkMarkAsRead}
-                className="text-xs"
-              >
-                <Check className="h-3.5 w-3.5 mr-1" />
-                Mark as read
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDelete}
-                className="text-xs"
-              >
-                <Trash2 className="h-3.5 w-3.5 mr-1" />
-                Delete
-              </Button>
-            </div>
+    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      <div className="border-b border-gray-400 rounded-b-3xl">
+        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="mb-4 md:mb-0">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+              Notifications
+            </h1>
+            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+              View and manage your notifications
+            </p>
           </div>
-        )}
-
-        {/* Notifications list */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          {isLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500">Loading notifications...</p>
-            </div>
-          ) : isError ? (
-            <div className="p-8 text-center">
-              <p className="text-red-500">Error loading notifications</p>
+          {unreadCount > 0 && (
+            <div className="flex flex-shrink-0 space-x-2">
               <Button
                 variant="outline"
-                className="mt-4"
-                onClick={() => queryClient.invalidateQueries({ queryKey: ['notifications'] })}
+                onClick={handleMarkAllAsRead}
+                disabled={markAllAsReadMutation.isPending}
               >
-                Try again
+                {markAllAsReadMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <MailOpen className="h-4 w-4 mr-2" />
+                )}
+                Mark all as read
               </Button>
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className="py-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No notifications</h3>
-              <p className="text-gray-500">You do not have any notifications yet</p>
-            </div>
-          ) : (
-            <div>
-              <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-sm text-gray-700">
-                    {totalCount} Notification{totalCount !== 1 ? "s" : ""}
-                  </h3>
-                </div>
-              </div>
-
-              <ul className="divide-y divide-gray-200">
-                {notifications.filter(notification => notification && notification.id).map((notification: Notification) => (
-                  <li key={notification.id} className={cn(
-                    "px-4 py-4 hover:bg-gray-50 transition-colors",
-                    notification.isRead === 0 && "bg-blue-50/30"
-                  )}>
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 mr-3">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                          checked={selectedNotifications.includes(notification.id)}
-                          onChange={() => toggleSelection(notification.id)}
-                        />
-                      </div>
-                      <div className="flex-shrink-0 mr-3">
-                        {getNotificationIcon(notification.type)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex justify-between">
-                          <Link
-                            href={`/${notification.entityType?.toLowerCase() || 'tasks'}/${notification.entityId || ''}`}
-                            className={cn(
-                              "text-sm",
-                              notification.isRead === 0 ? "font-medium text-gray-900" : "text-gray-700"
-                            )}
-                          >
-                            {notification.title}
-                          </Link>
-                          <span className="text-xs text-gray-500">
-                            {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
-                        <div className="mt-2 flex items-center gap-2">
-                          {notification.isRead === 0 && (
-                            <button
-                              onClick={() => handleMarkAsRead(notification.id)}
-                              className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center"
-                            >
-                              <MailOpen className="h-3.5 w-3.5 mr-1" />
-                              Mark as read
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteNotification(notification.id)}
-                            className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
-                          >
-                            <Trash2 className="h-3.5 w-3.5 mr-1" />
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Load more button */}
-              {hasNextPage && (
-                <div className="px-4 py-3 border-t border-gray-200 text-center">
-                  <Button
-                    variant="outline"
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                    className="w-full"
-                  >
-                    {isFetchingNextPage ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 mr-2" />
-                    )}
-                    Load more
-                  </Button>
-                </div>
-              )}
             </div>
           )}
         </div>
       </div>
-    </PageWrapper>
+      <div className="flex-1 bg-gray-50">
+        <div className="p-6 space-y-6">
+          {/* Bulk actions */}
+          {selectedNotifications.length > 0 && (
+            <div className="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700">
+                {selectedNotifications.length} notification{selectedNotifications.length > 1 ? "s" : ""} selected
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkMarkAsRead}
+                  className="text-xs"
+                >
+                  <Check className="h-3.5 w-3.5 mr-1" />
+                  Mark as read
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  className="text-xs"
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1" />
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Notifications list */}
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            {isLoading ? (
+              <div className="p-8 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500">Loading notifications...</p>
+              </div>
+            ) : isError ? (
+              <div className="p-8 text-center">
+                <p className="text-red-500">Error loading notifications</p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => queryClient.invalidateQueries({ queryKey: ['notifications'] })}
+                >
+                  Try again
+                </Button>
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="py-12 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mail className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No notifications</h3>
+                <p className="text-gray-500">You do not have any notifications yet</p>
+              </div>
+            ) : (
+              <div>
+                <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm text-gray-700">
+                      {totalCount} Notification{totalCount !== 1 ? "s" : ""}
+                    </h3>
+                  </div>
+                </div>
+
+                <ul className="divide-y divide-gray-200">
+                  {notifications.filter(notification => notification && notification.id).map((notification: Notification) => (
+                    <li key={notification.id} className={cn(
+                      "px-4 py-4 hover:bg-gray-50 transition-colors",
+                      notification.isRead === 0 && "bg-blue-50/30"
+                    )}>
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 mr-3">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            checked={selectedNotifications.includes(notification.id)}
+                            onChange={() => toggleSelection(notification.id)}
+                          />
+                        </div>
+                        <div className="flex-shrink-0 mr-3">
+                          {getNotificationIcon(notification.type)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex justify-between">
+                            <Link
+                              href={`/${notification.entityType?.toLowerCase() || 'tasks'}/${notification.entityId || ''}`}
+                              className={cn(
+                                "text-sm",
+                                notification.isRead === 0 ? "font-medium text-gray-900" : "text-gray-700"
+                              )}
+                            >
+                              {notification.title}
+                            </Link>
+                            <span className="text-xs text-gray-500">
+                              {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
+                          <div className="mt-2 flex items-center gap-2">
+                            {notification.isRead === 0 && (
+                              <button
+                                onClick={() => handleMarkAsRead(notification.id)}
+                                className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center"
+                              >
+                                <MailOpen className="h-3.5 w-3.5 mr-1" />
+                                Mark as read
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteNotification(notification.id)}
+                              className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
+                            >
+                              <Trash2 className="h-3.5 w-3.5 mr-1" />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Load more button */}
+                {hasNextPage && (
+                  <div className="px-4 py-3 border-t border-gray-200 text-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetchingNextPage}
+                      className="w-full"
+                    >
+                      {isFetchingNextPage ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 mr-2" />
+                      )}
+                      Load more
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 } 
