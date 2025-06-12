@@ -6,11 +6,10 @@ const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1` || 'http:/
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, 
-  withCredentials: true, // Enable sending cookies with requests
+  timeout: 10000,
+  withCredentials: true, // This is crucial for cookies
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
   }
 });
 
@@ -23,25 +22,12 @@ apiClient.interceptors.request.use((config) => {
 
 // Add response interceptor to handle common errors
 apiClient.interceptors.response.use(
-  (response) => {
-    // Check if we need to refresh the token
-    const cookies = document.cookie.split(';');
-    const hasAccessToken = cookies.some(cookie => cookie.trim().startsWith('accessToken='));
-    
-    if (!hasAccessToken && response.config.url !== '/user/login') {
-      // If no access token and not on login page, redirect to login
-      window.location.href = '/login';
-    }
-    return response;
-  },
+  (response) => response,
   (error) => {
     const { response } = error;
-    if (response) {
-      // If we get a 401, clear any existing tokens and redirect to login
-      if (response.status === 401) {
-        document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-        window.location.href = '/login';
-      }
+    if (response && response.status === 401) {
+      // Handle unauthorized errors (e.g., redirect to login)
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
