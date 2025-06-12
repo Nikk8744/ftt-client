@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['images.unsplash.com', "randomuser.me"],
+    domains: ['images.unsplash.com', 'randomuser.me'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -11,8 +11,8 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'randomuser.me/api',
-        pathname: '**',
+        hostname: 'randomuser.me',
+        pathname: '/api/**',
       }
     ],
   },
@@ -20,8 +20,28 @@ const nextConfig = {
     return [
       {
         source: '/api/v1/:path*',
-        destination: process.env.NEXT_PUBLIC_API_BASE_URL,
-        // destination: 'http://localhost:5000/api/v1/:path*',
+        destination: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1/:path*',
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
       },
     ];
   },

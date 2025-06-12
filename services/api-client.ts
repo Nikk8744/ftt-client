@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Use the environment variable if available, otherwise use the proxy path
 // const API_BASE_URL = 'http://localhost:5000/api/v1';
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1`;
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1` || 'http://localhost:5000/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -16,11 +16,6 @@ const apiClient = axios.create({
 // Add request interceptor to handle JWT tokens
 apiClient.interceptors.request.use((config) => {
   // JWT is sent via cookies automatically with withCredentials: true
-  // but we'll also add it to the Authorization header as a fallback
-  const token = localStorage.getItem('auth-token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
   return config;
 });
 
