@@ -10,23 +10,38 @@ const apiClient = axios.create({
   withCredentials: true, // Enable sending cookies with requests
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   }
 });
 
 // Add request interceptor to handle JWT tokens
 apiClient.interceptors.request.use((config) => {
-  // JWT is sent via cookies automatically with withCredentials: true
+  // Ensure credentials are included in every request
+  config.withCredentials = true;
   return config;
 });
 
 // Add response interceptor to handle common errors
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Check if we need to refresh the token
+    const cookies = document.cookie.split(';');
+    const hasAccessToken = cookies.some(cookie => cookie.trim().startsWith('accessToken='));
+    
+    if (!hasAccessToken && response.config.url !== '/user/login') {
+      // If no access token and not on login page, redirect to login
+      window.location.href = '/login';
+    }
+    return response;
+  },
   (error) => {
     const { response } = error;
-    if (response && response.status === 401) {
-      // Handle unauthorized errors (e.g., redirect to login)
-      window.location.href = '/login';
+    if (response) {
+      // If we get a 401, clear any existing tokens and redirect to login
+      if (response.status === 401) {
+        document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

@@ -11,11 +11,8 @@ export function middleware(request: NextRequest) {
   );
 
   // Get the token from cookies
-  // According to the API guide, the backend sets 'accessToken' and 'refreshToken' cookies
   const token = request.cookies.get('accessToken')?.value;
-  // Fallback to our custom cookie if needed
-  const customToken = request.cookies.get('auth-token')?.value;
-  const isAuthenticated = !!(token || customToken);
+  const isAuthenticated = !!token;
 
   // If the user is on a protected path but not authenticated, redirect to login
   if (!isPublicPath && !isAuthenticated) {
