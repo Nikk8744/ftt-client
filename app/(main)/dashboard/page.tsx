@@ -245,7 +245,7 @@ export default function DashboardPage() {
                 <div className="absolute bottom-2 right-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button className="bg-indigo-100 p-1.5 rounded-full hover:bg-indigo-200 transition-colors">
+                      <button className=" p-1.5 rounded-full hover:bg-indigo-100">
                         <Info className="h-4 w-4 text-indigo-600" />
                       </button>
                     </TooltipTrigger>
@@ -287,8 +287,8 @@ export default function DashboardPage() {
                 <div className="absolute bottom-2 right-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button className="bg-blue-100 p-1.5 rounded-full hover:bg-blue-200 transition-colors">
-                        <Info className="h-4 w-4 text-blue-600" />
+                      <button className="p-1.5 rounded-full hover:bg-indigo-100 transition-colors">
+                        <Info className="h-4 w-4 text-indigo-600" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent className="bg-gray-800 text-white">
@@ -319,8 +319,8 @@ export default function DashboardPage() {
                 <div className="absolute bottom-2 right-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button className="bg-green-100 p-1.5 rounded-full hover:bg-green-200 transition-colors">
-                        <Info className="h-4 w-4 text-green-600" />
+                      <button className="p-1.5 rounded-full hover:bg-indigo-100 transition-colors">
+                        <Info className="h-4 w-4 text-indigo-600" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent className="bg-gray-800 text-white">

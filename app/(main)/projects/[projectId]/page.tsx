@@ -26,6 +26,7 @@ import { formatDate } from "@/lib/utils";
 import TaskForm from "@/components/feature/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { Task } from "@/types";
+import { Calendar, ChevronDown, CircleCheck, Clock, Info, Plus, User } from "lucide-react";
 
 // Form validation schemas
 const projectSchema = z.object({
@@ -292,9 +293,11 @@ export default function ProjectDetailsPage() {
               Add Member
             </Button>
             <Button
-              variant="outline"
+              variant="default"
               onClick={() => setIsAddTaskModalOpen(true)}
-            >
+              className="flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-800"
+            > 
+            <Plus className="h-4 w-4" />
               Add Task
             </Button>
             <Button
@@ -387,19 +390,7 @@ export default function ProjectDetailsPage() {
                 <Card className="border border-gray-100 rounded-xl bg-white overflow-hidden">
                   <div className="border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white px-4 py-3">
                     <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <svg
-                        className="w-4 h-4 text-gray-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                        />
-                      </svg>
+                      <Info className="h-4 w-4 text-indigo-600" />
                       Project Info
                     </h3>
                   </div>
@@ -409,19 +400,7 @@ export default function ProjectDetailsPage() {
                       {/* Owner */}
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
-                          <svg
-                            className="w-4 h-4 text-blue-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                            />
-                          </svg>
+                          <User className="h-4 w-4 text-indigo-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -436,19 +415,7 @@ export default function ProjectDetailsPage() {
                       {/* Status */}
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                          <svg
-                            className="w-4 h-4 text-green-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
+                          <CircleCheck className="h-4 w-4 text-green-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -474,19 +441,7 @@ export default function ProjectDetailsPage() {
                       {/* Created Date */}
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
-                          <svg
-                            className="w-4 h-4 text-purple-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                            />
-                          </svg>
+                          <Plus className="h-4 w-4 text-purple-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -501,19 +456,7 @@ export default function ProjectDetailsPage() {
                       {/* Total Hours */}
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mt-0.5">
-                          <svg
-                            className="w-4 h-4 text-orange-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
+                          <Clock className="h-4 w-4 text-orange-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -528,19 +471,7 @@ export default function ProjectDetailsPage() {
                       {/* Start Date */}
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center mt-0.5">
-                          <svg
-                            className="w-4 h-4 text-teal-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
+                          <Calendar className="h-4 w-4 text-teal-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -555,19 +486,7 @@ export default function ProjectDetailsPage() {
                       {/* End Date */}
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
-                          <svg
-                            className="w-4 h-4 text-red-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
+                          <Calendar className="h-4 w-4 text-red-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -734,9 +653,7 @@ export default function ProjectDetailsPage() {
                 <option value="Completed">Completed</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
+                <ChevronDown className="h-4 w-4 text-gray-700" />
               </div>
               {projectErrors.status && (
                 <p className="mt-1 text-xs text-red-600">

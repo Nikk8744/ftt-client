@@ -22,9 +22,8 @@ export default function MainLayout({
     const cookies = parseCookies();
     const hasAuthCookie = !!cookies['accessToken'] || !!cookies['auth-token'];
     
-    // If no auth in state but we have cookies, middleware should handle redirects
-    // If no auth in state and no cookies, redirect to login
-    if (!isAuthenticated && !hasAuthCookie) {
+    // Only redirect if we're sure the store has hydrated and there's no auth
+    if (!isLoading && !isAuthenticated && !hasAuthCookie) {
       router.push('/login');
     }
     
@@ -34,7 +33,7 @@ export default function MainLayout({
     }
     
     setIsLoading(false);
-  }, [isAuthenticated, router, user, fetchRecentNotifications]);
+  }, [isAuthenticated, router, user, fetchRecentNotifications, isLoading]);
 
   // Don't render anything during loading to prevent flash of content
   if (isLoading) {

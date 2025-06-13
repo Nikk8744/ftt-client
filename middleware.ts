@@ -7,20 +7,25 @@ const publicPaths = ['/login', '/register', '/forgot-password', '/'];
 export function middleware(request: NextRequest) {
   // Check if the path is public
   const isPublicPath = publicPaths.some(path => 
-    request.nextUrl.pathname.startsWith(path)
+    request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
   );
+  console.log("🚀 ~ middleware ~ isPublicPath:", isPublicPath)
+  console.log("🚀 ~ middleware ~ request.nextUrl.pathname:", request.nextUrl.pathname)
 
   // Get the token from cookies
   const token = request.cookies.get('accessToken')?.value;
+  console.log("🚀 ~ middleware ~ token:", token)
   const isAuthenticated = !!token;
+  console.log("🚀 ~ middleware ~ isAuthenticated:", isAuthenticated)
 
+  console.log("🚀 ~ middleware ~ isAuthenticated, isPublicPath:", isAuthenticated, isPublicPath);
   // If the user is on a protected path but not authenticated, redirect to login
-  if (!isPublicPath && !isAuthenticated) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  // if (!isPublicPath && !isAuthenticated) {
+  //   return NextResponse.redirect(new URL('/login', request.url));
+  // }
 
   // If the user is authenticated but tries to access login/register, redirect to dashboard
-  if (isAuthenticated && isPublicPath && 
+  if (isAuthenticated && isPublicPath &&
       (request.nextUrl.pathname === '/login' || 
        request.nextUrl.pathname === '/register')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -32,7 +37,14 @@ export function middleware(request: NextRequest) {
 // Configure which paths the middleware runs on
 export const config = {
   matcher: [
-    // Match all paths except static files, images, etc.
-    '/((?!_next/static|_next/image|favicon.ico|api).*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
   ],
 }; 
