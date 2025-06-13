@@ -246,7 +246,7 @@ export const getProjectReportPdf = async (projectId: string) => {
     }
     
     // Use the correct API path that will be properly routed through Next.js
-    const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/reports/project/${projectId}/pdf`;
+    const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/reports/project/${projectId}/pdf`;
     
     console.log('Downloading PDF from:', endpoint);
     
@@ -283,7 +283,7 @@ export const getProjectReportPdf = async (projectId: string) => {
 export const getTasksReportPdf = async (projectId?: string) => {
   try {
     // Use the correct API path that will be properly routed through Next.js
-    const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/reports/tasks/pdf${projectId ? `?projectId=${projectId}` : ''}`;
+    const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/reports/tasks/pdf${projectId ? `?projectId=${projectId}` : ''}`;
     
     console.log('Downloading PDF from:', endpoint);
     
@@ -320,7 +320,7 @@ export const getTasksReportPdf = async (projectId?: string) => {
 export const getAllProjectsReportPdf = async () => {
   try {
     // Use the correct API path that will be properly routed through Next.js
-    const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/reports/project/summary/all/pdf`;
+    const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/reports/project/summary/all/pdf`;
     
     console.log('Downloading PDF from:', endpoint);
     

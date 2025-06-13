@@ -25,8 +25,14 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const { response } = error;
-    if (response && response.status === 401) {
-      // Handle unauthorized errors (e.g., redirect to login)
+    
+    // Only redirect to login if it's a 401 and we're not already on the login page
+    if (response && response.status === 401 && window.location.pathname !== '/login') {
+      // Clear any existing auth data
+      localStorage.removeItem('user');
+      localStorage.removeItem('auth-token');
+      
+      // Use router.push instead of window.location for better navigation
       window.location.href = '/login';
     }
     return Promise.reject(error);
