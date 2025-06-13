@@ -374,7 +374,7 @@ const Icons = {
         d="M44,23.5C44,34.27,35.05,43,24,43c-1.651,0-3.25-0.194-4.784-0.564	c-0.465-0.112-0.951-0.069-1.379,0.145L13.46,44.77C12.33,45.335,11,44.513,11,43.249v-4.025c0-0.575-0.257-1.111-0.681-1.499	C6.425,34.165,4,29.11,4,23.5C4,12.73,12.95,4,24,4S44,12.73,44,23.5z"
       />
       <path
-        d="M34.992,17.292c-0.428,0-0.843,0.142-1.2,0.411l-5.694,4.215	c-0.133,0.1-0.28,0.15-0.435,0.15c-0.15,0-0.291-0.047-0.41-0.136l-3.972-2.99c-0.808-0.601-1.76-0.918-2.757-0.918	c-1.576,0-3.025,0.791-3.876,2.116l-1.211,1.891l-4.12,6.695c-0.392,0.614-0.422,1.372-0.071,2.014	c0.358,0.654,1.034,1.06,1.764,1.06c0.428,0,0.843-0.142,1.2-0.411l5.694-4.215c0.133-0.1,0.28-0.15,0.435-0.15	c0.15,0,0.291,0.047,0.41,0.136l3.972,2.99c0.809,0.602,1.76,0.918,2.757,0.918c1.576,0,3.025-0.791-3.876,2.116l1.211-1.891	l4.12-6.695c0.392-0.614,0.422-1.372,0.071-2.014C36.398,17.698,35.722,17.292,34.992,17.292L34.992,17.292z"
+        d="M34.992,17.292c-0.428,0-0.843,0.142-1.2,0.411l-5.694,4.215	c-0.133,0-0.28,0.15-0.435,0.15c-0.15,0-0.291-0.047-0.41-0.136l-3.972-2.99c-0.808-0.601-1.76-0.918-2.757-0.918	c-1.576,0-3.025,0.791-3.876,2.116l-1.211,1.891l-4.12,6.695c-0.392,0.614-0.422,1.372-0.071,2.014	c0.358,0.654,1.034,1.06,1.764,1.06c0.428,0,0.843-0.142,1.2-0.411l5.694-4.215c0.133-0.1,0.28-0.15,0.435-0.15	c0.15,0,0.291,0.047,0.41,0.136l3.972,2.99c0.809,0.602,1.76,0.918,2.757,0.918c1.576,0,3.025-0.791-3.876,2.116l1.211-1.891	l4.12-6.695c0.392-0.614,0.422-1.372,0.071-2.014C36.398,17.698,35.722,17.292,34.992,17.292L34.992,17.292z"
         opacity=".05"
       />
       <path
@@ -534,7 +534,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <div className="relative bg-[#0a0a0a] overflow-hidden pt-16">
+    <div className="relative bg-[#0a0a0a] overflow-hidden pt-12 sm:pt-16">
       {/* Aurora background effect */}
       <div className="absolute inset-0 z-0">
         <Aurora 
@@ -545,50 +545,55 @@ export default function HeroSection() {
         />
       </div>
       
-      <div className="max-w-7xl mx-auto pt-16 pb-20 px-4 sm:px-6 lg:px-8 sm:pt-24 sm:pb-32 relative z-10">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-          <div className="lg:col-span-6">
-            <div className="sm:max-w-lg">
-              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl mb-4 font-serif">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10 sm:pt-20 sm:pb-20 relative z-10">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+          {/* Left: Text/CTA/Avatars */}
+          <div className="w-full lg:col-span-6 flex flex-col justify-center items-center lg:items-start text-center lg:text-left mt-10 lg:mt-0">
+            <div className="w-full max-w-lg">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4 font-serif">
                 Track Your Time.
-                <div className="text-lime-500 text-4xl sm:text-5xl mt-1 font-serif">
+                <div className="text-lime-500 text-3xl xs:text-4xl sm:text-5xl mt-1 font-serif">
                   Boost Your <span className="block">Productivity.</span>
                 </div>
               </h1>
-              <p className="mt-4 text-lg text-white/90">
+              <p className="mt-4 text-base xs:text-lg text-white/90">
                 The ultimate time tracking solution for freelancers and small teams. Track time, manage projects, and boost your productivity with our intuitive platform.
               </p>
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-8 flex flex-row flex-wrap gap-4 justify-center lg:justify-start">
                 <Link
                   href="/register"
-                  className="inline-block px-6 py-3 rounded-md bg-atlantis-400 text-slate-900 font-medium hover:bg-atlantis-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-block px-6 py-3 rounded-md bg-atlantis-400 text-slate-900 font-medium hover:bg-atlantis-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-base xs:text-lg"
                 >
                   Get Started - It&apos;s Free
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="inline-block px-6 py-3 rounded-md border border-white/30 text-white font-medium hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 backdrop-blur-sm"
+                  className="inline-block px-6 py-3 rounded-md border border-white/30 text-white font-medium hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 backdrop-blur-sm text-base xs:text-lg"
                 >
                   Learn More
                 </Link>
               </div>
               <div className="mt-8">
-                <div className="flex items-center">
+                <div className="flex flex-col lg:flex-row items-center gap-2 xs:gap-4">
                   <AvatarCircles 
                     avatarUrls={avatars} 
                     numPeople={986} 
                     className="drop-shadow-md"
                   />
-                  <p className="ml-3 text-sm text-white/80 mt-3">
+                  <p className="text-sm text-white/80 mt-2 xs:mt-0">
                     Join thousands of satisfied users
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-12 lg:mt-0 lg:col-span-6">
-            <div className="pl-4 -mr-20 sm:pl-6 md:-mr-16 lg:px-0 lg:m-0 lg:relative lg:h-full flex items-center justify-center">
-              <AnimatedBeamDemo />
+
+          {/* Right: Integration Graph */}
+          <div className="w-full flex justify-center items-center lg:col-span-6 mb-8 lg:mb-0">
+            <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-none flex items-center justify-center">
+              <div className="w-full max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+                <AnimatedBeamDemo />
+              </div>
             </div>
           </div>
         </div>

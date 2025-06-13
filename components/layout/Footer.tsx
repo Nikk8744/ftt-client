@@ -74,75 +74,65 @@ export default function Footer() {
         </div> */}
         
         <div className="max-w-7xl mx-auto relative z-10">
-          {/* Contact Us Header - Similar to reference image */}
-          <div className="mb-10 pb-4 border-b border-atlantis-600/50">
-            <h2 className="text-xl md:text-3xl font-mono text-black flex items-center">
-              CONTACT US
-              <span className="ml-2 flex items-center justify-center w-6 h-6 rounded-md bg-atlantis-200 text-atlantis-800">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                  <polyline points="22,6 12,13 2,6"></polyline>
-                </svg>
-              </span>
-            </h2>
+          {/* Company name and description at the top */}
+          <div className="mb-10 flex flex-col items-center text-center gap-4">
+            <div className="flex items-center space-x-2 justify-center">
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br flex items-center justify-center">
+                <Clock className="w-7 h-7 text-black" />
+              </div>
+              <h3 className="text-2xl font-semibold text-slate-900 font-sans tracking-wider">TimeTracker</h3>
+            </div>
+            <p className="text-slate-800 font-sans font-normal tracking-wide text-base max-w-xl mx-auto">
+              The best time tracking solution for freelancers and small teams. Track time, manage projects, and get paid.
+            </p>
+            {/* Social links */}
+            <div className="flex space-x-3 pt-2 justify-center">
+              <SocialLink href="#" label="Twitter">
+                <TwitterIcon />
+              </SocialLink>
+              <SocialLink href="#" label="LinkedIn">
+                <LinkedInIcon />
+              </SocialLink>
+              <SocialLink href="#" label="GitHub">
+                <GitHubIcon />
+              </SocialLink>
+            </div>
           </div>
         
-          {/* Footer content grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {/* Company column */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-md bg-gradient-to-br flex items-center justify-center">
-                    <Clock className="w-7 h-7 text-black" />
+          {/* Footer content grid - centered */}
+          <div className="flex justify-center w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-16 mt-8 items-start max-w-6xl w-full mx-auto">
+              {/* Product column */}
+              <div className="space-y-4 items-center text-center ">
+                <h3 className="text-base md:text-lg font-semibold uppercase text-slate-900 tracking-wider font-sans">Product</h3>
+                <div className="flex flex-col space-y-2">
+                  <FooterLink href="#features">Features</FooterLink>
+                  <FooterLink href="#pricing">Pricing</FooterLink>
+                  <FooterLink href="/dashboard">Dashboard</FooterLink>
+                  <FooterLink href="#integrations">Integrations</FooterLink>
+                  <FooterLink href="#updates">Updates</FooterLink>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 font-mono tracking-wider">TimeTracker</h3>
               </div>
-              <p className="text-slate-800 font-mono tracking-wider text-sm">The best time tracking solution for freelancers and small teams. Track time, manage projects, and get paid.</p>
               
-              {/* Social links */}
-              <div className="flex space-x-3 pt-2">
-                <SocialLink href="#" label="Twitter">
-                  <TwitterIcon />
-                </SocialLink>
-                <SocialLink href="#" label="LinkedIn">
-                  <LinkedInIcon />
-                </SocialLink>
-                <SocialLink href="#" label="GitHub">
-                  <GitHubIcon />
-                </SocialLink>
+              {/* Resources column */}
+              <div className="space-y-4 items-center text-center">
+                <h3 className="text-base md:text-lg font-semibold uppercase text-slate-900 tracking-wider font-sans">Resources</h3>
+                <div className="flex flex-col space-y-2">
+                  <FooterLink href="#blog">Blog</FooterLink>
+                  <FooterLink href="#help">Help Center</FooterLink>
+                  <FooterLink href="#guides">Guides</FooterLink>
+                  <FooterLink href="#api">API Docs</FooterLink>
+                </div>
               </div>
-            </div>
-            
-            {/* Product column */}
-            <div className="space-y-4">
-              <h3 className="text-md font-bold uppercase text-slate-900 tracking-wider">Product</h3>
-              <div className="flex flex-col space-y-2">
-                <FooterLink href="#features">Features</FooterLink>
-                <FooterLink href="#pricing">Pricing</FooterLink>
-                <FooterLink href="#">Integrations</FooterLink>
-                <FooterLink href="#">Updates</FooterLink>
-              </div>
-            </div>
-            
-            {/* Resources column */}
-            <div className="space-y-4">
-              <h3 className="text-md font-bold uppercase text-slate-900 tracking-wider">Resources</h3>
-              <div className="flex flex-col space-y-2">
-                <FooterLink href="#">Blog</FooterLink>
-                <FooterLink href="#">Help Center</FooterLink>
-                <FooterLink href="#">Guides</FooterLink>
-                <FooterLink href="#">API Docs</FooterLink>
-              </div>
-            </div>
-            
-            {/* Company column */}
-            <div className="space-y-4">
-              <h3 className="text-md font-bold uppercase text-slate-900 tracking-wider">Company</h3>
-              <div className="flex flex-col space-y-2">
-                <FooterLink href="#">About</FooterLink>
-                <FooterLink href="#">Careers</FooterLink>
-                <FooterLink href="#">Contact</FooterLink>
-                <FooterLink href="#">Privacy</FooterLink>
+              
+              {/* Company column */}
+              <div className="space-y-4 items-center text-center ">
+                <h3 className="text-base md:text-lg font-semibold uppercase text-slate-900 tracking-wider font-sans">Company</h3>
+                <div className="flex flex-col space-y-2">
+                  <FooterLink href="#about">About</FooterLink>
+                  <FooterLink href="#careers">Careers</FooterLink>
+                  <FooterLink href="#privacy">Privacy</FooterLink>
+                </div>
               </div>
             </div>
           </div>
@@ -170,14 +160,14 @@ export default function Footer() {
           </div> */}
           
           {/* Bottom bar with copyright and Back to Top */}
-          <div className="mt-12 pt-8 border-t border-atlantis-600/50 flex flex-col md:flex-row justify-between items-center text-slate-800 text-sm">
-            <div className="mb-4 md:mb-0">
+          <div className="mt-12 pt-8 border-t border-atlantis-600/50 flex flex-col md:flex-row justify-between items-center text-slate-800 text-sm gap-4 md:gap-0 font-sans font-normal">
+            <div className="mb-2 md:mb-0">
               © {new Date().getFullYear()} TimeTracker. All rights reserved.
             </div>
-            <div className="flex space-x-6 items-center">
-              <FooterLink href="#">Terms</FooterLink>
-              <FooterLink href="#">Privacy</FooterLink>
-              <FooterLink href="#">Cookies</FooterLink>
+            <div className="flex flex-wrap space-x-6 items-center justify-center">
+              <FooterLink href="#terms">Terms</FooterLink>
+              <FooterLink href="#privacy">Privacy</FooterLink>
+              <FooterLink href="#cookies">Cookies</FooterLink>
               <a 
                 href="#top" 
                 className="ml-4 text-slate-900 hover:text-atlantis-700 transition-colors duration-300 flex items-center gap-1.5 font-medium"
