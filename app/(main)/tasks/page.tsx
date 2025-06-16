@@ -21,7 +21,7 @@ export default function TasksPage() {
   const queryClient = useQueryClient();
 
   // Get current user
-  const { data: userData } = useQuery({
+  const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ["currentUser"],
     queryFn: getCurrentUser,
   });
@@ -63,7 +63,7 @@ export default function TasksPage() {
   
   // Determine which tasks to display based on active tab
   const displayTasks = activeTab === 'all' ? allTasks : assignedTasks;
-  const isLoading = (activeTab === 'all' ? (tasksLoading || assignedTasksLoading) : assignedTasksLoading) || !userData?.user?.id;
+  const isLoading = userLoading || tasksLoading || assignedTasksLoading || projectsLoading;
 
   // Update task status mutation
   const updateTaskMutation = useMutation({
@@ -147,7 +147,7 @@ export default function TasksPage() {
             </button>
           </div>
 
-          {isLoading || projectsLoading ? (
+          {isLoading ? (
             <Card className="p-8 text-center">
               <p>Loading tasks...</p>
             </Card>

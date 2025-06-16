@@ -11,7 +11,6 @@ export function middleware(request: NextRequest) {
   );
 // Get the token from cookies
   const token = request.cookies.get('accessToken')?.value;
-  console.log("🚀 ~ middleware ~ token:", token)
   const isAuthenticated = !!token;
 
   // If the user is on a protected path but not authenticated, redirect to login

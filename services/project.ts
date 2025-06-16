@@ -70,7 +70,7 @@ export const getCombinedProjectsOfUser = async () => {
 
     return { projects: allProjects };
   } catch (error) {
-    console.error('Error fetching all user projects:', error);
+    console.error('Error fetching combined projects:', error);
     throw error;
   }
 };

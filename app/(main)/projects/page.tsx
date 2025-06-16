@@ -6,26 +6,12 @@ import { getAllProjectsOfUser, createProject, deleteProject, updateProject } fro
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
 import { ProjectCreateData, Project } from '@/types';
 import Button from '@/components/ui/Button';
-import Modal from '@/components/ui/Modal';
 import { ConfirmModal } from '@/components/ui/Modal';
-import Input from '@/components/ui/Input';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { ProjectsTable } from '@/components/feature/ProjectsTable';
 import { Plus } from 'lucide-react';
 import Card from '@/components/ui/Card';
-
-// Form validation schema
-const projectSchema = z.object({
-  name: z.string().min(3, 'Project name must be at least 3 characters').max(255, 'Project name cannot exceed 255 characters'),
-  description: z.string().min(5, 'Project description must be at least 5 characters').max(1000, 'Project description cannot exceed 1000 characters'),
-  startDate: z.string().min(1, 'Start date is required'),
-  endDate: z.string().min(1, 'End date is required'),
-  status: z.enum(['Pending', 'In-Progress', 'Completed']).optional(),
-});
-
-type ProjectFormData = z.infer<typeof projectSchema>;
+import EditProjectModal from '@/components/feature/EditProjectModal';
+import CreateProjectModal from '@/components/feature/CreateProjectModal';
 
 export default function ProjectsPage() {
   const queryClient = useQueryClient();
@@ -64,13 +50,12 @@ export default function ProjectsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', 'owned'] });
       setIsCreateModalOpen(false);
-      reset();
     },
   });
 
   // Update project mutation
   const updateProjectMutation = useMutation({
-    mutationFn: (data: { id: number; project: ProjectFormData }) => 
+    mutationFn: (data: { id: number; project: ProjectCreateData }) => 
       updateProject(data.id, data.project),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', 'owned'] });
@@ -87,57 +72,6 @@ export default function ProjectsPage() {
       setDeleteModalState({ isOpen: false, projectId: null });
     },
   });
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-  } = useForm<ProjectFormData>({
-    resolver: zodResolver(projectSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default 30 days from now
-      status: 'Pending',
-    },
-  });
-
-  const onSubmit = (data: ProjectFormData) => {
-    createProjectMutation.mutate(data);
-  };
-
-  const openDeleteModal = (projectId: number) => {
-    setDeleteModalState({ isOpen: true, projectId });
-  };
-
-  const openEditModal = (project: Project) => {
-    setSelectedProject(project);
-    // Set form values based on the selected project
-    setValue('name', project.name);
-    setValue('description', project.description);
-    setValue('startDate', project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '');
-    setValue('endDate', project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '');
-    setValue('status', project.status || 'Pending');
-    setIsEditModalOpen(true);
-  };
-
-  const handleUpdateProject = (data: ProjectFormData) => {
-    if (selectedProject) {
-      updateProjectMutation.mutate({
-        id: selectedProject.id,
-        project: data
-      });
-    }
-  };
-
-  const handleDeleteProject = () => {
-    if (deleteModalState.projectId) {
-      deleteProjectMutation.mutate(deleteModalState.projectId);
-    }
-  };
 
   const ownedProjects = ownedProjectsData?.projects || [];
   const memberProjects = memberProjectsData?.projects || [];
@@ -227,9 +161,6 @@ export default function ProjectsPage() {
                   <div className="mt-6">
                     <Button
                       variant="default"
-                      // leftIcon={
-                        
-                      // }
                       onClick={() => setIsCreateModalOpen(true)}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -244,8 +175,8 @@ export default function ProjectsPage() {
               )  : (
                 <ProjectsTable
                   data={ownedProjects}
-                  onDelete={openDeleteModal}
-                  onEdit={openEditModal}
+                  onDelete={() => setDeleteModalState({ isOpen: true, projectId: ownedProjects[0].id })}
+                  onEdit={setSelectedProject}
                 />
               )}
             </>
@@ -277,8 +208,8 @@ export default function ProjectsPage() {
               ) : (
                 <ProjectsTable
                   data={memberProjects}
-                  onDelete={openDeleteModal}
-                  onEdit={openEditModal}
+                  onDelete={() => setDeleteModalState({ isOpen: true, projectId: memberProjects[0].id })}
+                  onEdit={setSelectedProject}
                 />
               )}
             </>
@@ -286,237 +217,43 @@ export default function ProjectsPage() {
         </div>
 
         {/* Create Project Modal */}
-        <Modal
+        <CreateProjectModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
-          title="Create New Project"
-          footer={
-            <>
-              <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                onClick={handleSubmit(onSubmit)}
-                isLoading={createProjectMutation.isPending}
-                disabled={createProjectMutation.isPending}
-              >
-                Create
-              </Button>
-            </>
-          }
-        >
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Input
-              id="name"
-              label="Project Name"
-              fullWidth
-              error={errors.name?.message}
-              {...register('name')}
-            />
-
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                id="description"
-                rows={4}
-                className={`w-full rounded-md border ${
-                  errors.description ? 'border-red-500' : 'border-gray-300'
-                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                {...register('description')}
-              />
-              {errors.description && (
-                <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
-              )}
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  id="startDate"
-                  className={`w-full rounded-md border ${
-                    errors.startDate ? 'border-red-500' : 'border-gray-300'
-                  } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                  {...register('startDate')}
-                />
-                {errors.startDate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
-                )}
-              </div>
-              
-              <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  id="endDate"
-                  className={`w-full rounded-md border ${
-                    errors.endDate ? 'border-red-500' : 'border-gray-300'
-                  } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                  {...register('endDate')}
-                />
-                {errors.endDate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
-                )}
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                id="status"
-                className={`w-full rounded-md border ${
-                  errors.status ? 'border-red-500' : 'border-gray-300'
-                } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                {...register('status')}
-              >
-                <option value="Pending">Pending</option>
-                <option value="In-Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-              </select>
-              {errors.status && (
-                <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
-              )}
-            </div>
-          </form>
-        </Modal>
+          onSubmit={createProjectMutation.mutate}
+          isLoading={createProjectMutation.isPending}
+          error={createProjectMutation.isError ? "Failed to create project. Please try again." : null}
+        />
 
         {/* Edit Project Modal */}
-        <Modal
+        <EditProjectModal
           isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
             setSelectedProject(null);
           }}
-          title="Edit Project"
-          footer={
-            <>
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setIsEditModalOpen(false);
-                  setSelectedProject(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                onClick={handleSubmit(handleUpdateProject)}
-                isLoading={updateProjectMutation.isPending}
-                disabled={updateProjectMutation.isPending}
-              >
-                Save Changes
-              </Button>
-            </>
-          }
-        >
-          {selectedProject && (
-            <form onSubmit={handleSubmit(handleUpdateProject)} className="space-y-4">
-              <Input
-                id="edit-name"
-                label="Project Name"
-                fullWidth
-                error={errors.name?.message}
-                {...register('name')}
-              />
-
-              <div>
-                <label htmlFor="edit-description" className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  id="edit-description"
-                  rows={4}
-                  className={`w-full rounded-md border ${
-                    errors.description ? 'border-red-500' : 'border-gray-300'
-                  } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                  {...register('description')}
-                />
-                {errors.description && (
-                  <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
-                )}
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="edit-startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    id="edit-startDate"
-                    className={`w-full rounded-md border ${
-                      errors.startDate ? 'border-red-500' : 'border-gray-300'
-                    } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                    {...register('startDate')}
-                  />
-                  {errors.startDate && (
-                    <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <label htmlFor="edit-endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    id="edit-endDate"
-                    className={`w-full rounded-md border ${
-                      errors.endDate ? 'border-red-500' : 'border-gray-300'
-                    } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                    {...register('endDate')}
-                  />
-                  {errors.endDate && (
-                    <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="edit-status" className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select
-                  id="edit-status"
-                  className={`w-full rounded-md border ${
-                    errors.status ? 'border-red-500' : 'border-gray-300'
-                  } shadow-sm focus:border-primary-500 focus:ring-primary-500 py-2 px-3`}
-                  {...register('status')}
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="In-Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-                {errors.status && (
-                  <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
-                )}
-              </div>
-
-              {updateProjectMutation.isError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-sm text-red-600">Failed to update project. Please try again.</p>
-                </div>
-              )}
-            </form>
-          )}
-        </Modal>
+          project={selectedProject}
+          onSubmit={(data) => {
+            if (selectedProject) {
+              updateProjectMutation.mutate({
+                id: selectedProject.id,
+                project: data
+              });
+            }
+          }}
+          isLoading={updateProjectMutation.isPending}
+          error={updateProjectMutation.isError ? "Failed to update project. Please try again." : null}
+        />
 
         {/* Delete Confirmation Modal */}
         <ConfirmModal
           isOpen={deleteModalState.isOpen}
           onClose={() => setDeleteModalState({ isOpen: false, projectId: null })}
-          onConfirm={handleDeleteProject}
+          onConfirm={() => {
+            if (selectedProject) {
+              deleteProjectMutation.mutate(selectedProject.id);
+            }
+          }}
           title="Delete Project"
           message="Are you sure you want to delete this project? This action cannot be undone and all associated tasks and time logs will be deleted."
           confirmText="Delete"

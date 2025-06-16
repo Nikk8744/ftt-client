@@ -127,7 +127,7 @@ export const bulkAssignUsersToTask = async (taskId: number, userIds: number[]) =
 export const getUserAssignedTasks = async (userId: number) => {
   try {
     const response = await apiClient.get(`/taskAssignment/user/${userId}/assigned`);
-    console.log("Assigned tasks API response:", response.data);
+    // console.log("Assigned tasks API response:", response.data);
     
     // Make sure we return in a consistent format with { tasks: [...] }
     if (Array.isArray(response.data)) {
