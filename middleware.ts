@@ -9,16 +9,11 @@ export function middleware(request: NextRequest) {
   const isPublicPath = publicPaths.some(path => 
     request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
   );
-  console.log("🚀 ~ middleware ~ isPublicPath:", isPublicPath)
-  console.log("🚀 ~ middleware ~ request.nextUrl.pathname:", request.nextUrl.pathname)
-
-  // Get the token from cookies
+// Get the token from cookies
   const token = request.cookies.get('accessToken')?.value;
   console.log("🚀 ~ middleware ~ token:", token)
   const isAuthenticated = !!token;
-  console.log("🚀 ~ middleware ~ isAuthenticated:", isAuthenticated)
 
-  console.log("🚀 ~ middleware ~ isAuthenticated, isPublicPath:", isAuthenticated, isPublicPath);
   // If the user is on a protected path but not authenticated, redirect to login
   // if (!isPublicPath && !isAuthenticated) {
   //   return NextResponse.redirect(new URL('/login', request.url));

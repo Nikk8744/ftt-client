@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
 import { Notification, getNotifications, getUnreadCount } from '@/services/notification';
 import { toast } from '@/components/ui/use-toast';
+import useAuthStore from '@/store/auth';
 
 interface NotificationState {
   // State
@@ -12,7 +13,7 @@ interface NotificationState {
   socket: Socket | null;
   
   // Actions
-  initializeSocket: (token: string) => void;
+  initializeSocket: () => void;
   markAsRead: (notificationId: number) => void;
   markAllAsRead: () => void;
   deleteNotification: (notificationId: number) => void;
@@ -32,20 +33,23 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   socket: null,
   
   // Initialize WebSocket connection
-  initializeSocket: (token: string) => {
+  initializeSocket: () => {
     // Clean up any existing socket
     const { socket: currentSocket, cleanup } = get();
     if (currentSocket) {
       cleanup();
     }
     
-    if (!token) {
-      console.error('No token provided for WebSocket connection');
+    // Get auth state
+    const { isAuthenticated } = useAuthStore.getState();
+    
+    if (!isAuthenticated) {
+      console.error('User is not authenticated');
       return;
     }
     
     const socketInstance = io(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000', {
-      auth: { token }
+      withCredentials: true // This will send cookies with the WebSocket connection
     });
     
     // Set up event listeners
@@ -61,6 +65,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     });
     
     socketInstance.on('unreadNotificationsCount', ({ count }: { count: number }) => {
+      console.log("🚀 ~ socketInstance.on ~ count:", count)
       set({ unreadCount: count });
     });
     
