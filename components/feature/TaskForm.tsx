@@ -131,7 +131,7 @@ const TaskForm = ({
       subject: task?.subject || "",
       description: task?.description || "",
       status: task?.status || "Pending",
-      dueDate: task?.dueDate ? task.dueDate : "",
+      dueDate: task?.dueDate ? task.dueDate : new Date().toISOString().slice(0, 16),
     },
   });
 

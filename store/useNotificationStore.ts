@@ -65,7 +65,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     });
     
     socketInstance.on('unreadNotificationsCount', ({ count }: { count: number }) => {
-      console.log("🚀 ~ socketInstance.on ~ count:", count)
       set({ unreadCount: count });
     });
     

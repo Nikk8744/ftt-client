@@ -87,9 +87,9 @@ export default function ProjectDetailsPage() {
     data: ownerData,
     isLoading: ownerLoading,
   } = useQuery({
-    queryKey: ["project-owner", projectData?.project?.userId],
-    queryFn: () => getProjectOwner(Number(projectData?.project?.userId)),
-    enabled: !!projectData?.project?.userId,
+    queryKey: ["project-owner", projectData?.project?.ownerId],
+    queryFn: () => getProjectOwner(Number(projectData?.project?.ownerId)),
+    enabled: !!projectData?.project?.ownerId,
   });
 
   // Get project tasks

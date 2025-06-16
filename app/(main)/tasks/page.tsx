@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserTasks, updateTask, deleteTask } from "@/services/task";
-import { getAllProjectsOfUser } from "@/services/project";
+import { getCombinedProjectsOfUser } from "@/services/project";
 import { getUserAssignedTasks } from "@/services/taskMembers";
 import Card from "@/components/ui/Card";
 import TaskForm from "@/components/feature/TaskForm";
@@ -42,10 +42,10 @@ export default function TasksPage() {
     enabled: !!userData?.user?.id,
   });
 
-  // Fetch projects for filter
+  // Fetch all projects (owned and member of)
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
-    queryKey: ["projects"],
-    queryFn: getAllProjectsOfUser,
+    queryKey: ["allUserProjects"],
+    queryFn: getCombinedProjectsOfUser,
   });
 
   const ownedTasks = tasksData?.tasks || [];

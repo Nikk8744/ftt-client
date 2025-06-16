@@ -5,7 +5,7 @@ import useAuth from '@/lib/hooks/useAuth';
 import useTimer from '@/lib/hooks/useTimer';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
-import { getAllProjectsOfUser } from '@/services/project';
+import {  getCombinedProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
 import { useQuery } from '@tanstack/react-query';
 import { Project, Task } from '@/types';
@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, isMobile }) => {
     isLoading: projectsLoading,
   } = useQuery({
     queryKey: ['projects'],
-    queryFn: getAllProjectsOfUser,
+    queryFn: getCombinedProjectsOfUser,
     enabled: isStopTimerModalOpen,
   });
 

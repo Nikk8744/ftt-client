@@ -35,10 +35,8 @@ export const removeMemberFromProject = async (projectId: number, userId: number)
  * Get all members of a project
  */
 export const getAllMembersOfProject = async (projectId: number) => {
-  console.log("helllo", projectId)
   try {
     const response = await apiClient.get(`/projectMember/getAllMembers/${projectId}`);
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error(`Error fetching members of project ${projectId}:`, error);

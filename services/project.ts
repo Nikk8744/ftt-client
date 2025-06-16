@@ -1,5 +1,5 @@
-import { ProjectCreateData, ProjectUpdateData } from '@/types';
 import apiClient from './api-client';
+import { Project, ProjectCreateData, ProjectUpdateData } from '@/types';
 import axios from 'axios';
 import { getUserById } from './user';
 
@@ -43,6 +43,34 @@ export const getAllProjectsOfUser = async () => {
     };
   } catch (error) {
     console.error('Error fetching user projects:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all projects (owned and member of) for a user
+ */
+export const getCombinedProjectsOfUser = async () => {
+  try {
+    // Get owned projects
+    const ownedProjectsResponse = await apiClient.get('/project/getAllProjectsOfUser');
+    const ownedProjects = ownedProjectsResponse.data.projects || [];
+
+    // Get projects where user is a member
+    const memberProjectsResponse = await apiClient.get('/projectMember/getAllProjectsAUserIsMemberOf');
+    const memberProjects = memberProjectsResponse.data.projects || [];
+
+    // Combine and remove duplicates
+    const allProjects = [...ownedProjects];
+    memberProjects.forEach((memberProject: Project) => {
+      if (!allProjects.some(project => project.id === memberProject.id)) {
+        allProjects.push(memberProject);
+      }
+    });
+
+    return { projects: allProjects };
+  } catch (error) {
+    console.error('Error fetching all user projects:', error);
     throw error;
   }
 };

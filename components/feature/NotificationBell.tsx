@@ -109,10 +109,10 @@ export default function NotificationBell() {
                 
                 <div className="flex-1 space-y-1">
                   <Link
-                    href={`/${notification.entityType?.toLowerCase() || 'tasks'}/${notification.entityId || ''}`}
+                    href={`/${notification.entityType?.toLowerCase()}s/${notification.entityId || ''}`}
                     className="text-left text-foreground/80 after:absolute after:inset-0 z-10"
                     onClick={() => handleNotificationClick(notification.id)}
-                  >
+                  > 
                     <span className={cn(
                       "font-medium hover:underline",
                       notification.isRead === 0 ? "text-foreground font-semibold" : "text-foreground/80"
