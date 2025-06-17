@@ -44,6 +44,7 @@ import DateRangePicker from '@/components/feature/reports/DateRangePicker';
 import ExportButton from '@/components/feature/reports/ExportButton';
 import ChartCard from '@/components/feature/reports/ChartCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Loader from '@/components/ui/Loader';
 
 // Update the interfaces to match the API structure
 interface ProjectResponse {
@@ -362,9 +363,7 @@ export default function ReportsPage() {
 
         <TabsContent value="overview" className="space-y-6">
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
+            <Loader centered text="Loading report data..." />
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -483,9 +482,7 @@ export default function ReportsPage() {
 
         <TabsContent value="projects" className="space-y-6">
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
+            <Loader centered text="Loading project reports..." />
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -531,9 +528,7 @@ export default function ReportsPage() {
 
         <TabsContent value="tasks" className="space-y-6">
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
+            <Loader centered text="Loading task reports..." />
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -600,9 +595,7 @@ export default function ReportsPage() {
         
         <TabsContent value="team" className="space-y-6">
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
+            <Loader centered text="Loading team reports..." />
           ) : teamProjectId === 'all' ? (
             <div className="flex justify-center items-center py-20">
               <div className="text-center">
@@ -643,9 +636,7 @@ export default function ReportsPage() {
         
         <TabsContent value="risks" className="space-y-6">
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
+            <Loader centered text="Loading risk reports..." />
           ) : risksProjectId === 'all' ? (
             <div className="flex justify-center items-center py-20">
               <div className="text-center">

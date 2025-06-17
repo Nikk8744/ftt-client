@@ -48,7 +48,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Columns3,
-  // Filter,
   ListFilter,
   CircleX,
   SquarePen,
@@ -66,7 +65,13 @@ interface TasksTableProps {
   onStatusChange: (task: Task, status: string) => void;
 }
 
-export function   TasksTable({ data, projects, onEdit, onDelete, onStatusChange }: TasksTableProps) {
+export function TasksTable({
+  data,
+  projects,
+  onEdit,
+  onDelete,
+  onStatusChange,
+}: TasksTableProps) {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -130,7 +135,7 @@ export function   TasksTable({ data, projects, onEdit, onDelete, onStatusChange 
         return (
           <Select
             value={status}
-            onValueChange={(newStatus) => onStatusChange(row.original, newStatus)}
+            onValueChange={(newStatus) => onStatusChange && onStatusChange(row.original, newStatus)}
           >
             <SelectTrigger className="w-[130px] h-8 px-3 py-1 rounded-full border-0 bg-blue-50/50 hover:bg-blue-100/50 focus:ring-1 focus:ring-blue-200">
               <SelectValue>
@@ -197,7 +202,7 @@ export function   TasksTable({ data, projects, onEdit, onDelete, onStatusChange 
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onEdit(row.original)}
+            onClick={() => onEdit && onEdit(row.original)}
           > 
             <SquarePen className="w-4 h-4" />
           </Button>
@@ -205,7 +210,7 @@ export function   TasksTable({ data, projects, onEdit, onDelete, onStatusChange 
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => onDelete(row.original)}
+              onClick={() => onDelete && onDelete(row.original)}
             >
               <Trash2 className="w-4 h-4" />
             </Button>

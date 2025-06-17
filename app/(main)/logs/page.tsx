@@ -11,9 +11,9 @@ import { z } from "zod";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Modal, { ConfirmModal } from "@/components/ui/Modal";
-import { formatDate, formatDuration } from "@/lib/utils";
 import { Project, Task, TimeLog, TimeLogUpdateData } from "@/types";
-import { Calendar, Check, ChevronDown, FilterIcon, FolderOpenDot, Pencil, Trash2, X, Zap } from "lucide-react";
+import { Calendar, Check, ChevronDown, FilterIcon, FolderOpenDot, X, Zap } from "lucide-react";
+import { LogsTable } from "@/components/feature/LogsTable";
 
 // Form validation schema
 const timeLogSchema = z.object({
@@ -461,93 +461,15 @@ export default function LogsPage() {
               <p>No time logs found matching your filters</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Time
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Project
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Task
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Duration
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Description
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredLogs.map((log: TimeLog) => (
-                    <tr key={log.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(log.startTime)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(log.startTime).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        {log.endTime &&
-                          ` - ${new Date(log.endTime).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {log.projectId
-                          ? projects.find((p: Project) => p.id === log.projectId)
-                              ?.name || "Unknown Project"
-                          : "-"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {log.taskId
-                          ? tasks.find((t: Task) => t.id === log.taskId)
-                              ?.subject || "Unknown Task"
-                          : "-"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {log.duration ? formatDuration(log.duration) : 
-                         log.timeSpent ? formatDuration(log.timeSpent) : "In Progress"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                        {log.description || "-"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openEditModal(log)}
-                            className="hover:text-blue-500 hover:bg-gray-100"
-                          >
-                            <Pencil className="w-4 h-4 o" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => openDeleteModal(log.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Card className="overflow-hidden border border-gray-200 shadow-sm">
+              <LogsTable 
+                data={filteredLogs} 
+                projects={projects} 
+                tasks={tasks}
+                onEdit={openEditModal}
+                onDelete={(log) => openDeleteModal(log.id)}
+              />
+            </Card>
           )}
         </div>
       </div>

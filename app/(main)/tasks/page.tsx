@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUserTasks, updateTask, deleteTask } from "@/services/task";
 import { getCombinedProjectsOfUser } from "@/services/project";
 import { getUserAssignedTasks } from "@/services/taskMembers";
-import Card from "@/components/ui/Card";
 import TaskForm from "@/components/feature/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { TasksTable } from "@/components/feature/TasksTable";
 import { Task } from "@/types";
 import { getCurrentUser } from "@/services/user";
+import Loader from '@/components/ui/Loader';
 
 export default function TasksPage() {
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
@@ -148,20 +148,7 @@ export default function TasksPage() {
           </div>
 
           {isLoading ? (
-            <Card className="p-8 text-center">
-              <p>Loading tasks...</p>
-            </Card>
-          ) : displayTasks.length === 0 ? (
-            <Card className="p-8 text-center">
-              <p className="text-gray-500 mb-4">
-                {activeTab === 'all' ? 'No tasks found.' : 'No tasks assigned to you.'}
-              </p>
-              <p className="text-sm text-gray-500">
-                {activeTab === 'all' 
-                  ? 'To create a new task, please go to a project and use the "Add Task" button there.'
-                  : 'Tasks assigned to you will appear here.'}
-              </p>
-            </Card>
+            <Loader centered text="Loading tasks..." />
           ) : (
             <TasksTable
               data={displayTasks}

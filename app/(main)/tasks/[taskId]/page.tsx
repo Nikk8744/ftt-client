@@ -45,6 +45,7 @@ import {
   FolderOpenDot,
 } from "lucide-react";
 import Input from "@/components/ui/Input";
+import Loader from '@/components/ui/Loader';
 
 export default function TaskDetailsPage() {
   const { taskId } = useParams();
@@ -277,9 +278,7 @@ export default function TaskDetailsPage() {
 
   if (taskLoading) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      <Loader centered text="Loading task details..." />
     );
   }
 
@@ -430,9 +429,7 @@ export default function TaskDetailsPage() {
                   </div>
 
                   {logsLoading ? (
-                    <div className="text-center py-8">
-                      <p>Loading time logs...</p>
-                    </div>
+                    <Loader centered size="sm" text="Loading time logs..." />
                   ) : logs.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

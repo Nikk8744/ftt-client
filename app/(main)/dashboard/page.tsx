@@ -9,13 +9,14 @@ import Badge from '@/components/ui/Badge';
 import { formatDate, formatDuration } from '@/lib/utils';
 import useAuth from '@/lib/hooks/useAuth';
 import Link from 'next/link';
-import { Project, Task, TimeLog } from '@/types';
+import { Project, Task } from '@/types';
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
 import { getUserAssignedTasks } from '@/services/taskMembers';
 import { useEffect, useState } from 'react';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Clock, Plus, Info, FolderOpenDot, ClipboardCheck } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { LogsTable } from '@/components/feature/LogsTable';
+// import Loader from '@/components/ui/Loader';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -420,109 +421,39 @@ export default function DashboardPage() {
             </div>
             
             {logsLoading ? (
-              <Card className="overflow-hidden border border-gray-800 shadow-sm">
-                <Table>
-                  <TableCaption className="text-gray-600 bg-gray-50 border-t border-gray-200 py-3">
-                    Loading your time tracking activities...
-                  </TableCaption>
-                  <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <TableRow>
-                      <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {[1, 2, 3].map((i: number) => (
-                      <TableRow key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                        <TableCell>
-                          <div className="h-4 w-24 bg-indigo-100 rounded animate-pulse"></div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-32 bg-indigo-100 rounded animate-pulse"></div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-40 bg-indigo-100 rounded animate-pulse"></div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-16 bg-indigo-100 rounded animate-pulse"></div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <Card className="p-8 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                    <Clock className="w-8 h-8 text-gray-300" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">Loading logs...</h3>
+                  <div className="w-24 h-2 bg-gray-200 rounded animate-pulse"></div>
+                </div>
               </Card>
+                            // <Loader centered size="sm" text="Loading logs..." />
+
             ) : recentLogs.length === 0 ? (
-              <Card className="overflow-hidden border border-gray-200 shadow-sm">
-                <Table>
-                  <TableCaption className="text-gray-600 bg-gray-50 border-t border-gray-200 py-3">
-                    <div className="flex flex-col items-center py-6">
-                      <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
-                        <Clock className="w-8 h-8 text-indigo-500" />
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No time logs found</h3>
-                      <p className="text-gray-500 mb-4">Start tracking time to see your activity history here</p>
-                      <Link href="/logs" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <Clock className="w-4 h-4 mr-2" />
-                        Track Time
-                      </Link>
-                    </div>
-                  </TableCaption>
-                  <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <TableRow>
-                      <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  {/* <TableBody>
-                    <TableRow>
-                      <TableCell colSpan={4} className="h-24 text-center text-gray-500 bg-gray-50/30">
-                        No time logs to display
-                      </TableCell>
-                    </TableRow>
-                  </TableBody> */}
-                </Table>
+              <Card className="p-8 text-center">
+                <div className="flex flex-col items-center py-6">
+                  <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-3">
+                    <Clock className="w-8 h-8 text-indigo-500" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No time logs found</h3>
+                  <p className="text-gray-500 mb-4">Start tracking time to see your activity history here</p>
+                  <Link href="/logs" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Track Time
+                  </Link>
+                </div>
               </Card>
             ) : (
               <Card className="overflow-hidden border border-gray-200 shadow-sm">
-                <Table className="border border-gray-800">
-                  <TableCaption className="text-gray-600 bg-gray-50 border border-gray-200 py-3">
-                    Your recent time tracking activities
-                  </TableCaption>
-                  <TableHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
-                    <TableRow>
-                      <TableHead className="text-indigo-700 font-semibold">Date</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Project</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Task</TableHead>
-                      <TableHead className="text-indigo-700 font-semibold">Duration</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentLogs.map((log: TimeLog, index: number) => (
-                      <TableRow 
-                        key={log.id} 
-                        className={`hover:bg-indigo-50/40 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
-                      >
-                        <TableCell className="font-medium text-gray-700">{formatDate(log.startTime)}</TableCell>
-                        <TableCell className="text-gray-800 font-medium">
-                          {allProjects.find((p: Project) => p.id === log.projectId)?.name || 'No Project'}
-                        </TableCell>
-                        <TableCell className="text-gray-600">
-                          {allTasks.find((t: Task) => t.id === log.taskId)?.subject || 'No Task'}
-                        </TableCell>
-                        <TableCell className="flex items-center gap-1.5 text-gray-700">
-                          <Clock className="h-3.5 w-3.5 text-indigo-500" />
-                          <span className="font-medium">
-                            {log.timeSpent ? formatDuration(log.timeSpent) : 'In Progress'}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <LogsTable 
+                  data={recentLogs} 
+                  projects={allProjects} 
+                  tasks={allTasks} 
+                  showActions={false}
+                />
               </Card>
             )}
           </div>
