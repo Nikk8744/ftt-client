@@ -64,6 +64,7 @@ export default function ProjectDetailsPage() {
     queryFn: () => getProjectById(Number(projectId)),
     enabled: !!projectId,
   });
+    console.log("🚀 ~ ProjectDetailsPage ~ projectData:", projectData)
 
   // Get project owner information
   const {
@@ -172,8 +173,9 @@ export default function ProjectDetailsPage() {
     setIsDeleteTaskModalOpen(true);
   };
 
-  const project = projectData?.project;
-  const tasks = tasksData?.tasks || [];
+  const project = projectData?.data;
+  console.log("🚀 ~ ProjectDetailsPage ~ project:", project)
+  const tasks = tasksData?.data || [];
   const teamMembers = teamData?.members || [];
   const projectOwner = ownerData?.user;
 

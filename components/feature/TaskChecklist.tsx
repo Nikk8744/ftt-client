@@ -108,7 +108,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
     setDeleteModalState({ isOpen: true, itemId });
   };
 
-  const checklist = checklistData?.checklist || [];
+  const checklist = checklistData?.data || [];
 
   if (isLoading) {
     return <div className="py-2">Loading checklist...</div>;

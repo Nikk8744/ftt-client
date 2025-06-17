@@ -50,7 +50,7 @@ export const getAllMembersOfProject = async (projectId: number) => {
 export const getAllProjectsUserIsMemberOf = async () => {
   try {
     const response = await apiClient.get('/projectMember/getAllProjectsAUserIsMemberOf');
-    console.log("🚀 ~ getAllProjectsUserIsMemberOf ~ response:", response)
+    // console.log("🚀 ~ getAllProjectsUserIsMemberOf ~ response:", response)
     return response.data;
   } catch (error) {
     console.error('Error fetching projects user is member of:', error);

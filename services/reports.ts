@@ -125,7 +125,7 @@ export const getTaskStatusOverview = async (projectId?: string): Promise<TaskSta
   try {
     const endpoint = `/reports/tasks/status${projectId ? `?projectId=${projectId}` : ''}`;
     const response = await apiGet<any>(endpoint);
-    console.log("🚀 ~ getTaskStatusOverview ~ response:", response);
+    // console.log("🚀 ~ getTaskStatusOverview ~ response:", response);
     
     // Process the response to match our expected format
     const { data } = response;
@@ -216,7 +216,7 @@ export const getTaskCompletionTrend = async (projectId?: string, days: number = 
   try {
     const endpoint = `/reports/tasks/completion-trend${projectId ? `?projectId=${projectId}` : ''}${projectId ? '&' : '?'}days=${days}`;
     const response = await apiGet<any>(endpoint);
-    console.log("🚀 ~ getTaskCompletionTrend ~ response:", response);
+    // console.log("🚀 ~ getTaskCompletionTrend ~ response:", response);
     
     // Check if response has the expected structure
     if (!response || !response.data || !Array.isArray(response.data)) {

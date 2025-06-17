@@ -74,7 +74,6 @@ export default function LogsPage() {
   const logs = logsData?.logs || [];
   const projects = projectsData?.projects || [];
   const tasks = tasksData?.tasks || [];
-  console.log("🚀 ~ LogsPage ~ tasks:", tasks);
 
   // Selected log for editing
   const selectedLog = editLogId

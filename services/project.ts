@@ -38,8 +38,9 @@ export const getProjectOwner = getUserById;
 export const getAllProjectsOfUser = async () => {
   try {
     const response = await apiClient.get('/project/getAllProjectsOfUser');
+    console.log("🚀 ~ getAllProjectsOfUser ~ response:", response)
     return {
-      projects: response.data.projects || []
+      projects: response.data.data || []
     };
   } catch (error) {
     console.error('Error fetching user projects:', error);
@@ -54,11 +55,11 @@ export const getCombinedProjectsOfUser = async () => {
   try {
     // Get owned projects
     const ownedProjectsResponse = await apiClient.get('/project/getAllProjectsOfUser');
-    const ownedProjects = ownedProjectsResponse.data.projects || [];
+    const ownedProjects = ownedProjectsResponse.data.data || [];
 
     // Get projects where user is a member
     const memberProjectsResponse = await apiClient.get('/projectMember/getAllProjectsAUserIsMemberOf');
-    const memberProjects = memberProjectsResponse.data.projects || [];
+    const memberProjects = memberProjectsResponse.data.data || [];
 
     // Combine and remove duplicates
     const allProjects = [...ownedProjects];

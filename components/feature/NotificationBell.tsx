@@ -38,10 +38,11 @@ export default function NotificationBell() {
 
   // Get the most recent 5 notifications, regardless of read status
   const recentNotifications = notifications
-    .filter(notification => notification && notification.id)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 5);
-
+  .filter(notification => notification && notification.id)
+  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  .slice(0, 5);
+  
+  console.log("🚀 ~ NotificationBell ~ recentNotifications:", recentNotifications)
   // Don't render anything if the user is not authenticated
   if (!isAuthenticated) {
     return null;

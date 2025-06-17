@@ -28,22 +28,22 @@ import Avatar from "@/components/ui/Avatar";
 import { User, TimeLog, TimeLogUpdateData } from "@/types";
 import { getCurrentUser, getUserById } from "@/services/user";
 import { getAllMembersOfProject } from "@/services/projectMember";
-import { 
-  Edit, 
-  Clock, 
-  Eye, 
-  EyeOff, 
-  Trash2, 
-  AlignLeft, 
-  Info, 
-  Users, 
-  Calendar, 
-  PlusCircle, 
-  X, 
-  Check, 
+import {
+  Edit,
+  Clock,
+  Eye,
+  EyeOff,
+  Trash2,
+  AlignLeft,
+  Info,
+  Users,
+  Calendar,
+  PlusCircle,
+  X,
+  Check,
   UserIcon,
-  FolderOpenDot
-} from 'lucide-react'
+  FolderOpenDot,
+} from "lucide-react";
 import Input from "@/components/ui/Input";
 
 export default function TaskDetailsPage() {
@@ -60,7 +60,7 @@ export default function TaskDetailsPage() {
   const [selectedLog, setSelectedLog] = useState<TimeLog | null>(null);
   const [assignUserModalOpen, setAssignUserModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [filterText, setFilterText] = useState('');
+  const [filterText, setFilterText] = useState("");
 
   // Get current user
   const { data: userData } = useQuery({
@@ -70,8 +70,8 @@ export default function TaskDetailsPage() {
 
   // Use useEffect to set currentUser when userData changes
   useEffect(() => {
-    if (userData?.user) {
-      setCurrentUser(userData.user);
+    if (userData?.data) {
+      setCurrentUser(userData.data);
     }
   }, [userData]);
 
@@ -88,20 +88,20 @@ export default function TaskDetailsPage() {
 
   // Get project details
   const { data: projectData } = useQuery({
-    queryKey: ["project", taskData?.task?.projectId],
-    queryFn: () => getProjectById(taskData?.task?.projectId || 0),
-    enabled: !!taskData?.task?.projectId,
+    queryKey: ["project", taskData?.data?.projectId],
+    queryFn: () => getProjectById(taskData?.data?.projectId || 0),
+    enabled: !!taskData?.data?.projectId,
   });
 
   // Get task creator details
   const { data: creatorData, isLoading: creatorLoading } = useQuery({
-    queryKey: ["taskCreator", taskData?.task?.ownerId],
+    queryKey: ["taskCreator", taskData?.data?.ownerId],
     queryFn: async () => {
-      if (!taskData?.task?.ownerId) return { user: null };
-      const response = await getUserById(taskData.task.ownerId);
+      if (!taskData?.data?.ownerId) return { user: null };
+      const response = await getUserById(taskData.data.ownerId);
       return response;
     },
-    enabled: !!taskData?.task?.ownerId,
+    enabled: !!taskData?.data?.ownerId,
   });
 
   // Get task assignee
@@ -179,32 +179,36 @@ export default function TaskDetailsPage() {
       setAssignUserModalOpen(false);
       setSelectedUserId(null);
     },
-  }); 
+  });
 
   // Unassign user mutation
   const unassignUserMutation = useMutation({
-    mutationFn: (userId: number) => unassignUserFromTask(Number(taskId), userId),
+    mutationFn: (userId: number) =>
+      unassignUserFromTask(Number(taskId), userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["taskAssignee", taskId] });
     },
   });
 
   // Get project members instead of searching users
-  const { data: projectMembersData, isLoading: projectMembersLoading } = useQuery({
-    queryKey: ["projectMembers", taskData?.task?.projectId],
-    queryFn: async () => {
-      if (!taskData?.task?.projectId) return { members: [] };
-      // Use the proper service function to get project members
-      return getAllMembersOfProject(taskData.task.projectId);
-    },
-    enabled: !!taskData?.task?.projectId && assignUserModalOpen,
-  });
-  
-  const task = taskData?.task;
-  const project = projectData?.project;
-  const assignees = assigneeData?.data || [];
-  const followers = followersData?.users || [];
-  const logs = logsData?.data || [];
+  const { data: projectMembersData, isLoading: projectMembersLoading } =
+    useQuery({
+      queryKey: ["projectMembers", taskData?.data?.projectId],
+      queryFn: async () => {
+        if (!taskData?.data?.projectId) return { members: [] };
+        // Use the proper service function to get project members
+        return getAllMembersOfProject(taskData.data.projectId);
+      },
+      enabled: !!taskData?.data?.projectId && assignUserModalOpen,
+    });
+    
+    const task = taskData?.data;
+    const project = projectData?.data;
+    const assignees = assigneeData?.data || [];
+    const followers = followersData?.users || [];
+    // console.log("🚀 ~ TaskDetailsPage ~ followersData:", followersData)
+    const logs = logsData?.data || [];
+    // console.log("🚀 ~ TaskDetailsPage ~ logsData:", logsData)
 
   // Check if current user is following this task
   const isUserFollowing = currentUser
@@ -272,11 +276,19 @@ export default function TaskDetailsPage() {
   };
 
   if (taskLoading) {
-    return <div>Loading task details...</div>;
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (taskError || !task) {
-    return <div>Error loading task details</div>;
+    return (
+      <div className="text-center py-8 text-red-500">
+        <p>Error loading task details</p>
+      </div>
+    );
   }
 
   return (
@@ -285,27 +297,27 @@ export default function TaskDetailsPage() {
         <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
             <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-              {taskLoading ? "Loading..." : taskData?.task?.subject}
+              {taskLoading ? "Loading..." : taskData?.data?.subject}
             </h1>
             <div className="flex items-center space-x-2 mt-1">
-              {taskData?.task?.projectId && (
-                <Link href={`/projects/${taskData.task.projectId}`} className="text-sm text-blue-600 hover:underline flex items-center">
+              {taskData?.data?.projectId && (
+                <Link
+                  href={`/projects/${taskData.data.projectId}`}
+                  className="text-sm text-blue-600 hover:underline flex items-center"
+                >
                   <FolderOpenDot className="w-4 h-4 mr-1" />
-                  {projectData?.project?.name || "Loading project..."}
+                  {projectData?.data?.name || "Loading project..."}
                 </Link>
               )}
-              {taskData?.task?.status && (
-                <Badge variant={getStatusBadgeVariant(taskData.task.status)}>
-                  {taskData.task.status}
+              {taskData?.data?.status && (
+                <Badge variant={getStatusBadgeVariant(taskData.data.status)}>
+                  {taskData.data.status}
                 </Badge>
               )}
             </div>
           </div>
           <div className="flex flex-shrink-0 space-x-2">
-            <Button
-              variant="outline"
-              onClick={handleFollowToggle}
-            >
+            <Button variant="outline" onClick={handleFollowToggle}>
               {followersData?.users?.some(
                 (follower) => follower.id === currentUser?.id
               ) ? (
@@ -327,17 +339,11 @@ export default function TaskDetailsPage() {
               <Users className="h-4 w-4 mr-2" />
               Assign
             </Button>
-            <Button
-              variant="default"
-              onClick={handleStartTimer}
-            >
+            <Button variant="default" onClick={handleStartTimer}>
               <Clock className="h-4 w-4 mr-2" />
               Track Time
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditModalOpen(true)}
-            >
+            <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
@@ -361,7 +367,7 @@ export default function TaskDetailsPage() {
             <div className="text-center py-8 text-red-500">
               <p>Error loading task details</p>
             </div>
-          ) : !taskData?.task ? (
+          ) : !taskData?.data ? (
             <div className="text-center py-8 text-red-500">
               <p>Task not found</p>
             </div>
@@ -468,18 +474,20 @@ export default function TaskDetailsPage() {
                                 {formatDate(log.startTime)}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {new Date(log.startTime).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
+                                {new Date(log.startTime).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
                                 {log.endTime &&
-                                  ` - ${new Date(log.endTime).toLocaleTimeString(
-                                    [],
-                                    {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    }
-                                  )}`}
+                                  ` - ${new Date(
+                                    log.endTime
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}`}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {log.timeSpent
@@ -541,11 +549,11 @@ export default function TaskDetailsPage() {
                       </div>
                       {creatorLoading ? (
                         <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
-                      ) : creatorData?.user ? (
+                      ) : creatorData?.data ? (
                         <div className="flex items-center gap-2">
-                          <Avatar name={creatorData.user.name} size="xs" />
+                          <Avatar name={creatorData.data.name} size="xs" />
                           <span className="text-sm font-medium text-gray-900">
-                            {creatorData.user.name}
+                            {creatorData.data.name}
                           </span>
                         </div>
                       ) : (
@@ -554,7 +562,7 @@ export default function TaskDetailsPage() {
                         </span>
                       )}
                     </div>
-                    {/* Status */} 
+                    {/* Status */}
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-600" />
@@ -667,7 +675,10 @@ export default function TaskDetailsPage() {
                   ) : assignees.length > 0 ? (
                     <div className="space-y-2 max-h-48 overflow-y-auto">
                       {assignees.map((assignee: User) => (
-                        <div key={assignee.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div
+                          key={assignee.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        >
                           <div className="flex items-center gap-3">
                             <Avatar name={assignee.name} size="sm" />
                             <div className="min-w-0 flex-1">
@@ -933,7 +944,7 @@ export default function TaskDetailsPage() {
         onClose={() => {
           setAssignUserModalOpen(false);
           setSelectedUserId(null);
-          setFilterText('');
+          setFilterText("");
         }}
         title="Assign User to Task"
         footer={
@@ -943,7 +954,7 @@ export default function TaskDetailsPage() {
               onClick={() => {
                 setAssignUserModalOpen(false);
                 setSelectedUserId(null);
-                setFilterText('');
+                setFilterText("");
               }}
             >
               Cancel
@@ -960,22 +971,25 @@ export default function TaskDetailsPage() {
         }
       >
         <div className="space-y-4">
-          <div> 
-            <Input 
+          <div>
+            <Input
               id="search"
               label="Filter Users:"
               placeholder="Filter by name or email..."
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
               className="flex justify-start items-center space-x-5"
-            /> 
+            />
           </div>
-          
+
           <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
             {projectMembersLoading ? (
               <div className="p-4 space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3 animate-pulse">
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 animate-pulse"
+                  >
                     <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
                     <div className="flex-1">
                       <div className="h-3 bg-gray-200 rounded mb-1"></div>
@@ -984,24 +998,34 @@ export default function TaskDetailsPage() {
                   </div>
                 ))}
               </div>
-            ) : projectMembersData?.members && projectMembersData.members.length > 0 ? (
+            ) : projectMembersData?.members &&
+              projectMembersData.members.length > 0 ? (
               <div className="divide-y divide-gray-100">
                 {projectMembersData.members
-                  .filter((user: User) => 
-                    !filterText || 
-                    user.name.toLowerCase().includes(filterText.toLowerCase()) || 
-                    user.email.toLowerCase().includes(filterText.toLowerCase())
+                  .filter(
+                    (user: User) =>
+                      !filterText ||
+                      user.name
+                        .toLowerCase()
+                        .includes(filterText.toLowerCase()) ||
+                      user.email
+                        .toLowerCase()
+                        .includes(filterText.toLowerCase())
                   )
                   .map((user: User) => (
-                    <div 
+                    <div
                       key={user.id}
-                      className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedUserId === user.id ? 'bg-blue-50' : ''}`}
+                      className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
+                        selectedUserId === user.id ? "bg-blue-50" : ""
+                      }`}
                       onClick={() => setSelectedUserId(user.id)}
                     >
                       <div className="flex items-center gap-3">
                         <Avatar name={user.name} size="sm" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {user.name}
+                          </p>
                           <p className="text-xs text-gray-500">{user.email}</p>
                         </div>
                       </div>
