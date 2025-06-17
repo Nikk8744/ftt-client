@@ -20,6 +20,7 @@ import React, { ReactNode } from 'react';
 import { cn } from "@/lib/utils";
 import { assignUserToTask, getTaskAssignees } from "@/services/taskMembers";
 import { getAllMembersOfProject } from "@/services/projectMember";
+import { X } from "lucide-react";
 
 // Form validation schema
 const taskSchema = z.object({
@@ -136,7 +137,7 @@ const TaskForm = ({
   });
 
   // Fetch existing checklist items if editing a task
-  const { data: checklistData, isLoading: checklistLoading } = useQuery<{ checklist: ChecklistItem[] }, Error>({
+  const { data: checklistData, isLoading: checklistLoading } = useQuery<{ data: ChecklistItem[] }, Error>({
     queryKey: ["checklist", task?.id],
     queryFn: async () => {
       if (!task) return null;
@@ -145,11 +146,12 @@ const TaskForm = ({
     },
     enabled: !!task?.id && isOpen,
   });
+  console.log("🚀 ~ checklistData:", checklistData)
 
   // Load checklist items when available
   useEffect(() => {
-    if (checklistData?.checklist) {
-      setChecklistItems(checklistData.checklist);
+    if (checklistData?.data) {
+      setChecklistItems(checklistData.data);
     }
   }, [checklistData]);
 
@@ -327,7 +329,7 @@ const TaskForm = ({
         assignUserMutation.mutate(selectedUserId);
       } else {
         // For create mode, store in local state until task is created
-        const userToAdd = projectMembersData?.members?.find(
+        const userToAdd = projectMembersData?.data?.find(
           (member: User) => member.id === selectedUserId
         );
         
@@ -517,7 +519,7 @@ const TaskForm = ({
                         {assignee.email}
                       </p>
                     </div>
-                    {selectedAssignees.length > 1 && (
+                    {selectedAssignees.length > 0 && (
                       <Button
                         type="button"
                         variant="ghost"
@@ -537,6 +539,7 @@ const TaskForm = ({
                             clipRule="evenodd"
                           />
                         </svg>
+                        <X className="h-4 w-4" />
                       </Button>
                     )}
                   </div>
@@ -614,18 +617,7 @@ const TaskForm = ({
                     onClick={() => handleDeleteItem(item.id)}
                     className="text-gray-400 hover:text-gray-500"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <X className="h-4 w-4" />
                   </Button>
                 </div>
               ))}
@@ -668,6 +660,7 @@ const TaskForm = ({
                       clipRule="evenodd"
                     />
                   </svg>
+                  sasaaasas
                 </Button>
               </div>
             ))}
@@ -767,9 +760,9 @@ const TaskForm = ({
                   </div>
                 ))}
               </div>
-            ) : projectMembersData?.members && projectMembersData.members.length > 0 ? (
+            ) : projectMembersData?.data && projectMembersData.data.length > 0 ? (
               <div className="divide-y divide-gray-100">
-                {projectMembersData.members
+                {projectMembersData.data
                   .filter((user: User) => 
                     !filterText || 
                     user.name.toLowerCase().includes(filterText.toLowerCase()) || 
@@ -795,7 +788,9 @@ const TaskForm = ({
                       {selectedUserId === user.id && (
                         <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          asasasdasd
                         </svg>
+                        
                       )}
                     </div>
                   ))}

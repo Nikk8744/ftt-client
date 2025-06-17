@@ -73,7 +73,7 @@ export default function DashboardPage() {
 
   // Combine owned projects and projects user is a member of
   const ownedProjects = projectsData?.projects || [];
-  const memberProjects = memberProjectsData?.projects || [];
+  const memberProjects = memberProjectsData?.data || [];
   
   // Filter out duplicates (projects that user both owns and is a member of)
   const memberProjectsFiltered = memberProjects.filter(

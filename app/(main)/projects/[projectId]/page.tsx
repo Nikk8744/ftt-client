@@ -174,9 +174,8 @@ export default function ProjectDetailsPage() {
   };
 
   const project = projectData?.data;
-  console.log("🚀 ~ ProjectDetailsPage ~ project:", project)
   const tasks = tasksData?.data || [];
-  const teamMembers = teamData?.members || [];
+  const teamMembers = teamData?.data || [];
   const projectOwner = ownerData?.user;
 
   // Check if current user is the project owner

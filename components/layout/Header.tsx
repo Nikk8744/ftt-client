@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import useAuth from '@/lib/hooks/useAuth';
 import useTimer from '@/lib/hooks/useTimer';
@@ -36,6 +36,22 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, isMobile }) => {
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
   const [description, setDescription] = useState('');
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Fetch projects for selection in modal
   const { 
@@ -132,40 +148,51 @@ const activeProjects = projects.filter((project: any)  =>
           </div>
 
           {/* User Menu */}
-          <div className="relative group ml-3">
-            <button className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-medium text-sm shadow-sm hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 transition-all duration-200">
+          <div className="relative ml-3" ref={userMenuRef}>
+            <button 
+              className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-medium text-sm shadow-sm hover:scale-110 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 transition-all duration-200"
+              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              aria-expanded={isUserMenuOpen}
+            >
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </button>
             
             {/* Dropdown Menu */}
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 hidden group-hover:block transform origin-top-right transition-all duration-200 z-20">
-              <div className="px-4 py-2 text-sm text-gray-900 border-b border-gray-100">
-                <div className="font-medium truncate">{user?.name || 'User'}</div>
-                <div className="truncate text-gray-500 text-xs">{user?.email || ''}</div>
+            {isUserMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20 animate-in fade-in slide-in-from-top-5 duration-200">
+                <div className="px-4 py-2 text-sm text-gray-900 border-b border-gray-100">
+                  <div className="font-medium truncate">{user?.name || 'User'}</div>
+                  <div className="truncate text-gray-500 text-xs">{user?.email || ''}</div>
+                </div>
+                <Link 
+                  href="/profile" 
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={() => setIsUserMenuOpen(false)}
+                >
+                  <User className="w-4 h-4" />
+                  Profile
+                </Link>
+                <Link
+                  href="/settings/profile"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={() => setIsUserMenuOpen(false)}
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Link>
+                <hr className="my-1 border-gray-100" />
+                <button
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    logout();
+                  }}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
               </div>
-              <Link 
-                href="/profile" 
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <User className="w-4 h-4" />
-                Profile
-              </Link>
-              <Link
-                href="/settings/profile"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-                Settings
-              </Link>
-              <hr className="my-1 border-gray-100" />
-              <button
-                onClick={logout}
-                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>

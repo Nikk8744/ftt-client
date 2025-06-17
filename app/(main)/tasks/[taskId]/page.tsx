@@ -495,7 +495,7 @@ export default function TaskDetailsPage() {
                                 {log.description || "-"}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                {log.userId === currentUser?.id && (
+                                {log.userId === currentUser?.id ? (
                                   <div className="flex items-center justify-end gap-2">
                                     <Button
                                       variant="ghost"
@@ -514,6 +514,8 @@ export default function TaskDetailsPage() {
                                       <Trash2 className="w-3 h-3" />
                                     </Button>
                                   </div>
+                                ) : (
+                                  <div className="flex items-center justify-end gap-2">--</div>
                                 )}
                               </td>
                             </tr>
@@ -995,10 +997,10 @@ export default function TaskDetailsPage() {
                   </div>
                 ))}
               </div>
-            ) : projectMembersData?.members &&
-              projectMembersData.members.length > 0 ? (
+            ) : projectMembersData?.data &&
+              projectMembersData.data.length > 0 ? (
               <div className="divide-y divide-gray-100">
-                {projectMembersData.members
+                {projectMembersData.data
                   .filter(
                     (user: User) =>
                       !filterText ||

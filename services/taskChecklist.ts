@@ -33,7 +33,7 @@ export const getChecklistItemById = async (itemId: number) => {
 export const addChecklistItem = async (data: { taskId: number; item: string }) => {
   try {
     const response = await apiClient.post('/items/addItem', data);
-    return response.data;
+      return response.data;
   } catch (error) {
     console.error('Error adding checklist item:', error);
     throw error;

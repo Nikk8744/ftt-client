@@ -133,7 +133,7 @@ export default function ReportsPage() {
         const ownedProjects = await getAllProjectsOfUser();
         
         // Extract project data
-        const memberProjectsData = memberProjects.projects || [];
+        const memberProjectsData = memberProjects.data || [];
         const ownedProjectsData = ownedProjects.projects || [];
         
         // Combine projects and remove duplicates
