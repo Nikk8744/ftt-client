@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Button from "@/components/ui/Button";
-import { Clock, Edit, Trash2 } from "lucide-react";
+import { Clock, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDate, formatDuration } from "@/lib/utils";
 import Link from "next/link";
 
@@ -31,6 +31,7 @@ interface LogsTableProps {
   tasks: Task[];
   isLoading?: boolean;
   showActions?: boolean;
+  showPagination?: boolean;
   onEdit?: (log: TimeLog) => void;
   onDelete?: (log: TimeLog) => void;
 }
@@ -40,6 +41,7 @@ export function LogsTable({
   projects,
   tasks,
   showActions = true,
+  showPagination = true,
   onEdit,
   onDelete,
 }: LogsTableProps) {
@@ -133,7 +135,7 @@ export function LogsTable({
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-start gap-2">
           {onEdit && (
             <Button
               variant="outline"
@@ -176,6 +178,11 @@ export function LogsTable({
       sorting,
       columnFilters,
       columnVisibility,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
     },
   });
 
@@ -225,6 +232,40 @@ export function LogsTable({
           )}
         </TableBody>
       </Table>
+      
+      {showPagination && data.length > 0 && (
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t">
+          <div className="text-sm text-gray-600">
+            Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to {Math.min(
+              (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+              data.length
+            )} of {data.length} logs
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="h-8 w-8 p-0 border-gray-300"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="text-sm font-medium">
+              Page <span className="font-medium">{table.getState().pagination.pageIndex + 1}</span> of <span className="font-medium">{table.getPageCount()}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="h-8 w-8 p-0 border-gray-300"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -3,32 +3,16 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserLogs, updateTimeLog, deleteTimeLog } from "@/services/log";
-import { getAllProjectsOfUser } from "@/services/project";
+import {  getCombinedProjectsOfUser } from "@/services/project";
 import { getUserTasks } from "@/services/task";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import Modal, { ConfirmModal } from "@/components/ui/Modal";
-import { Project, Task, TimeLog, TimeLogUpdateData } from "@/types";
+import { ConfirmModal } from "@/components/ui/Modal";
+import { Project, TimeLog, TimeLogUpdateData } from "@/types";
 import { Calendar, Check, ChevronDown, FilterIcon, FolderOpenDot, X, Zap } from "lucide-react";
 import { LogsTable } from "@/components/feature/LogsTable";
-
-// Form validation schema
-const timeLogSchema = z.object({
-  description: z.string().max(1000).optional(),
-  projectId: z.number().nullable().optional(),
-  taskId: z.number().nullable().optional(),
-  timeSpent: z.number().nullable().optional(),
-  duration: z.number().nullable().optional(),
-  userId: z.number().nullable().optional(),
-  name: z.string().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-});
-
-type TimeLogFormData = z.infer<typeof timeLogSchema>;
+import EditTimeLogModal from "@/components/feature/EditTimeLogModal";
+import Loader from "@/components/ui/Loader";
 
 export default function LogsPage() {
   const queryClient = useQueryClient();
@@ -62,7 +46,7 @@ export default function LogsPage() {
   // Fetch projects for filter and editing
   const { data: projectsData } = useQuery({
     queryKey: ["projects"],
-    queryFn: getAllProjectsOfUser,
+    queryFn: getCombinedProjectsOfUser,
   });
 
   // Fetch tasks for editing
@@ -73,6 +57,7 @@ export default function LogsPage() {
 
   const logs = logsData?.logs || [];
   const projects = projectsData?.projects || [];
+  console.log("🚀 ~ LogsPage ~ projects:", projects)
   const tasks = tasksData?.tasks || [];
 
   // Selected log for editing
@@ -108,26 +93,6 @@ export default function LogsPage() {
     return true;
   });
 
-  // Form for editing logs
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors },
-  } = useForm<TimeLogFormData>({
-    resolver: zodResolver(timeLogSchema),
-    defaultValues: {
-      description: selectedLog?.description || "",
-      projectId: selectedLog?.projectId
-        ? Number(selectedLog.projectId)
-        : undefined,
-      taskId: selectedLog?.taskId ? Number(selectedLog.taskId) : undefined,
-      startTime: selectedLog?.startTime || "",
-      endTime: selectedLog?.endTime || "",
-    },
-  });
-
   // Update log mutation
   const updateLogMutation = useMutation({
     mutationFn: (data: { id: number; updateData: TimeLogUpdateData }) =>
@@ -135,7 +100,6 @@ export default function LogsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["logs"] });
       setEditLogId(null);
-      reset();
     },
   });
 
@@ -150,17 +114,6 @@ export default function LogsPage() {
 
   const openEditModal = (log: TimeLog) => {
     setEditLogId(log.id);
-    reset({
-      description: log.description || "",
-      projectId: log.projectId ? Number(log.projectId) : 0,
-      taskId: log.taskId ? Number(log.taskId) : 0,
-      startTime: log.startTime
-        ? new Date(log.startTime).toISOString().slice(0, 16)
-        : "",
-      endTime: log.endTime
-        ? new Date(log.endTime).toISOString().slice(0, 16)
-        : "",
-    });
   };
 
   const openDeleteModal = (logId: number) => {
@@ -176,31 +129,8 @@ export default function LogsPage() {
     }
   };
 
-  const onSubmit = (data: TimeLogFormData) => {
+  const handleUpdateTimeLog = (updateData: TimeLogUpdateData) => {
     if (!editLogId) return;
-
-    const updateData: TimeLogUpdateData = {};
-
-    if (data.description !== selectedLog?.description) {
-      updateData.description = data.description || null;
-    }
-
-    if (Number(data.projectId) !== selectedLog?.projectId) {
-      updateData.projectId = data.projectId ? Number(data.projectId) : null;
-    }
-
-    if (Number(data.taskId) !== selectedLog?.taskId) {
-      updateData.taskId = data.taskId ? Number(data.taskId) : null;
-    }
-
-    if (data.startTime && data.startTime !== selectedLog?.startTime) {
-      updateData.startTime = data.startTime;
-    }
-
-    if (data.endTime && data.endTime !== selectedLog?.endTime) {
-      updateData.endTime = data.endTime;
-    }
-
     updateLogMutation.mutate({ id: editLogId, updateData });
   };
 
@@ -209,18 +139,14 @@ export default function LogsPage() {
     setSelectedProjectId(projectId);
   };
 
-  // Get filtered tasks based on selected project
-  const filteredTasks = tasks.filter((task: Task) => {
-    const selectedProjectIdNum = Number(watch("projectId"));
-    return !selectedProjectIdNum || task.projectId === selectedProjectIdNum;
-  });
+  // We no longer need to filter tasks here as it's handled in the EditTimeLogModal component
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between shadow-[inset_-1px_-4px_0px_#465fff] rounded-b-3xl">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
               Time Logs
             </h1>
             <p className="mt-1 text-sm text-gray-500 max-w-4xl">
@@ -230,7 +156,7 @@ export default function LogsPage() {
         </div>
       </div>
       <div className="flex-1 bg-gray-50">
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {/* Filters */}
           <Card className="mb-6 border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="p-4">
@@ -450,7 +376,7 @@ export default function LogsPage() {
           {/* Time Logs Table */}
           {logsLoading ? (
             <div className="text-center py-8">
-              <p>Loading time logs...</p>
+              <Loader text="Loading time logs..." centered/>
             </div>
           ) : logsError ? (
             <div className="text-center py-8 text-red-500">
@@ -472,144 +398,18 @@ export default function LogsPage() {
             </Card>
           )}
         </div>
-      </div>
+      </div>  
 
       {/* Edit Log Modal */}
-      <Modal
+      <EditTimeLogModal
         isOpen={editLogId !== null}
         onClose={() => setEditLogId(null)}
-        title="Edit Time Log"
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setEditLogId(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              onClick={handleSubmit(onSubmit)}
-              isLoading={updateLogMutation.isPending}
-            >
-              Save Changes
-            </Button>
-          </>
-        }
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label
-              htmlFor="startTime"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Start Time
-            </label>
-            <input
-              type="datetime-local"
-              id="startTime"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              {...register("startTime")}
-            />
-            {errors.startTime && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.startTime.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="endTime"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              End Time
-            </label>
-            <input
-              type="datetime-local"
-              id="endTime"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              {...register("endTime")}
-            />
-            {errors.endTime && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.endTime.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="projectId"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Project
-            </label>
-            <select
-              id="projectId"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              {...register("projectId")}
-            >
-              <option value="">No Project</option>
-              {projects.map((project: Project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-            {errors.projectId && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.projectId.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="taskId"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Task
-            </label>
-            <select
-              id="taskId"
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              {...register("taskId")}
-              disabled={!watch("projectId")}
-            >
-              <option value="">No Task</option>
-              {filteredTasks.map((task: Task) => (
-                <option key={task.id} value={task.id}>
-                  {task.name || task.subject}
-                </option>
-              ))}
-            </select>
-            {errors.taskId && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.taskId.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              rows={3}
-              className="w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              {...register("description")}
-              placeholder="What did you work on?"
-            />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
-        </form>
-      </Modal>
+        onSubmit={handleUpdateTimeLog}
+        isLoading={updateLogMutation.isPending}
+        timeLog={selectedLog}
+        projects={projects}
+        tasks={tasks}
+      />
 
       {/* Delete Confirmation Modal */}
       <ConfirmModal

@@ -110,7 +110,7 @@ export default function TasksPage() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between shadow-[inset_-1px_-4px_0px_#465fff] rounded-b-3xl">
           <div className="mb-4 md:mb-0">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
               Tasks

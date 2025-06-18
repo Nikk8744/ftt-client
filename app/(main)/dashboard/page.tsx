@@ -219,7 +219,7 @@ export default function DashboardPage() {
           {/* Stats Section */}
           <TooltipProvider>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
+              <Card className="p-6 border border-gray-200 rounded-xl bg-white relative shadow-[-3px_-5px_7px_1px_#465fff]">
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm font-medium text-gray-500">
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                 </div>
               </Card>
 
-              <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
+              <Card className="p-6 border border-gray-200 rounded-xl shadow-[-3px_-5px_7px_1px_#465fff] bg-white relative">
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm font-medium text-gray-500">
@@ -299,7 +299,7 @@ export default function DashboardPage() {
                 </div>
               </Card>
 
-              <Card className="p-6 border border-gray-200 rounded-xl shadow-sm bg-white relative">
+              <Card className="p-6 border border-gray-200 rounded-xl bg-white relative shadow-[-3px_-5px_7px_1px_#465fff]">
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm font-medium text-gray-500">

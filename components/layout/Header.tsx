@@ -173,7 +173,7 @@ const activeProjects = projects.filter((project: any)  =>
                   Profile
                 </Link>
                 <Link
-                  href="/settings/profile"
+                  href="/profile"
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   onClick={() => setIsUserMenuOpen(false)}
                 >

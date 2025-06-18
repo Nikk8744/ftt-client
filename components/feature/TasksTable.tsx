@@ -202,14 +202,14 @@ export function TasksTable({
       id: "actions",
       header: () => <span className="sr-only">Actions</span>,
       cell: ({ row }) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-start gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onEdit && onEdit(row.original)}
             className="w-6 h-6 md:w-8 md:h-8"
           > 
-            <SquarePen className="w-3 h-3 md:w-4 md:h-4" />
+            <SquarePen className="w-3 h-3 md:w-4 md:h-4 text-blue-500" />
           </Button>
           {row.original.status === "Done" && (
             <Button

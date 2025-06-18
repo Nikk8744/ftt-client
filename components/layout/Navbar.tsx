@@ -26,7 +26,7 @@ export default function Navbar() {
 
   return (
     <nav 
-      className={`w-full z-50 transition-all duration-500 rounded-b-3xl border-b-2 border-atlantis-500 rounded-t-md bg-black h-20 fixed top-0 transform ${
+      className={`w-full z-50 transition-all duration-500 rounded-b-3xl border-b-2 shadow-[3px_5px_7px_1px_#84cc16] border-atlantis-500 rounded-t-md bg-black h-20 fixed top-0 transform ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
