@@ -8,7 +8,11 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { TasksTable } from "@/components/feature/TasksTable";
 import TeamMembers from "@/components/TeamMembers";
-import { getProjectById, updateProject, getProjectOwner } from "@/services/project";
+import {
+  getProjectById,
+  updateProject,
+  getProjectOwner,
+} from "@/services/project";
 import { getTasksByProject, updateTask, deleteTask } from "@/services/task";
 import {
   addMemberToProject,
@@ -20,9 +24,10 @@ import { formatDate } from "@/lib/utils";
 import TaskForm from "@/components/feature/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { Task } from "@/types";
-import { Calendar, CircleCheck, Clock, Info, Plus, User } from "lucide-react";
-import EditProjectModal from '@/components/feature/EditProjectModal';
-import AddMemberModal from '@/components/feature/AddMemberModal';
+import { Calendar, CircleCheck, Clock, Info, Pencil, Plus, User, UserPlus } from "lucide-react";
+import EditProjectModal from "@/components/feature/EditProjectModal";
+import AddMemberModal from "@/components/feature/AddMemberModal";
+import Loader from "@/components/ui/Loader";
 
 // Add back the project form data type
 type ProjectFormData = {
@@ -64,23 +69,17 @@ export default function ProjectDetailsPage() {
     queryFn: () => getProjectById(Number(projectId)),
     enabled: !!projectId,
   });
-    console.log("🚀 ~ ProjectDetailsPage ~ projectData:", projectData)
+  console.log("🚀 ~ ProjectDetailsPage ~ projectData:", projectData);
 
   // Get project owner information
-  const {
-    data: ownerData,
-    isLoading: ownerLoading,
-  } = useQuery({
-    queryKey: ["project-owner", projectData?.project?.ownerId],
-    queryFn: () => getProjectOwner(Number(projectData?.project?.ownerId)),
-    enabled: !!projectData?.project?.ownerId,
+  const { data: ownerData, isLoading: ownerLoading } = useQuery({
+    queryKey: ["project-owner", projectData?.data?.ownerId],
+    queryFn: () => getProjectOwner(Number(projectData?.data?.ownerId)),
+    enabled: !!projectData?.data?.ownerId,
   });
 
   // Get project tasks
-  const {
-    data: tasksData,
-    isLoading: tasksLoading,
-  } = useQuery({
+  const { data: tasksData, isLoading: tasksLoading } = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: () => getTasksByProject(Number(projectId)),
     enabled: !!projectId,
@@ -105,9 +104,12 @@ export default function ProjectDetailsPage() {
 
   // Add member mutation
   const addMemberMutation = useMutation({
-    mutationFn: (data: { userId: string }) => addMemberToProject(Number(projectId), Number(data.userId)),
+    mutationFn: (data: { userId: string }) =>
+      addMemberToProject(Number(projectId), Number(data.userId)),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projectMembers', projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["projectMembers", projectId],
+      });
       setIsAddMemberModalOpen(false);
       setApiError(null);
     },
@@ -118,9 +120,12 @@ export default function ProjectDetailsPage() {
 
   // Remove member mutation
   const removeMemberMutation = useMutation({
-    mutationFn: (userId: number) => removeMemberFromProject(Number(projectId), userId),
+    mutationFn: (userId: number) =>
+      removeMemberFromProject(Number(projectId), userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projectMembers', projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["projectMembers", projectId],
+      });
       setRemoveModalState({ isOpen: false, userId: null });
     },
   });
@@ -176,7 +181,7 @@ export default function ProjectDetailsPage() {
   const project = projectData?.data;
   const tasks = tasksData?.data || [];
   const teamMembers = teamData?.data || [];
-  const projectOwner = ownerData?.user;
+  const projectOwner = ownerData?.data;
 
   // Check if current user is the project owner
   const isOwner = project && user ? project.ownerId === user.id : false;
@@ -192,37 +197,43 @@ export default function ProjectDetailsPage() {
         <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
             <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-              {projectLoading ? "Loading..." : projectData?.project?.name}
+              {projectLoading ? "Loading..." : projectData?.data?.name}
             </h1>
             <p className="mt-1 text-sm text-gray-500 max-w-4xl">
-              {projectData?.project?.description}
+              {projectData?.data?.description}
             </p>
           </div>
           <div className="flex flex-shrink-0 space-x-2">
             <Button
-              variant="outline"
-              onClick={() => setIsAddMemberModalOpen(true)}
-            >
-              Add Member
-            </Button>
-            <Button
-              variant="default"
+              variant="myBtn"
               onClick={() => setIsAddTaskModalOpen(true)}
-              className="flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-800"
-            > 
-            <Plus className="h-4 w-4" />
+            >
+              <Plus className="h-4 w-4" />
               Add Task
             </Button>
-            <Button
-              variant="default"
-              onClick={() => {
-                if (projectData?.project) {
-                  setIsEditModalOpen(true);
-                }
-              }}
-            >
-              Edit Project
-            </Button>
+            {isOwner && (
+              <>
+                <Button
+                  variant="default"
+                  onClick={() => setIsAddMemberModalOpen(true)}
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Add Member
+                </Button>
+
+                <Button
+                  variant="myBtn"
+                  onClick={() => {
+                    if (projectData?.data) {
+                      setIsEditModalOpen(true);
+                    }
+                  }}
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit Project
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -230,7 +241,7 @@ export default function ProjectDetailsPage() {
         <div className="p-6">
           {projectLoading ? (
             <div className="text-center py-8">
-              <p>Loading project details...</p>
+              <Loader centered text="Loading project details..." />
             </div>
           ) : projectError ? (
             <div className="text-center py-8 text-red-500">
@@ -263,8 +274,8 @@ export default function ProjectDetailsPage() {
                         No tasks found in this project.
                       </p>
                       <p className="text-sm text-gray-500">
-                        Click the &quot;Add Task&quot; button to create your first
-                        task.
+                        Click the &quot;Add Task&quot; button to create your
+                        first task.
                       </p>
                     </Card>
                   ) : (
@@ -301,10 +312,14 @@ export default function ProjectDetailsPage() {
                             Owner
                           </p>
                           <p className="text-sm font-semibold text-gray-900 mt-0.5">
-                            {isOwner ? `${user?.name} (You)` : (ownerLoading ? "Loading..." : projectOwner?.name || "Unknown User")}
+                            {isOwner
+                              ? `${user?.name} (You)`
+                              : ownerLoading
+                              ? "Loading..."
+                              : projectOwner?.name || "Unknown User"}
                           </p>
                         </div>
-                      </div>  
+                      </div>
 
                       {/* Status */}
                       <div className="flex items-start gap-3">
@@ -416,10 +431,14 @@ export default function ProjectDetailsPage() {
       <EditProjectModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        project={projectData?.project || null}
+        project={projectData?.data || null}
         onSubmit={onUpdateProject}
         isLoading={updateProjectMutation.isPending}
-        error={updateProjectMutation.isError ? "Failed to update project. Please try again." : null}
+        error={
+          updateProjectMutation.isError
+            ? "Failed to update project. Please try again."
+            : null
+        }
       />
 
       {/* Add Member Modal */}

@@ -9,6 +9,7 @@ import {
 import Button from '@/components/ui/Button';
 // import Card from '@/components/ui/Card';
 import { ConfirmModal } from '@/components/ui/Modal';
+import { Edit, Trash2 } from 'lucide-react';
 
 interface ChecklistItem {
   id: number;
@@ -199,7 +200,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                         onClick={() => setEditingItem({ id: item.id, text: item.item })}
                         disabled={updateItemMutation.isPending}
                       >
-                        Edit
+                        <Edit className="h-4 w-4 text-blue-600" />
                       </Button>
                       <Button
                         variant="destructive"
@@ -207,7 +208,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                         onClick={() => openDeleteModal(item.id)}
                         disabled={deleteItemMutation.isPending}
                       >
-                        Delete
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   )}

@@ -10,6 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import Button from './ui/Button';
+import { EllipsisVertical, User, UserPlus } from 'lucide-react';
 
 interface TeamMember {
   id: number;
@@ -49,9 +50,7 @@ export default function TeamMembers({
             onClick={onAddMember}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 shadow-sm"
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <UserPlus className="h-4 w-4" />
             Add Member
           </Button>
         )}
@@ -73,18 +72,14 @@ export default function TeamMembers({
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-gray-600 uppercase tracking-wider px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <User className="h-4 w-4" />
                     Name
                   </div>
                 </TableHead>
                 {onRemoveMember && (
                   <TableHead className="text-xs font-semibold text-gray-600 uppercase tracking-wider px-4 py-3 w-[120px]">
                     <div className="flex items-center gap-2">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
+                      <EllipsisVertical className="h-4 w-4" />
                       Actions
                     </div>
                   </TableHead>
@@ -153,9 +148,7 @@ export default function TeamMembers({
                 onClick={onAddMember}
                 className="text-xs px-4 py-2 flex items-center gap-2"
               >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
+                <UserPlus className="h-4 w-4" />
                 Add Your First Member
               </Button>
             )}

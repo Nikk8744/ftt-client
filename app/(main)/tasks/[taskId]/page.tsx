@@ -43,9 +43,10 @@ import {
   Check,
   UserIcon,
   FolderOpenDot,
+  UserPlus,
 } from "lucide-react";
 import Input from "@/components/ui/Input";
-import Loader from '@/components/ui/Loader';
+import Loader from "@/components/ui/Loader";
 
 export default function TaskDetailsPage() {
   const { taskId } = useParams();
@@ -202,14 +203,16 @@ export default function TaskDetailsPage() {
       },
       enabled: !!taskData?.data?.projectId && assignUserModalOpen,
     });
-    
-    const task = taskData?.data;
-    const project = projectData?.data;
-    const assignees = assigneeData?.data || [];
-    const followers = followersData?.users || [];
-    // console.log("🚀 ~ TaskDetailsPage ~ followersData:", followersData)
-    const logs = logsData?.data || [];
-    // console.log("🚀 ~ TaskDetailsPage ~ logsData:", logsData)
+
+  const task = taskData?.data;
+  const project = projectData?.data;
+  const assignees = assigneeData?.data || [];
+  const followers = followersData?.users || [];
+  // console.log("🚀 ~ TaskDetailsPage ~ followersData:", followersData)
+  const logs = logsData?.data || [];
+  // console.log("🚀 ~ TaskDetailsPage ~ logsData:", logsData)
+
+  const isTaskOwner: boolean = task?.ownerId === currentUser?.id;
 
   // Check if current user is following this task
   const isUserFollowing = currentUser
@@ -277,9 +280,7 @@ export default function TaskDetailsPage() {
   };
 
   if (taskLoading) {
-    return (
-      <Loader centered text="Loading task details..." />
-    );
+    return <Loader centered text="Loading task details..." />;
   }
 
   if (taskError || !task) {
@@ -321,38 +322,49 @@ export default function TaskDetailsPage() {
                 (follower) => follower.id === currentUser?.id
               ) ? (
                 <>
-                  <EyeOff className="h-4 w-4 mr-2" />
+                  <EyeOff className="h-4 w-4 mr-1" />
                   Unfollow
                 </>
               ) : (
                 <>
-                  <Eye className="h-4 w-4 mr-2" />
+                  <Eye className="h-4 w-4 mr-1" />
                   Follow
                 </>
               )}
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setAssignUserModalOpen(true)}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              Assign
-            </Button>
-            <Button variant="default" onClick={handleStartTimer}>
-              <Clock className="h-4 w-4 mr-2" />
-              Track Time
-            </Button>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => setDeleteModalState({ isOpen: true })}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </Button>
+
+            {isTaskOwner && (
+              <>
+                <Button
+                  variant="darkBtn"
+                  onClick={() => setAssignUserModalOpen(true)}
+                >
+                  <Users className="h-4 w-4 mr-1" />
+                  {assignees.length > 0 ? "Add More" : "Assign"}
+                </Button>
+                <Button
+                  variant="myBtn"
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setDeleteModalState({ isOpen: true })}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              </>
+            )}
+
+              {/* <Button variant="myBtn" onClick={handleStartTimer}>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4 mr-1" />
+                  Track Time
+                </div>
+              </Button> */}
           </div>
         </div>
       </div>
@@ -515,7 +527,9 @@ export default function TaskDetailsPage() {
                                     </Button>
                                   </div>
                                 ) : (
-                                  <div className="flex items-center justify-end gap-2">--</div>
+                                  <div className="flex items-center justify-end gap-2">
+                                    --
+                                  </div>
                                 )}
                               </td>
                             </tr>
@@ -655,11 +669,12 @@ export default function TaskDetailsPage() {
                       )}
                     </div>
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
                       onClick={() => setAssignUserModalOpen(true)}
                       className="text-xs"
                     >
+                      <UserPlus className="h-4 w-4 mr-1" />
                       {assignees.length > 0 ? "Add More" : "Assign"}
                     </Button>
                   </div>
