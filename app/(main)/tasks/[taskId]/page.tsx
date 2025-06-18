@@ -294,9 +294,9 @@ export default function TaskDetailsPage() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
               {taskLoading ? "Loading..." : taskData?.data?.subject}
             </h1>
             <div className="flex items-center space-x-2 mt-1">
@@ -322,13 +322,13 @@ export default function TaskDetailsPage() {
                 (follower) => follower.id === currentUser?.id
               ) ? (
                 <>
-                  <EyeOff className="h-4 w-4 mr-1" />
-                  Unfollow
+                  <EyeOff className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">Unfollow</span>
                 </>
               ) : (
                 <>
-                  <Eye className="h-4 w-4 mr-1" />
-                  Follow
+                  <Eye className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">Follow</span>
                 </>
               )}
             </Button>
@@ -339,22 +339,24 @@ export default function TaskDetailsPage() {
                   variant="darkBtn"
                   onClick={() => setAssignUserModalOpen(true)}
                 >
-                  <Users className="h-4 w-4 mr-1" />
-                  {assignees.length > 0 ? "Add More" : "Assign"}
+                  <Users className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">
+                    {assignees.length > 0 ? "Add More" : "Assign"}
+                  </span>
                 </Button>
                 <Button
                   variant="myBtn"
                   onClick={() => setIsEditModalOpen(true)}
                 >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  <Edit className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">Edit</span>
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={() => setDeleteModalState({ isOpen: true })}
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete
+                  <Trash2 className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">Delete</span>
                 </Button>
               </>
             )}
@@ -369,7 +371,7 @@ export default function TaskDetailsPage() {
         </div>
       </div>
       <div className="flex-1 bg-gray-50">
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {taskLoading ? (
             <div className="text-center py-8">
               <p>Loading task details...</p>
@@ -436,7 +438,7 @@ export default function TaskDetailsPage() {
                       className="flex items-center gap-1.5"
                     >
                       <Clock className="w-4 h-4" />
-                      Start Timer
+                      <span className="hidden sm:inline">Start Timer</span>
                     </Button>
                   </div>
 
@@ -459,19 +461,19 @@ export default function TaskDetailsPage() {
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Date
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Time
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Duration
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="hidden sm:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Description
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
@@ -479,10 +481,10 @@ export default function TaskDetailsPage() {
                         <tbody className="bg-white divide-y divide-gray-200">
                           {logs.map((log: TimeLog) => (
                             <tr key={log.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                                 {formatDate(log.startTime)}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                                 {new Date(log.startTime).toLocaleTimeString(
                                   [],
                                   {
@@ -498,15 +500,15 @@ export default function TaskDetailsPage() {
                                     minute: "2-digit",
                                   })}`}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                                 {log.timeSpent
                                   ? formatDuration(log.timeSpent)
                                   : "In Progress"}
                               </td>
-                              <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                              <td className="hidden sm:table-cell px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-500 max-w-xs truncate">
                                 {log.description || "-"}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-xs sm:text-sm font-medium">
                                 {log.userId === currentUser?.id ? (
                                   <div className="flex items-center justify-end gap-2">
                                     <Button
@@ -547,7 +549,7 @@ export default function TaskDetailsPage() {
                 <Card className="hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center gap-2 mb-4">
                     <Info className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                       Task Info
                     </h3>
                   </div>
@@ -556,7 +558,7 @@ export default function TaskDetailsPage() {
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                       <div className="flex items-center gap-2">
                         <UserIcon className="w-4 h-4 text-indigo-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">
                           Created By
                         </span>
                       </div>
@@ -565,12 +567,12 @@ export default function TaskDetailsPage() {
                       ) : creatorData?.data ? (
                         <div className="flex items-center gap-2">
                           <Avatar name={creatorData.data.name} size="xs" />
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-xs sm:text-sm font-medium text-gray-900">
                             {creatorData.data.name}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-sm font-medium text-gray-500">
+                        <span className="text-xs sm:text-sm font-medium text-gray-500">
                           Unknown
                         </span>
                       )}
@@ -579,7 +581,7 @@ export default function TaskDetailsPage() {
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                       <div className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">
                           Status
                         </span>
                       </div>
@@ -596,13 +598,13 @@ export default function TaskDetailsPage() {
                       <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                         <div className="flex items-center gap-2">
                           <FolderOpenDot className="w-4 h-4 text-purple-600" />
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-xs sm:text-sm font-medium text-gray-700">
                             Project
                           </span>
                         </div>
                         <Link
                           href={`/projects/${project.id}`}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                          className="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
                         >
                           {project.name}
                         </Link>
@@ -614,11 +616,11 @@ export default function TaskDetailsPage() {
                       <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-orange-600" />
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-xs sm:text-sm font-medium text-gray-700">
                             Due Date
                           </span>
                         </div>
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-xs sm:text-sm font-medium text-gray-900">
                           {formatDate(task.dueDate)}
                         </span>
                       </div>
@@ -629,11 +631,11 @@ export default function TaskDetailsPage() {
                       <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-teal-600" />
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-xs sm:text-sm font-medium text-gray-700">
                             Time Spent
                           </span>
                         </div>
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-xs sm:text-sm font-medium text-gray-900">
                           {formatDuration(task.totalTimeSpent)}
                         </span>
                       </div>
@@ -643,11 +645,11 @@ export default function TaskDetailsPage() {
                     <div className="flex items-center justify-between py-2">
                       <div className="flex items-center gap-2">
                         <PlusCircle className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">
                           Created
                         </span>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-xs sm:text-sm font-medium text-gray-900">
                         {formatDate(task.createdAt)}
                       </span>
                     </div>
@@ -659,7 +661,7 @@ export default function TaskDetailsPage() {
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <div className="flex items-center gap-2">
                       <Users className="w-5 h-5 text-green-600" />
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                         Assignees
                       </h3>
                       {assignees.length > 0 && (
@@ -674,8 +676,10 @@ export default function TaskDetailsPage() {
                       onClick={() => setAssignUserModalOpen(true)}
                       className="text-xs"
                     >
-                      <UserPlus className="h-4 w-4 mr-1" />
-                      {assignees.length > 0 ? "Add More" : "Assign"}
+                      <UserPlus className="h-4 w-4 md:mr-1" />
+                      <span className="hidden md:inline">
+                        {assignees.length > 0 ? "Add More" : "Assign"}
+                      </span>
                     </Button>
                   </div>
                   {assigneeLoading ? (
@@ -691,15 +695,15 @@ export default function TaskDetailsPage() {
                       {assignees.map((assignee: User) => (
                         <div
                           key={assignee.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                          className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 sm:gap-3">
                             <Avatar name={assignee.name} size="sm" />
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-gray-900 truncate">
+                              <p className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
                                 {assignee.name}
                               </p>
-                              <p className="text-xs text-gray-500 truncate">
+                              <p className="text-xs text-gray-500 truncate hidden sm:block">
                                 {assignee.email}
                               </p>
                             </div>
@@ -735,7 +739,7 @@ export default function TaskDetailsPage() {
                 <Card className="hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center gap-2 mb-4">
                     <Eye className="w-5 h-5 text-yellow-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                       Followers
                     </h3>
                     {followers.length > 0 && (
@@ -764,14 +768,14 @@ export default function TaskDetailsPage() {
                       {followers.map((follower) => (
                         <div
                           key={follower.id}
-                          className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                          className="flex items-center gap-2 sm:gap-3 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                         >
                           <Avatar name={follower.name} size="sm" />
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-gray-900 truncate">
+                            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                               {follower.name}
                             </p>
-                            <p className="text-xs text-gray-500 truncate">
+                            <p className="text-xs text-gray-500 truncate hidden sm:block">
                               {follower.email}
                             </p>
                           </div>

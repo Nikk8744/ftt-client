@@ -110,9 +110,9 @@ export default function TasksPage() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
               Tasks
             </h1>
             <p className="mt-1 text-sm text-gray-500 max-w-4xl">
@@ -122,11 +122,11 @@ export default function TasksPage() {
         </div>
       </div>
       <div className="flex-1 bg-gray-50">
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {/* Tab Navigation */}
-          <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-6 max-w-md">
+          <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-4 sm:mb-6 max-w-md">
             <button
-              className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
+              className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
                 activeTab === 'all'
                   ? 'bg-white shadow text-blue-700'
                   : 'text-gray-700 hover:bg-white/[0.5]'
@@ -136,14 +136,14 @@ export default function TasksPage() {
               All Tasks
             </button>
             <button
-              className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
+              className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
                 activeTab === 'assigned'
                   ? 'bg-white shadow text-blue-700'
                   : 'text-gray-700 hover:bg-white/[0.5]'
               }`}
               onClick={() => setActiveTab('assigned')}
             >
-              Assigned to Me
+              Assigned
             </button>
           </div>
 

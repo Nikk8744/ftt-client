@@ -194,9 +194,9 @@ export default function ProjectDetailsPage() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
               {projectLoading ? "Loading..." : projectData?.data?.name}
             </h1>
             <p className="mt-1 text-sm text-gray-500 max-w-4xl">
@@ -208,8 +208,8 @@ export default function ProjectDetailsPage() {
               variant="myBtn"
               onClick={() => setIsAddTaskModalOpen(true)}
             >
-              <Plus className="h-4 w-4" />
-              Add Task
+              <Plus className="h-4 w-4 md:mr-1" />
+              <span className="hidden md:inline">Add Task</span>
             </Button>
             {isOwner && (
               <>
@@ -217,8 +217,8 @@ export default function ProjectDetailsPage() {
                   variant="default"
                   onClick={() => setIsAddMemberModalOpen(true)}
                 >
-                  <UserPlus className="h-4 w-4" />
-                  Add Member
+                  <UserPlus className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">Add Member</span>
                 </Button>
 
                 <Button
@@ -229,8 +229,8 @@ export default function ProjectDetailsPage() {
                     }
                   }}
                 >
-                  <Pencil className="h-4 w-4" />
-                  Edit Project
+                  <Pencil className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">Edit Project</span>
                 </Button>
               </>
             )}
@@ -238,7 +238,7 @@ export default function ProjectDetailsPage() {
         </div>
       </div>
       <div className="flex-1 bg-gray-50">
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {projectLoading ? (
             <div className="text-center py-8">
               <Loader centered text="Loading project details..." />
@@ -293,25 +293,25 @@ export default function ProjectDetailsPage() {
               <div className="space-y-6">
                 {/* Project Info */}
                 <Card className="border border-gray-100 rounded-xl bg-white overflow-hidden">
-                  <div className="border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white px-4 py-3">
-                    <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <div className="border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white px-3 sm:px-4 py-2 sm:py-3">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 flex items-center gap-2">
                       <Info className="h-4 w-4 text-indigo-600" />
                       Project Info
                     </h3>
                   </div>
 
-                  <div className="p-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-3 sm:p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       {/* Owner */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
-                          <User className="h-4 w-4 text-indigo-600" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                          <User className="h-3 w-3 sm:h-4 sm:w-4 text-indigo-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Owner
                           </p>
-                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
                             {isOwner
                               ? `${user?.name} (You)`
                               : ownerLoading
@@ -322,9 +322,9 @@ export default function ProjectDetailsPage() {
                       </div>
 
                       {/* Status */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                          <CircleCheck className="h-4 w-4 text-green-600" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
+                          <CircleCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -348,60 +348,60 @@ export default function ProjectDetailsPage() {
                       </div>
 
                       {/* Created Date */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Plus className="h-4 w-4 text-purple-600" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
+                          <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Created
                           </p>
-                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
                             {formatDate(project.createdAt)}
                           </p>
                         </div>
                       </div>
 
                       {/* Total Hours */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Clock className="h-4 w-4 text-orange-600" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-orange-100 rounded-full flex items-center justify-center mt-0.5">
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Total Hours
                           </p>
-                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
                             {project.totalHours || "0"} hrs
                           </p>
                         </div>
                       </div>
 
                       {/* Start Date */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Calendar className="h-4 w-4 text-teal-600" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-teal-100 rounded-full flex items-center justify-center mt-0.5">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-teal-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Start Date
                           </p>
-                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
                             {formatDate(project.startDate)}
                           </p>
                         </div>
                       </div>
 
                       {/* End Date */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Calendar className="h-4 w-4 text-red-600" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                             End Date
                           </p>
-                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
                             {formatDate(project.endDate)}
                           </p>
                         </div>

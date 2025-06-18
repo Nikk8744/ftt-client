@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, useEffect } from "react";
 import { Task, Project } from "@/types";
 import {
   ColumnDef,
@@ -74,7 +74,11 @@ export function TasksTable({
 }: TasksTableProps) {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    description: false,
+    createdAt: false,
+    dueDate: false,
+  });
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "subject",
@@ -137,7 +141,7 @@ export function TasksTable({
             value={status}
             onValueChange={(newStatus) => onStatusChange && onStatusChange(row.original, newStatus)}
           >
-            <SelectTrigger className="w-[130px] h-8 px-3 py-1 rounded-full border-0 bg-blue-50/50 hover:bg-blue-100/50 focus:ring-1 focus:ring-blue-200">
+            <SelectTrigger className="w-[90px] sm:w-[130px] h-8 px-2 sm:px-3 py-1 rounded-full border-0 bg-blue-50/50 hover:bg-blue-100/50 focus:ring-1 focus:ring-blue-200">
               <SelectValue>
                 <div className="flex items-center gap-1.5">
                   <div className={cn(
@@ -147,7 +151,7 @@ export function TasksTable({
                     "bg-gray-400"
                   )} />
                   <span className={cn(
-                    "text-sm font-medium",
+                    "text-xs sm:text-sm font-medium",
                     status === "Done" ? "text-green-700" :
                     status === "In-Progress" ? "text-yellow-700" :
                     "text-gray-600"
@@ -203,16 +207,18 @@ export function TasksTable({
             variant="outline"
             size="sm"
             onClick={() => onEdit && onEdit(row.original)}
+            className="w-6 h-6 md:w-8 md:h-8"
           > 
-            <SquarePen className="w-4 h-4" />
+            <SquarePen className="w-3 h-3 md:w-4 md:h-4" />
           </Button>
           {row.original.status === "Done" && (
             <Button
               variant="destructive"
               size="sm"
               onClick={() => onDelete && onDelete(row.original)}
+              className="w-6 h-6 md:w-8 md:h-8"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
             </Button>
           )}
         </div>
@@ -238,13 +244,33 @@ export function TasksTable({
     },
   });
 
+  // Set default column visibility based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setColumnVisibility({
+        description: window.innerWidth >= 1024,
+        createdAt: window.innerWidth >= 768,
+        dueDate: window.innerWidth >= 640,
+      });
+    };
+    
+    // Set initial values
+    handleResize();
+    
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {/* Filter by task name or description */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <Input
               id={`${id}-input`}
               onChange={(e) => {
@@ -252,7 +278,7 @@ export function TasksTable({
               }}
               value={(table.getColumn("subject")?.getFilterValue() as string) ?? ""}
               className={cn(
-                "peer min-w-60 ps-9",
+                "peer w-full sm:min-w-60 ps-9 text-xs sm:text-sm",
                 Boolean(table.getColumn("subject")?.getFilterValue()) && "pe-9"
               )}
               placeholder="Filter tasks..."
@@ -278,14 +304,14 @@ export function TasksTable({
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-3">
                 <Columns3
-                  className="-ms-1 me-2 opacity-60"
+                  className="opacity-60"
                   size={16}
                   strokeWidth={2}
                   aria-hidden="true"
                 />
-                View
+                <span className="hidden md:inline">View</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -322,7 +348,7 @@ export function TasksTable({
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className="h-11"
+                      className="h-10 px-2 sm:px-4 py-2 text-xs sm:text-sm"
                     >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <button
@@ -369,7 +395,7 @@ export function TasksTable({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -387,72 +413,72 @@ export function TasksTable({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex-1 text-xs sm:text-sm text-muted-foreground order-2 sm:order-1">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="flex items-center space-x-6 lg:space-x-8">
+        <div className="flex flex-wrap items-center gap-4 sm:space-x-6 lg:space-x-8 order-1 sm:order-2">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
+            <p className="text-xs sm:text-sm font-medium">Rows per page</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
                 table.setPageSize(Number(value));
               }}
             >
-              <SelectTrigger className="h-8 w-[70px]">
+              <SelectTrigger className="h-7 sm:h-8 w-[60px] sm:w-[70px] text-xs sm:text-sm">
                 <SelectValue placeholder={table.getState().pagination.pageSize} />
               </SelectTrigger>
               <SelectContent side="top">
                 {[10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                  <SelectItem key={pageSize} value={`${pageSize}`} className="text-xs sm:text-sm">
                     {pageSize}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+          <div className="flex w-[90px] sm:w-[100px] items-center justify-center text-xs sm:text-sm font-medium">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2">
             <Button
               variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
+              className="hidden h-7 sm:h-8 w-7 sm:w-8 p-0 lg:flex"
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
               <span className="sr-only">Go to first page</span>
-              <ChevronFirst className="h-4 w-4" />
+              <ChevronFirst className="h-3 sm:h-4 w-3 sm:w-4" />
             </Button>
             <Button
               variant="outline"
-              className="h-8 w-8 p-0"
+              className="h-7 sm:h-8 w-7 sm:w-8 p-0"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
               <span className="sr-only">Go to previous page</span>
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3 sm:h-4 w-3 sm:w-4" />
             </Button>
             <Button
               variant="outline"
-              className="h-8 w-8 p-0"
+              className="h-7 sm:h-8 w-7 sm:w-8 p-0"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
               <span className="sr-only">Go to next page</span>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3 sm:h-4 w-3 sm:w-4" />
             </Button>
             <Button
               variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
+              className="hidden h-7 sm:h-8 w-7 sm:w-8 p-0 lg:flex"
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
               <span className="sr-only">Go to last page</span>
-              <ChevronLast className="h-4 w-4" />
+              <ChevronLast className="h-3 sm:h-4 w-3 sm:w-4" />
             </Button>
           </div>
         </div>
