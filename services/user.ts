@@ -6,9 +6,17 @@ export const loginUser = async (credentials: UserLoginCredentials) => {
     const response = await apiClient.post('/user/login', credentials);
     
     // The backend sets cookies automatically with HttpOnly
-    // We'll also store the user data in localStorage for getCurrentUser function
+    // We'll store the user data in auth-storage for consistent access
     if (response.data.user) {
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Create or update auth-storage with the correct structure
+      const authData = {
+        state: {
+          isAuthenticated: true,
+          user: response.data.user
+        },
+        version: 0
+      };
+      localStorage.setItem('auth-storage', JSON.stringify(authData));
     }
     
     return response.data;
@@ -41,9 +49,16 @@ export const getUserById = async (id: number) => {
 export const updateUser = async (id: number, data: UserUpdateData) => {
   try {
     const response = await apiClient.patch(`/user/updateDetails/${id}`, data);
-    // Update localStorage with the new user data
+    // Update auth-storage with the new user data
     if (response.data.user) {
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Get existing auth-storage data
+      const storedAuth = localStorage.getItem('auth-storage');
+      if (storedAuth) {
+        const authData = JSON.parse(storedAuth);
+        // Update only the user data while preserving the structure
+        authData.state.user = response.data.user;
+        localStorage.setItem('auth-storage', JSON.stringify(authData));
+      }
     }
     return response.data;
   } catch (error) {
@@ -67,15 +82,15 @@ export const logoutUser = async () => {
     // Call the backend logout endpoint to clear cookies
     const response = await apiClient.post('/user/logout');
     
-    // Also clear localStorage as a precaution
-    localStorage.removeItem('auth-token');
+    // Clear auth-storage from localStorage
+    localStorage.removeItem('auth-storage');
     
     return response.data;
   } catch (error) {
     console.error('Logout error:', error);
     
     // Even if the API call fails, clear the localStorage
-    localStorage.removeItem('auth-token');
+    localStorage.removeItem('auth-storage');
     
     throw error;
   }
@@ -84,15 +99,24 @@ export const logoutUser = async () => {
 // Get current user information - This should rely on the JWT token in cookies
 export const getCurrentUser = async () => {
   try {
-    // Get the current user's ID from localStorage
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
+    // Get the current user's ID from auth-storage in localStorage
+    const storedAuth = localStorage.getItem('auth-storage');
+    if (!storedAuth) {
       return { user: null };
     }
 
-    const { id } = JSON.parse(storedUser);
+    // Parse the auth-storage JSON structure
+    const authData = JSON.parse(storedAuth);
+    
+    // Extract user from the nested state structure
+    const user = authData?.state?.user;
+    
+    if (!user || !user.id) {
+      return { user: null };
+    }
+
     // Use the getUserById function to fetch fresh user data
-    const response = await getUserById(id);
+    const response = await getUserById(user.id);
     return response;
   } catch (error) {
     console.error('Error fetching current user:', error);

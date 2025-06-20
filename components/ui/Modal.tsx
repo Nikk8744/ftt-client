@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, Fragment, ReactNode } from 'react';
+import { useEffect, useState, useRef, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Button from './Button';
@@ -239,7 +239,7 @@ export function ConfirmModal({
       title={title}
       maxWidth="sm"
       footer={
-        <Fragment>
+        <div className="flex justify-end gap-2">
           <Button
             variant="outline"
             onClick={onClose}
@@ -256,7 +256,7 @@ export function ConfirmModal({
           >
             {confirmText}
           </Button>
-        </Fragment>
+        </div>
       }
     >
       <p className="text-gray-700">{message}</p>

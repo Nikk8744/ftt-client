@@ -53,7 +53,7 @@ const navigation: NavItem[] = [
   },
   {
     name: "Settings",
-    href: "/settings/profile",
+    href: "/profile",
     icon: <Settings className="w-5 h-5" />,
   },
 ];

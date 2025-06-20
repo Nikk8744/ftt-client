@@ -12,3 +12,6 @@
 
 <!-- ! task assignee functionality - crud checklist, follow, track time, (no delete, edit & assign). -->
 
+- when creating a task right now i am able to put the due date less than the current date, so need to sovlve this.
+- chekc the above for projects too.
+

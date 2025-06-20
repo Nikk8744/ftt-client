@@ -10,13 +10,13 @@ import { ConfirmModal } from "@/components/ui/Modal";
 import { TasksTable } from "@/components/feature/TasksTable";
 import { Task } from "@/types";
 import { getCurrentUser } from "@/services/user";
-import Loader from '@/components/ui/Loader';
+import Loader from "@/components/ui/Loader";
 
 export default function TasksPage() {
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
   const [deleteTaskModalOpen, setDeleteTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'assigned'>('all');
+  const [activeTab, setActiveTab] = useState<"all" | "assigned">("all");
 
   const queryClient = useQueryClient();
 
@@ -33,14 +33,16 @@ export default function TasksPage() {
   });
 
   // Fetch assigned tasks
-  const { data: assignedTasksData, isLoading: assignedTasksLoading } = useQuery({
-    queryKey: ["assignedTasks", userData?.user?.id],
-    queryFn: () => {
-      if (!userData?.user?.id) return { data: [] };
-      return getUserAssignedTasks(userData.user.id);
-    },
-    enabled: !!userData?.user?.id,
-  });
+  const { data: assignedTasksData, isLoading: assignedTasksLoading } = useQuery(
+    {
+      queryKey: ["assignedTasks", userData?.data?.id],
+      queryFn: () => {
+        if (!userData?.data?.id) return { data: [] };
+        return getUserAssignedTasks(userData.data.id);
+      },
+      enabled: !!userData?.data?.id,
+    }
+  );
 
   // Fetch all projects (owned and member of)
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
@@ -49,20 +51,25 @@ export default function TasksPage() {
   });
 
   const ownedTasks = tasksData?.tasks || [];
-  const assignedTasks = assignedTasksData?.data || [];
-  
+  const assignedTasks = assignedTasksData?.tasks.data || [];
+  // const assignedTasksFiltered = Array.isArray(assignedTasks) 
+  //   ? assignedTasks.filter(
+  //       (assignedTask: Task) => !ownedTasks.some((createdTask: Task) => createdTask.id === assignedTask.id)
+  //     )
+  //   : [];
+
   // Combine owned and assigned tasks for the "All Tasks" view, removing duplicates
-  const allTasks = [...ownedTasks];   
-  
+  const allTasks = [...ownedTasks];
+
   // Add assigned tasks that aren't already in the owned tasks list
   assignedTasks.forEach((assignedTask: Task) => {
-    if (!allTasks.some(task => task.id === assignedTask.id)) {
+    if (!allTasks.some((task) => task.id === assignedTask.id)) {
       allTasks.push(assignedTask);
     }
-  });           
-  
+  });
+
   // Determine which tasks to display based on active tab
-  const displayTasks = activeTab === 'all' ? allTasks : assignedTasks;
+  const displayTasks = activeTab === "all" ? allTasks : assignedTasks;
   const isLoading = userLoading || tasksLoading || assignedTasksLoading || projectsLoading;
 
   // Update task status mutation
@@ -89,9 +96,9 @@ export default function TasksPage() {
 
   // Handle status change
   const handleStatusChange = (task: Task, newStatus: string) => {
-    updateTaskMutation.mutate({ 
-      id: task.id, 
-      status: newStatus as "Pending" | "In-Progress" | "Done" 
+    updateTaskMutation.mutate({
+      id: task.id,
+      status: newStatus as "Pending" | "In-Progress" | "Done",
     });
   };
 
@@ -127,21 +134,21 @@ export default function TasksPage() {
           <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-4 sm:mb-6 max-w-md">
             <button
               className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-                activeTab === 'all'
-                  ? 'bg-white shadow text-blue-700'
-                  : 'text-gray-700 hover:bg-white/[0.5]'
+                activeTab === "all"
+                  ? "bg-white shadow text-blue-700"
+                  : "text-gray-700 hover:bg-white/[0.5]"
               }`}
-              onClick={() => setActiveTab('all')}
+              onClick={() => setActiveTab("all")}
             >
               All Tasks
             </button>
             <button
               className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-                activeTab === 'assigned'
-                  ? 'bg-white shadow text-blue-700'
-                  : 'text-gray-700 hover:bg-white/[0.5]'
+                activeTab === "assigned"
+                  ? "bg-white shadow text-blue-700"
+                  : "text-gray-700 hover:bg-white/[0.5]"
               }`}
-              onClick={() => setActiveTab('assigned')}
+              onClick={() => setActiveTab("assigned")}
             >
               Assigned
             </button>

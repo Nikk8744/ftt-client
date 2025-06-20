@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserLogs, updateTimeLog, deleteTimeLog } from "@/services/log";
-import {  getCombinedProjectsOfUser } from "@/services/project";
+import { getCombinedProjectsOfUser } from "@/services/project";
 import { getUserTasks } from "@/services/task";
+import { getUserAssignedTasks } from "@/services/taskMembers";
+import useAuthStore from '@/store/auth';
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/Modal";
@@ -16,6 +18,7 @@ import Loader from "@/components/ui/Loader";
 
 export default function LogsPage() {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
   const [dateRange, setDateRange] = useState<{
     startDate: string;
@@ -49,16 +52,25 @@ export default function LogsPage() {
     queryFn: getCombinedProjectsOfUser,
   });
 
-  // Fetch tasks for editing
-  const { data: tasksData } = useQuery({
-    queryKey: ["tasks"],
+  // Fetch user-owned tasks
+  const { data: userTasksData } = useQuery({
+    queryKey: ["userTasks"],
     queryFn: getUserTasks,
   });
 
+  // Fetch user-assigned tasks
+  const { data: assignedTasksData } = useQuery({
+    queryKey: ["assignedTasks", user?.id],
+    queryFn: () => user ? getUserAssignedTasks(user.id) : Promise.resolve({ tasks: [] }),
+    enabled: !!user,
+  });
+
+  const userTasks = Array.isArray(userTasksData?.tasks) ? userTasksData.tasks : [];
+  const assignedTasks = Array.isArray(assignedTasksData?.tasks.data) ? assignedTasksData.tasks.data : [];
+  const allTasks = [...userTasks, ...assignedTasks];
+
   const logs = logsData?.logs || [];
   const projects = projectsData?.projects || [];
-  console.log("🚀 ~ LogsPage ~ projects:", projects)
-  const tasks = tasksData?.tasks || [];
 
   // Selected log for editing
   const selectedLog = editLogId
@@ -391,7 +403,7 @@ export default function LogsPage() {
               <LogsTable 
                 data={filteredLogs} 
                 projects={projects} 
-                tasks={tasks}
+                tasks={allTasks}
                 onEdit={openEditModal}
                 onDelete={(log) => openDeleteModal(log.id)}
               />
@@ -408,7 +420,7 @@ export default function LogsPage() {
         isLoading={updateLogMutation.isPending}
         timeLog={selectedLog}
         projects={projects}
-        tasks={tasks}
+        tasks={allTasks}
       />
 
       {/* Delete Confirmation Modal */}

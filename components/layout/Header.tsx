@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import {  getCombinedProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
+import { getUserAssignedTasks } from '@/services/taskMembers';
 import { useQuery } from '@tanstack/react-query';
 import { Project, Task } from '@/types';
 import NotificationBell from '@/components/feature/NotificationBell';
@@ -65,16 +66,69 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen, isMobile }) => {
 
   // Fetch tasks when a project is selected
   const { 
-    data: tasksData,
-    isLoading: tasksLoading,
+    data: userTasksData,
+    isLoading: userTasksLoading,
   } = useQuery({
-    queryKey: ['tasks', selectedProject],
-    queryFn: () => selectedProject ? getUserTasks() : null,
-    enabled: !!selectedProject && isStopTimerModalOpen,
+    queryKey: ['userTasks', selectedProject],
+    queryFn: getUserTasks,
+    enabled: isStopTimerModalOpen,
+  });
+  
+  // Fetch tasks assigned to the user
+  const { 
+    data: assignedTasksData,
+    isLoading: assignedTasksLoading,
+  } = useQuery({
+    queryKey: ['assignedTasks', selectedProject],
+    queryFn: () => user ? getUserAssignedTasks(user.id) : Promise.resolve({ tasks: [] }),
+    enabled: !!user && isStopTimerModalOpen,
   });
 
   const projects = projectsData?.projects || [];
-  const tasks = tasksData?.tasks || [];
+  
+  // Get user created tasks
+  const userTasks = userTasksData?.tasks || [];
+  
+  // Extract assigned tasks based on API response structure
+  let assignedTasks: Task[] = [];
+  if (assignedTasksData) {
+    // Handle the specific structure we found: assignedTasksData.tasks.data
+    if (assignedTasksData.tasks?.data && Array.isArray(assignedTasksData.tasks.data)) {
+      assignedTasks = assignedTasksData.tasks.data;
+    }
+    // Handle other possible structures
+    else if (Array.isArray(assignedTasksData)) {
+      assignedTasks = assignedTasksData;
+    }
+    else if (assignedTasksData.tasks && Array.isArray(assignedTasksData.tasks)) {
+      assignedTasks = assignedTasksData.tasks;
+    }
+    else if (typeof assignedTasksData === 'object') {
+      // Try to get tasks from any property that looks like an array of tasks
+      const possibleTaskArrays = Object.values(assignedTasksData)
+        .filter(value => Array.isArray(value));
+      
+      if (possibleTaskArrays.length > 0) {
+        // Use the first array property found (likely to be tasks)
+        assignedTasks = possibleTaskArrays[0] as Task[];
+      }
+    }
+  }
+  
+  // Combine user tasks and assigned tasks
+  const allTasks = [...userTasks, ...assignedTasks];
+  
+  // Filter out duplicates (tasks that user both created and is assigned to)
+  const uniqueTasks = allTasks.filter((task, index, self) => 
+    index === self.findIndex((t) => t.id === task.id)
+  );
+
+  // Filter tasks by selected project
+  const filteredTasks = selectedProject 
+    ? uniqueTasks.filter((task: Task) => task.projectId === selectedProject && task.status !== 'Done')
+    : [];
+
+  const tasksLoading = userTasksLoading || assignedTasksLoading;
 
   // Filter out completed projects
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,15 +136,9 @@ const activeProjects = projects.filter((project: any)  =>
   project.status !== 'Completed' && project.status !== 'Done'
 );
 
-  // Filter tasks by selected project
-  const filteredTasks = selectedProject 
-    ? tasks.filter((task: Task) => task.projectId === selectedProject && task.status !== 'Done')
-    : [];
-
   const handleStopTimer = () => {
     // Require both project and task to stop timer
     if (!selectedProject || !selectedTask) return;
-
     stopTimer({
       projectId: selectedProject,
       taskId: selectedTask,

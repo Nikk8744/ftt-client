@@ -56,7 +56,7 @@ interface TaskFormProps {
   onClose: () => void;
 }
 
-const TaskForm = ({
+const   TaskForm = ({
   projectId,
   task,
   isOpen,
