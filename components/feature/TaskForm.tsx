@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils";
 import { assignUserToTask, getTaskAssignees } from "@/services/taskMembers";
 import { getAllMembersOfProject } from "@/services/projectMember";
 import { X } from "lucide-react";
+import Input from "@/components/ui/Input";
+import { Label } from "@/components/ui/label";
 
 // Form validation schema
 const taskSchema = z.object({
@@ -72,6 +74,7 @@ const   TaskForm = ({
     { id: string; text: string; isCompleted: boolean }[]
   >([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [dueDateError, setDueDateError] = useState<string | null>(null);
   
   // Assignee state
   const [assignUserModalOpen, setAssignUserModalOpen] = useState(false);
@@ -125,7 +128,6 @@ const   TaskForm = ({
     handleSubmit,
     formState: { errors },
     reset,
-    // setValue,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -193,11 +195,18 @@ const   TaskForm = ({
         return response;
       } catch (error) {
         console.error("Error in task creation:", error);
+        // console.error("Error in task creation:", error.response?.data);
         if (axios.isAxiosError(error)) {
-          console.error("Error response:", error.response?.data);
+          console.log("🚀 ~ mutationFn: ~ error:", error)
+          console.error("Error response:", error.response?.data.message);
+          const errorData = error.response?.data;
+        if (errorData?.message?.includes("Due date") || errorData?.errors?.dueDate) {
+          console.log("🚀 ~ mutationFn: ~ errorData:", errorData)
+          setDueDateError(errorData?.errors?.dueDate || errorData?.message || "Invalid due date");
+        }
           // Throw a more descriptive error
           throw new Error(
-            error.response?.data?.message || "Failed to create task"
+              error.response?.data.message
           );
         }
         throw error;
@@ -210,6 +219,7 @@ const   TaskForm = ({
       reset();
       setTemporaryItems([]);
       setSelectedAssignees([]);
+      setDueDateError(null);
     },
     onError: (error) => {
       console.error("Error creating task:", error);
@@ -226,7 +236,17 @@ const   TaskForm = ({
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["assignedTasks"] });
       queryClient.invalidateQueries({ queryKey: ["checklist", task!.id] });
+      setDueDateError(null);
       onClose();
+    },
+    onError: (error) => {
+      console.error("Error updating task:", error);
+      if (axios.isAxiosError(error)) {
+        const errorData = error.response?.data;
+        if (errorData?.message?.includes("due date") || errorData?.errors?.dueDate) {
+          setDueDateError(errorData?.errors?.dueDate || errorData?.message || "Invalid due date");
+        }
+      }
     },
   });
 
@@ -390,18 +410,13 @@ const   TaskForm = ({
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Task Name */}
         <div className="space-y-1.5">
-          <label htmlFor="subject" className="block text-sm font-medium text-gray-900">
+          <Label htmlFor="subject" className="text-sm font-medium text-gray-900">
             Task Name
-          </label>
-          <input
-            type="text"
+          </Label>
+          <Input
             id="subject"
-            className={cn(
-              "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-              "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500",
-              errors.subject && "border-red-500 focus:border-red-500 focus:ring-red-500"
-            )}
             placeholder="Enter task name"
+            className={errors.subject ? "border-red-500" : ""}
             {...register("subject")}
           />
           {errors.subject && (
@@ -411,52 +426,50 @@ const   TaskForm = ({
 
         {/* Description */}
         <div className="space-y-1.5">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-900">
+          <Label htmlFor="description" className="text-sm font-medium text-gray-900">
             Description (Optional)
-          </label>
-          <textarea
-            id="description"
-            rows={3}
-            className={cn(
-              "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-              "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-            )}
-            placeholder="Add more details about the task..."
-            {...register("description")}
-          />
+          </Label>
+          <div className="relative">
+            <textarea
+              id="description"
+              rows={3}
+              className={cn(
+                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
+                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              )}
+              placeholder="Add more details about the task..."
+              {...register("description")}
+            />
+          </div>
         </div>
 
         {/* Status and Due Date */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label htmlFor="status" className="block text-sm font-medium text-gray-900">
+            <Label htmlFor="status" className="text-sm font-medium text-gray-900">
               Status
-            </label>
-            <select
-              id="status"
-              className={cn(
-                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              )}
-              {...register("status")}
-            >
-              <option value="Pending">Not Started</option>
-              <option value="In-Progress">In Progress</option>
-              <option value="Done">Completed</option>
-            </select>
+            </Label>
+                                        <select
+                id="status"
+                className={cn(
+                  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
+                  "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                )}
+                {...register("status")}
+              >
+                <option value="Pending">Not Started</option>
+                <option value="In-Progress">In Progress</option>
+                <option value="Done">Completed</option>
+              </select>
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="dueDate" className="block text-sm font-medium text-gray-900">
-              Due Date (Optional)
-            </label>
-            <input
+            <Label htmlFor="dueDate" className="text-sm font-medium text-gray-900">
+              Due Date  
+            </Label>
+            <Input
               type="datetime-local"
               id="dueDate"
-              className={cn(
-                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              )}
               {...register("dueDate")}
             />
           </div>
@@ -527,19 +540,7 @@ const   TaskForm = ({
                         onClick={() => handleRemoveAssignee(assignee.id)}
                         className="text-gray-400 hover:text-gray-500"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <X className="h-4 w-4" />
+                        <X className="h-4 w-4 text-red-500" />
                       </Button>
                     )}
                   </div>
@@ -562,15 +563,11 @@ const   TaskForm = ({
           </label>
 
           <div className="flex items-center gap-2">
-            <input
+            <Input
               type="text"
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
               placeholder="Add checklist item..."
-              className={cn(
-                "flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              )}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && newItemText.trim()) {
                   e.preventDefault();
@@ -617,7 +614,7 @@ const   TaskForm = ({
                     onClick={() => handleDeleteItem(item.id)}
                     className="text-gray-400 hover:text-gray-500"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-4 w-4 text-red-500" />
                   </Button>
                 </div>
               ))}
@@ -647,20 +644,8 @@ const   TaskForm = ({
                   size="sm"
                   onClick={() => handleDeleteItem(item.id)}
                   className="text-gray-400 hover:text-gray-500"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  sasaaasas
+                >                  
+                  <X className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
             ))}
@@ -692,10 +677,14 @@ const   TaskForm = ({
         </div>
 
         {/* Error Message */}
-        {(createTaskMutation.isError || updateTaskMutation.isError) && (
+        {(createTaskMutation.isError || updateTaskMutation.isError || dueDateError) && (
           <div className="rounded-lg bg-red-50 border-l-4 border-red-400 p-4 text-sm text-red-700" role="alert">
             <p className="font-medium">Error</p>
-            <p>Failed to {isEditMode ? "update" : "create"} task. Please try again.</p>
+            {dueDateError ? (
+              <p>{dueDateError}</p>
+            ) : (
+              <p>Failed to {isEditMode ? "update" : "create"} task. Please try again.</p>
+            )}
           </div>
         )}
       </form>
@@ -734,13 +723,12 @@ const   TaskForm = ({
       >
         <div className="space-y-4">
           <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+            <Label htmlFor="search" className="text-sm font-medium text-gray-700 mb-1">
               Filter Users
-            </label>
-            <input
+            </Label>
+            <Input
               type="text"
               id="search"
-              className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
               placeholder="Filter by name or email..."
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}

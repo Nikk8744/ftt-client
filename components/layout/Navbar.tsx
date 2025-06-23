@@ -63,7 +63,7 @@ export default function Navbar() {
               <Link href="#how-it-works" className="text-white hover:text-atlantis-400 hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">
                 How It Works
               </Link>
-              <Link href="#testimonials" className="text-white hover:text-atlantis-400 hover:border-atlantis- 400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">
+              <Link href="#testimonials" className="text-white hover:text-atlantis-400 hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">
                 Testimonials
               </Link>
               <Link href="#pricing" className="text-white hover:text-atlantis-400 hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">

@@ -86,6 +86,26 @@ export function TasksTable({
     },
   ]);
 
+  const statuses = [
+    {
+      value: "Pending",
+      label: "Pending",
+      color: "bg-gray-400",
+      textColor: "text-gray-600",
+    },
+    {
+      value: "In-Progress",
+      label: "In Progress",
+      color: "bg-yellow-500",
+      textColor: "text-yellow-700",
+    },
+    {
+      value: "Done",
+      label: "Done",
+      color: "bg-green-500",
+      textColor: "text-green-700",
+    },
+  ];
   const columns: ColumnDef<Task>[] = [
     {
       header: "Task",
@@ -162,24 +182,20 @@ export function TasksTable({
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Pending" className="py-2">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2 w-2 rounded-full bg-gray-400" />
-                  <span className="text-sm font-medium text-gray-600">Pending</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="In-Progress" className="py-2">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                  <span className="text-sm font-medium text-yellow-700">In Progress</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="Done" className="py-2">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-sm font-medium text-green-700">Done</span>
-                </div>
-              </SelectItem>
+              {statuses.map((status) => (
+                <SelectItem key={status.value} value={status.value} className="py-2 border-b border-gray-200">
+                  <div className="flex items-center gap-1.5">
+                    <div className={cn(
+                      "h-2 w-2 rounded-full",
+                      status.color
+                    )} />
+                    <span className={cn(
+                      "text-sm font-medium",
+                      status.textColor
+                    )}>{status.label}</span>
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         );
