@@ -274,7 +274,7 @@ export default function DashboardPage() {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-gray-900">My Tasks</h2>
-              <Link href="/tasks" className="text-sm text-primary-600 hover:text-primary-500">
+              <Link href="/tasks" className="text-sm text-brand hover:text-brand-500">
                 View all tasks
               </Link>
             </div>
@@ -352,7 +352,7 @@ export default function DashboardPage() {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-gray-900">Recent Time Logs</h2>
-              <Link href="/logs" className="text-sm text-primary-600 hover:text-primary-500">
+              <Link href="/logs" className="text-sm text-brand hover:text-brand-500">
                 View all
               </Link>
             </div>
@@ -399,7 +399,7 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-gray-900">Your Projects</h2>
-              <Link href="/projects" className="text-sm text-primary-600 hover:text-primary-500">
+              <Link href="/projects" className="text-sm text-brand hover:text-brand-500">
                 View all
               </Link>
             </div>

@@ -151,7 +151,7 @@ export default function HowItWorksSection() {
   };
 
   return (
-    <section ref={sectionRef} className="py-32 px-6 max-w-7xl mx-auto relative" id="how-it-works">
+    <section ref={sectionRef} className="py-12 px-6 max-w-7xl mx-auto relative" id="how-it-works">
       <h2 className="text-4xl font-bold text-slate-50 text-center mb-6">
         How <span className="text-lime-500 bg-clip-text">TimeTracker</span> Works
       </h2>
@@ -160,10 +160,10 @@ export default function HowItWorksSection() {
       </p>
       
       <div className="max-w-4xl mx-auto relative pt-8">
-        {/* Vertical progress line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-700/30 -translate-x-1/2"></div>
+        {/* Vertical progress line - moves to right on small screens, center on large screens */}
+        <div className="absolute md:left-1/2 right-[21px] top-0 bottom-0 w-0.5 bg-slate-700/30 md:-translate-x-1/2"></div>
         <div 
-          className="absolute left-1/2 top-0 w-0.5 bg-sky-400 -translate-x-1/2 transition-all duration-500 ease-out"
+          className="absolute md:left-1/2 right-[21px] top-0 w-0.5 bg-sky-400 md:-translate-x-1/2 transition-all duration-500 ease-out"
           style={{ 
             height: activeStep < steps.length - 1 
               ? `calc(${(activeStep + 1) * 100 / steps.length}% - 10px)` 
@@ -175,83 +175,55 @@ export default function HowItWorksSection() {
           <div 
             key={index}
             ref={(el) => setStepRef(el, index)}
-            className={`flex items-start mb-28 relative opacity-40 translate-y-5 transition-all duration-500 ease-out ${index <= activeStep ? 'opacity-100 translate-y-0' : ''}`}
+            className={`flex items-start mb-28 relative opacity-40 translate-y-5 transition-all duration-500 ease-out ${index <= activeStep ? 'opacity-100 translate-y-0' : ''} ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}
           >
-            {/* Center circle marker */}
+            {/* Circle marker - moves to right on small screens, centered on large screens */}
             <div 
-              className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-slate-800 border-2 border-slate-600 z-10 top-[17px] transition-all duration-300 ${
+              className={`absolute md:left-1/2 right-[14px] md:-translate-x-1/2 w-4 h-4 rounded-full bg-slate-800 border-2 border-slate-600 z-10 top-[17px] transition-all duration-300 ${
                 index <= activeStep ? 'bg-sky-400 border-slate-50 shadow-[0_0_15px_rgba(56,189,248,0.5)]' : ''
               }`}
             ></div>
             
             {/* Status badge */}
             <div
-              className={`absolute top-[15px] left-1/2 -translate-x-1/2 py-1 px-4 bg-sky-500/20 text-sky-400 rounded-full text-sm font-bold whitespace-nowrap opacity-0 transition-all duration-300 ${
-                index === activeStep ? 'opacity-100 -translate-y-10' : ''
+              className={`absolute top-[15px] md:left-1/2 right-[21px] md:-translate-x-1/2 py-1 px-4 bg-sky-500/20 text-sky-400 rounded-full text-sm font-bold whitespace-nowrap opacity-0 transition-all duration-300 ${
+                index === activeStep ? 'opacity-100 md:-translate-y-10 -translate-x-24' : ''
               }`}
             >
               {step.status}
             </div>
             
-            {/* Left side for even steps */}
-            {index % 2 === 0 && (
-              <div 
-                className={`w-12 h-12 rounded-full bg-slate-800/70 flex items-center justify-center text-sky-400 ml-auto mr-6 transition-all duration-300 ${
-                  index <= activeStep ? 'bg-sky-500/20 text-slate-50 scale-110 shadow-[0_0_20px_rgba(56,189,248,0.3)]' : ''
-                }`}
-              >
-                {index < activeStep ? (
-                  <svg
-                    className="w-5 h-5 text-slate-50"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                ) : step.icon}
-              </div>
-            )}
+            {/* Icon - always on left for mobile, alternates for desktop */}
+            <div 
+              className={`w-12 h-12 rounded-full bg-slate-800/70 flex items-center justify-center text-sky-400 ml-0 mr-6 transition-all duration-300 ${
+                index <= activeStep ? 'bg-sky-500/20 text-slate-50 scale-110 shadow-[0_0_20px_rgba(56,189,248,0.3)]' : ''
+              }`}
+            >
+              {index < activeStep ? (
+                <svg
+                  className="w-5 h-5 text-slate-50"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              ) : step.icon}
+            </div>
             
             {/* Content */}
             <div 
-              className={`flex-1 px-6 ${index % 2 !== 0 ? 'text-right' : 'text-left'}`}
+              className={`flex-1 pr-12 md:px-6 text-left md:${index % 2 !== 0 ? 'text-right' : 'text-left'}`}
             >
               <h3 className="text-2xl font-bold text-slate-50 mb-2">{step.title}</h3>
               <p className="text-slate-300 leading-relaxed">{step.description}</p>
             </div>
-            
-            {/* Right side for odd steps */}
-            {index % 2 !== 0 && (
-              <div 
-                className={`w-12 h-12 rounded-full bg-slate-800/70 flex items-center justify-center text-sky-400 transition-all duration-300 ${
-                  index <= activeStep ? 'bg-sky-500/20 text-slate-50 scale-110 shadow-[0_0_20px_rgba(56,189,248,0.3)]' : ''
-                }`}
-              >
-                {index < activeStep ? (
-                  <svg
-                    className="w-5 h-5 text-slate-50"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                ) : step.icon}
-              </div>
-            )}
           </div>
         ))}
       </div>

@@ -546,7 +546,7 @@ export default function HeroSection() {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10 sm:pt-20 sm:pb-20 relative z-10">
-        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-8 items-center">
           {/* Left: Text/CTA/Avatars */}
           <div className="w-full lg:col-span-6 flex flex-col justify-center items-center lg:items-start text-center lg:text-left mt-10 lg:mt-0">
             <div className="w-full max-w-lg">
@@ -559,16 +559,16 @@ export default function HeroSection() {
               <p className="mt-4 text-base xs:text-lg text-white   font-serif tracking-wide">
                 The ultimate time tracking solution for freelancers and small teams. Track time, manage projects, and boost your productivity with our intuitive platform.
               </p>
-              <div className="mt-8 flex flex-row flex-wrap gap-4 justify-center lg:justify-start">
+              <div className="mt-8 flex flex-col xs:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href="/register"
-                  className="inline-block px-6 py-3 rounded-md bg-atlantis-400 text-slate-900 font-medium hover:bg-atlantis-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-base xs:text-lg"
+                  className="inline-block px-6 py-3 rounded-md bg-atlantis-400 text-slate-900 font-medium hover:bg-atlantis-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-base xs:text-lg w-full xs:w-48 text-center"
                 >
                   Get Started - It&apos;s Free
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="inline-block px-6 py-3 rounded-md border border-white/30 text-white font-medium hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 backdrop-blur-sm text-base xs:text-lg"
+                  className="inline-block px-6 py-3 rounded-md border border-white/30 text-white font-medium hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 backdrop-blur-sm text-base xs:text-lg w-full xs:w-48 text-center"
                 >
                   Learn More
                 </Link>

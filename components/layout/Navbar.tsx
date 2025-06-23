@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 // import Image from 'next/image';
 import Link from 'next/link';
+import { Clock } from 'lucide-react';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,23 +49,24 @@ export default function Navbar() {
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg> */}
-              <span className="text-lg font-semibold text-white font-serif border-2 border-atlantis-500 px-7 py-3 rounded-xl tracking-widest">Tracksy</span>
+              <Clock className="w-4 h-4 lg:w-6 lg:h-6 text-white mr-2 mb-0" />
+              <span className="text-xl lg:text-2xl font-semibold text-white font-serif pr-7 py-3 rounded-xl tracking-widest">Tracksy</span>
             </Link>
           </div>
 
           {/* Center - Navigation Links */}
           <div className="flex-grow hidden md:flex justify-center font-serif text-xl tracking-wider">
             <div className="flex ">
-              <Link href="#features" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
+              <Link href="#features" className="text-white hover:text-atlantis-400 hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">
                 Features
               </Link>
-              <Link href="#how-it-works" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
+              <Link href="#how-it-works" className="text-white hover:text-atlantis-400 hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">
                 How It Works
               </Link>
-              <Link href="#testimonials" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
+              <Link href="#testimonials" className="text-white hover:text-atlantis-400 hover:border-atlantis- 400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">
                 Testimonials
               </Link>
-              <Link href="#pricing" className="text-white hover:bg-atlantis-500 text-sm transition-colors border-2 border-atlantis-500 px-5 py-3 rounded-xl">
+              <Link href="#pricing" className="text-white hover:text-atlantis-400 hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl">
                 FAQs
               </Link>
             </div>
@@ -74,7 +76,7 @@ export default function Navbar() {
           <div className="flex-none w-40 hidden md:flex justify-end">
             <Link 
               href="/login" 
-              className="px-5 py-3 rounded-xl border-2 border-atlantis-500 text-white text-base tracking-wider font-serif hover:bg-atlantis-500 transition-colors"
+              className="px-5 py-3 rounded-xl border-2 border-atlantis-500 text-white text-base tracking-wider font-serif hover:bg-slate-800 hover:border-atlantis-400 transition-colors"
             >
               Log in
             </Link>
@@ -109,7 +111,7 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-      </div>
+      </div>  
 
       {/* Mobile menu */}
       <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden bg-atlantis-400 border-t-2 border-atlantis-600/50 rounded-3xl absolute w-full`}>
