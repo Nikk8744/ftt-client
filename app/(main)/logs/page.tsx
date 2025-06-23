@@ -15,6 +15,7 @@ import { Calendar, Check, ChevronDown, FilterIcon, FolderOpenDot, X, Zap } from 
 import { LogsTable } from "@/components/feature/LogsTable";
 import EditTimeLogModal from "@/components/feature/EditTimeLogModal";
 import Loader from "@/components/ui/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function LogsPage() {
   const queryClient = useQueryClient();
@@ -155,18 +156,12 @@ export default function LogsPage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
-      <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between shadow-[inset_-1px_-4px_0px_#465fff] rounded-b-3xl">
-          <div className="mb-4 md:mb-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-              Time Logs
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
-              View and manage your time tracking history
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Time Logs"
+        description="View and manage your time tracking history"
+        // variant="brand"
+      />
+      
       <div className="flex-1 bg-gray-50">
         <div className="p-3 sm:p-6">
           {/* Filters */}

@@ -53,9 +53,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     // Variant styles
     const variantStyles = {
-      outline: "border border-gray-300 rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 bg-white",
-      filled: "border border-transparent bg-gray-100 rounded-md focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500",
-      flushed: "border-b border-gray-300 rounded-none focus:border-primary-500 focus:ring-0 px-0",
+      outline: "border border-gray-300 rounded-md focus:border-brand focus:ring-1 focus:ring-brand bg-white",
+      filled: "border border-transparent bg-gray-100 rounded-md focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand",
+      flushed: "border-b border-gray-300 rounded-none focus:border-brand focus:ring-0 px-0",
     };
 
     // Width style
@@ -114,7 +114,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           />
           
           {rightIcon && (
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
               {rightIcon}
             </div>
           )}

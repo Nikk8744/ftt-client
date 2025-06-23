@@ -80,9 +80,9 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-md bg-gradient-to-br flex items-center justify-center">
                 <Clock className="w-7 h-7 text-black" />
               </div>
-              <h3 className="text-2xl font-semibold text-slate-900 font-sans tracking-wider">TimeTracker</h3>
+              <h3 className="text-3xl font-bold text-slate-900 font-serif tracking-wide">Tracksy</h3>
             </div>
-            <p className="text-slate-800 font-sans font-normal tracking-wide text-base max-w-xl mx-auto">
+            <p className="text-slate-800 font-serif font-semibold tracking-wider max-w-xl mx-auto">
               The best time tracking solution for freelancers and small teams. Track time, manage projects, and get paid.
             </p>
             {/* Social links */}
@@ -103,8 +103,8 @@ export default function Footer() {
           <div className="flex justify-center w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-16 mt-8 items-start max-w-6xl w-full mx-auto">
               {/* Product column */}
-              <div className="space-y-4 items-center text-center ">
-                <h3 className="text-base md:text-lg font-semibold uppercase text-slate-900 tracking-wider font-sans">Product</h3>
+              <div className="space-y-4 items-center text-center">
+                <h3 className="text-base md:text-lg font-bold uppercase text-slate-900 tracking-wider font-serif">Product</h3>
                 <div className="flex flex-col space-y-2">
                   <FooterLink href="#features">Features</FooterLink>
                   <FooterLink href="#pricing">Pricing</FooterLink>
@@ -116,7 +116,7 @@ export default function Footer() {
               
               {/* Resources column */}
               <div className="space-y-4 items-center text-center">
-                <h3 className="text-base md:text-lg font-semibold uppercase text-slate-900 tracking-wider font-sans">Resources</h3>
+                <h3 className="text-base md:text-lg font-bold uppercase text-slate-900 tracking-wider font-serif">Resources</h3>
                 <div className="flex flex-col space-y-2">
                   <FooterLink href="#blog">Blog</FooterLink>
                   <FooterLink href="#help">Help Center</FooterLink>
@@ -126,8 +126,8 @@ export default function Footer() {
               </div>
               
               {/* Company column */}
-              <div className="space-y-4 items-center text-center ">
-                <h3 className="text-base md:text-lg font-semibold uppercase text-slate-900 tracking-wider font-sans">Company</h3>
+              <div className="space-y-4 items-center text-center">
+                <h3 className="text-base md:text-lg font-bold uppercase text-slate-900 tracking-wider font-serif">Company</h3>
                 <div className="flex flex-col space-y-2">
                   <FooterLink href="#about">About</FooterLink>
                   <FooterLink href="#careers">Careers</FooterLink>

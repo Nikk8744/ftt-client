@@ -62,7 +62,7 @@ export default function AddMemberModal({
             Cancel
           </Button>
           <Button
-            variant="default"
+            variant="brandBtn"
             onClick={handleSubmit(onSubmit)}
             className="px-4 py-2 text-sm"
             isLoading={isLoading}

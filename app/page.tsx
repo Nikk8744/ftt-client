@@ -32,7 +32,7 @@ export default function Home() {
   const styles = {
     container: {
       minHeight: '100vh',
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'var(--font-dm-sans), sans-serif',
       background: 'linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a)',
       color: '#f8fafc',
       position: 'relative' as const,

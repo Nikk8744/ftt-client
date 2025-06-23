@@ -234,11 +234,13 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
   }, [table]);
 
   const handleStatusChange = (checked: boolean, value: string) => {
-    const filterValue = table.getColumn("status")?.getFilterValue() as string[];
-    const newFilterValue = filterValue ? [...filterValue] : [];
+    const filterValue = table.getColumn("status")?.getFilterValue() as string[] || [];
+    const newFilterValue = [...filterValue];
 
     if (checked) {
+      if (!newFilterValue.includes(value)) {
       newFilterValue.push(value);
+      }
     } else {
       const index = newFilterValue.indexOf(value);
       if (index > -1) {
@@ -305,16 +307,20 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="min-w-36 p-3" align="start">
+            <PopoverContent className="min-w-36 p-3 border border-gray-200" align="start">
               <div className="space-y-3">
-                <div className="text-xs font-medium text-muted-foreground">Filters</div>
+                <div className="text-xs font-medium text-muted-foreground border-b border-gray-200 pb-2">Filters</div>
                 <div className="space-y-3">
-                  {uniqueStatusValues.map((value, i) => (
-                    <div key={value} className="flex items-center gap-2">
+                  {uniqueStatusValues.map((value, i, array) => (
+                    <div key={value} className={`flex items-center gap-2 ${i !== array.length - 1 ? 'pb-2 border-b border-gray-200' : ''}`}>
                       <Checkbox
                         id={`${id}-${i}`}
                         checked={selectedStatuses.includes(value)}
-                        onCheckedChange={(checked: boolean) => handleStatusChange(checked, value)}
+                        onCheckedChange={(checked) => {
+                          if (typeof checked === 'boolean') {
+                            handleStatusChange(checked, value);
+                          }
+                        }}
                       />
                       <Label
                         htmlFor={`${id}-${i}`}
@@ -344,8 +350,8 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                 View
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="border border-gray-200">
+              <DropdownMenuLabel className="border-b border-gray-200">Toggle columns</DropdownMenuLabel>
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -353,10 +359,9 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className="capitalize border-b border-gray-200"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                      onSelect={(event) => event.preventDefault()}
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
@@ -368,7 +373,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-border bg-background">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-background">
         <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -378,7 +383,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className="h-11"
+                      className="h-11 border-gray-200"
                     >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
@@ -432,7 +437,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="last:py-0">
+                    <TableCell key={cell.id} className="last:py-0 border-gray-200">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -465,9 +470,13 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
             <SelectTrigger id={id} className="w-fit whitespace-nowrap">
               <SelectValue placeholder="Select number of results" />
             </SelectTrigger>
-            <SelectContent className="[&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2">
-              {[5, 10, 25, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={pageSize.toString()}>
+            <SelectContent className="[&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2 border border-gray-200">
+              {[5, 10, 25, 50].map((pageSize, index, array) => (
+                <SelectItem 
+                  key={pageSize} 
+                  value={pageSize.toString()}
+                  className={index !== array.length - 1 ? 'border-b border-gray-200' : ''}
+                >
                   {pageSize}
                 </SelectItem>
               ))}

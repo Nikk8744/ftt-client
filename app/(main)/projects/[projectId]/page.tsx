@@ -24,7 +24,7 @@ import { formatDate } from "@/lib/utils";
 import TaskForm from "@/components/feature/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { Task } from "@/types";
-import { Calendar, CircleCheck, Clock, Info, Pencil, Plus, User, UserPlus } from "lucide-react";
+import { AlignLeft, Calendar, CircleCheck, Clock, Info, Pencil, Plus, User, UserPlus } from "lucide-react";
 import EditProjectModal from "@/components/feature/EditProjectModal";
 import AddMemberModal from "@/components/feature/AddMemberModal";
 import Loader from "@/components/ui/Loader";
@@ -251,11 +251,32 @@ export default function ProjectDetailsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 {/* Project Description */}
-                <Card>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Description
-                  </h3>
-                  <p className="text-gray-600">{project.description}</p>
+                <Card className="hover:shadow-md transition-shadow duration-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlignLeft className="w-5 h-5 text-gray-600" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-0">
+                      Description
+                    </h3>
+                  </div>
+                  {project.description ? (
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {project.description}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlignLeft className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">
+                        No description provided
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        Add a description to provide more context for this project
+                      </p>
+                    </div>
+                  )}
                 </Card>
 
                 {/* Tasks Section */}

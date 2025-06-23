@@ -369,7 +369,7 @@ const   TaskForm = ({
         Cancel
       </Button>
       <Button
-        variant="default"
+        variant="brandBtn"
         onClick={handleSubmit(onSubmit)}
         isLoading={isPending}
         disabled={isPending}

@@ -13,9 +13,9 @@ import { Project, Task } from '@/types';
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
 import { getUserAssignedTasks } from '@/services/taskMembers';
 import { useEffect, useState } from 'react';
-import { Clock, Plus, Info, FolderOpenDot, ClipboardCheck } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Clock, Plus, FolderOpenDot, ClipboardCheck } from 'lucide-react';
 import { LogsTable } from '@/components/feature/LogsTable';
+import StatCard from '@/components/feature/reports/StatCard';
 // import Loader from '@/components/ui/Loader';
 
 export default function DashboardPage() {
@@ -221,121 +221,54 @@ export default function DashboardPage() {
         
         <div className="p-6">
           {/* Stats Section */}
-          <TooltipProvider>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <Card className="p-6 border border-gray-200 rounded-xl bg-white relative shadow-[-3px_-5px_7px_1px_#465fff]">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Total Projects
-                    </p>
-                    <div className="mt-2">
-                      <h3 className="text-3xl font-bold text-gray-900">
-                        {projectsDataLoading ? '...' : allProjects.length}
-                      </h3>
-                    </div>
-                    {!projectsDataLoading && (
-                      <div className="mt-1 text-xs text-gray-500">
-                        <span className="text-primary-600">{ownedProjects.length}</span> owned, 
-                        <span className="text-indigo-500 ml-1">{memberProjectsFiltered.length}</span> member
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-indigo-50 p-3 rounded-lg">
-                        <FolderOpenDot className="h-6 w-6 text-indigo-600" />
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute bottom-2 right-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className=" p-1.5 rounded-full hover:bg-indigo-100">
-                        <Info className="h-4 w-4 text-indigo-600" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-gray-800 text-white">
-                      <p>Projects you own or are a member of</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <StatCard
+              title="Total Projects"
+              value={projectsDataLoading ? '...' : allProjects.length}
+              icon={<FolderOpenDot size={24} />}
+              iconBgColor="bg-indigo-50"
+              iconColor="text-indigo-600"
+              tooltip="Projects you own or are a member of"
+              subtitle={
+                !projectsDataLoading && (
+                  <>
+                    <span className="text-primary-600">{ownedProjects.length}</span> owned, 
+                    <span className="text-indigo-500 ml-1">{memberProjectsFiltered.length}</span> member
+                  </>
+                )
+              }
+            />  
 
-              <Card className="p-6 border border-gray-200 rounded-xl shadow-[-3px_-5px_7px_1px_#465fff] bg-white relative">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Active Tasks
-                    </p>
-                    <div className="mt-2">
-                      <h3 className="text-3xl font-bold text-gray-900">
-                        {tasksDataLoading ? '...' : allTasks.filter((task: Task) => task.status !== 'Done').length}
-                      </h3>
-                    </div>
-                    {!tasksDataLoading && (
-                      <div className="mt-1 text-xs text-gray-500">
-                        <span className="text-primary-600">
-                          {createdTasks.filter((task: Task) => task.status !== 'Done').length}
-                        </span> created, 
-                        <span className="text-indigo-500 ml-1">
-                          {assignedTasksFiltered.filter((task: Task) => task.status !== 'Done').length}
-                        </span> assigned
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <ClipboardCheck className="h-6 w-6 text-blue-600" />
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute bottom-2 right-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="p-1.5 rounded-full hover:bg-indigo-100 transition-colors">
-                        <Info className="h-4 w-4 text-indigo-600" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-gray-800 text-white">
-                      <p>Tasks that are not yet completed</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </Card>
+            <StatCard
+              title="Active Tasks"
+              value={tasksDataLoading ? '...' : allTasks.filter((task: Task) => task.status !== 'Done').length}
+              icon={<ClipboardCheck size={24} />}
+              iconBgColor="bg-blue-50"
+              iconColor="text-blue-600"
+              tooltip="Tasks that are not yet completed"
+              subtitle={
+                !tasksDataLoading && (
+                  <>
+                    <span className="text-primary-600">
+                      {createdTasks.filter((task: Task) => task.status !== 'Done').length}
+                    </span> created, 
+                    <span className="text-indigo-500 ml-1">
+                      {assignedTasksFiltered.filter((task: Task) => task.status !== 'Done').length}
+                    </span> assigned
+                  </>
+                )
+              }
+            />
 
-              <Card className="p-6 border border-gray-200 rounded-xl bg-white relative shadow-[-3px_-5px_7px_1px_#465fff]">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Time Today
-                    </p>
-                    <div className="mt-2">
-                      <h3 className="text-3xl font-bold text-gray-900">
-                        {totalTimeTodayLoading ? '...' : formatDuration(totalTimeToday)}
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <Clock className="h-6 w-6 text-green-600" />
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute bottom-2 right-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="p-1.5 rounded-full hover:bg-indigo-100 transition-colors">
-                        <Info className="h-4 w-4 text-indigo-600" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-gray-800 text-white">
-                      <p>Total time tracked today</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </Card>
-            </div>
-          </TooltipProvider>
+            <StatCard
+              title="Time Today"
+              value={totalTimeTodayLoading ? '...' : formatDuration(totalTimeToday)}
+              icon={<Clock size={24} />}
+              iconBgColor="bg-green-50"
+              iconColor="text-green-600"
+              tooltip="Total time tracked today"
+            />
+          </div>
 
           {/* My Tasks Section */}
           <div className="mb-6">
@@ -368,7 +301,7 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No active tasks found</h3>
                   <p className="text-gray-500 mb-4">Create a task to get started with your projects</p>
-                  <Link href="/tasks" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#465fff] hover:bg-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                  <Link href="/tasks" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                     <Plus className="w-4 h-4 mr-2" />
                     Create a Task
                   </Link>
@@ -434,7 +367,7 @@ export default function DashboardPage() {
                   <div className="w-24 h-2 bg-gray-200 rounded animate-pulse"></div>
                 </div>
               </Card>
-                            // <Loader centered size="sm" text="Loading logs..." />
+              // <Loader centered size="sm" text="Loading logs..." />
 
             ) : recentLogs.length === 0 ? (
               <Card className="p-8 text-center">

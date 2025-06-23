@@ -160,7 +160,7 @@ export default function LoginPage() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-primary-600 focus:ring-indigo-500 border-gray-300 rounded"
                     disabled={isSubmitting}
                   />
                   <label
@@ -174,7 +174,7 @@ export default function LoginPage() {
                 <div className="text-sm">
                   <a
                     href="#"
-                    className="font-medium text-primary-600 hover:text-primary-500"
+                    className="font-medium text-brand hover:text-indigo-700"
                   >
                     Forgot your password?
                   </a>
@@ -187,7 +187,7 @@ export default function LoginPage() {
                   variant="default"
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
-                  className="w-full bg-[#465fff] hover:bg-indigo-600"
+                  className="w-full bg-brand hover:bg-indigo-700"
                 >
                   {isSubmitting ? "Signing in..." : "Sign in"}
                 </Button>
@@ -198,7 +198,7 @@ export default function LoginPage() {
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="font-medium text-primary-600 hover:text-primary-500"
+                className="font-medium text-brand hover:text-primary-500"
               >
                 Sign up
               </Link>

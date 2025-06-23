@@ -18,6 +18,7 @@ import { Plus } from "lucide-react";
 import EditProjectModal from "@/components/feature/EditProjectModal";
 import CreateProjectModal from "@/components/feature/CreateProjectModal";
 import Loader from "@/components/ui/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function ProjectsPage() {
   const queryClient = useQueryClient();
@@ -87,28 +88,15 @@ export default function ProjectsPage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
-      <div className="border-b border-gray-400 rounded-b-3xl">
-        {/* <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between  shadow-[0px_2px_4px_0px_rgba(12,12,13,0.05),0px_2px_4px_0px_rgba(12,12,13,0.1)] rounded-b-3xl"> */}
-        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between  shadow-[inset_-1px_-4px_0px_#465fff] rounded-b-3xl">
-          <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-              Projects
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
-              Manage your projects and collaborations
-            </p>
-          </div>
-          <div className="flex flex-shrink-0 space-x-2">
-            <Button
-              variant="default"
-              onClick={() => setIsCreateModalOpen(true)}
-            >
-              <Plus className="h-4 w-4" />
-              Create Project
-            </Button>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Projects"
+        description="Manage your projects and collaborations"
+        actionLabel="Create Project"
+        actionIcon={<Plus className="h-4 w-4" />}
+        onActionClick={() => setIsCreateModalOpen(true)}
+        // variant="brand"
+      />
+      
       <div className="flex-1 bg-gray-50 p-4 ">
         {/* <div className="border-b border-gray-200">
           <nav className="flex -mb-px">
@@ -138,7 +126,7 @@ export default function ProjectsPage() {
           <button
             className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
               activeTab === "owned"
-                ? "bg-white shadow text-blue-700"
+                ? "bg-white shadow text-brand-700"
                 : "text-gray-700 hover:bg-white/[0.5]"
             }`}
             onClick={() => setActiveTab("owned")}
@@ -148,7 +136,7 @@ export default function ProjectsPage() {
           <button
             className={`w-full rounded-md py-2.5 text-sm font-medium leading-5 ${
               activeTab === "member"
-                ? "bg-white shadow text-blue-700"
+                ? "bg-white shadow text-brand-700"
                 : "text-gray-700 hover:bg-white/[0.5]"
             }`}
             onClick={() => setActiveTab("member")}

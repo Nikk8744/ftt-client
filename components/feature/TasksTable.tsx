@@ -314,16 +314,16 @@ export function TasksTable({
                 <span className="hidden md:inline">View</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="border border-gray-200">
+              <DropdownMenuLabel className="border-b border-gray-200">Toggle columns</DropdownMenuLabel>
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
-                .map((column) => {
+                .map((column, index, array) => {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className={`capitalize ${index !== array.length - 1 ? 'border-b border-gray-200' : ''}`}
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                       onSelect={(event) => event.preventDefault()}
@@ -338,7 +338,7 @@ export function TasksTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-border bg-background">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-background">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -348,7 +348,7 @@ export function TasksTable({
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className="h-10 px-2 sm:px-4 py-2 text-xs sm:text-sm"
+                      className="h-10 px-2 sm:px-4 py-2 text-xs sm:text-sm border-gray-200"
                     >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <button
@@ -395,7 +395,7 @@ export function TasksTable({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm">
+                    <TableCell key={cell.id} className="px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm border-gray-200">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -430,9 +430,13 @@ export function TasksTable({
               <SelectTrigger className="h-7 sm:h-8 w-[60px] sm:w-[70px] text-xs sm:text-sm">
                 <SelectValue placeholder={table.getState().pagination.pageSize} />
               </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`} className="text-xs sm:text-sm">
+              <SelectContent side="top" className="border border-gray-200">
+                {[10, 20, 30, 40, 50].map((pageSize, index, array) => (
+                  <SelectItem 
+                    key={pageSize} 
+                    value={`${pageSize}`} 
+                    className={`text-xs sm:text-sm ${index !== array.length - 1 ? 'border-b border-gray-200' : ''}`}
+                  >
                     {pageSize}
                   </SelectItem>
                 ))}

@@ -370,26 +370,30 @@ export default function ReportsPage() {
                 <StatCard 
                   title="Total Projects" 
                   value={projectSummary.totalProjects || userProjects.length} 
-                  icon={<ClipboardList className="h-6 w-6 text-blue-500" />} 
-                  color="bg-blue-100" 
+                  icon={<ClipboardList />} 
+                  iconBgColor="bg-blue-100"
+                  iconColor="text-blue-500"
                 />
                 <StatCard 
                   title="Project Completion Rate" 
                   value={`${projectSummary.completionRate || 0}%`} 
-                  icon={<BarChart2 className="h-6 w-6 text-green-500" />} 
-                  color="bg-green-100" 
+                  icon={<BarChart2 />} 
+                  iconBgColor="bg-green-100"
+                  iconColor="text-green-500"
                 />
                 <StatCard 
                   title="Total Tasks" 
                   value={taskSummary.totalTasks || 0} 
-                  icon={<ListChecks className="h-6 w-6 text-indigo-500" />} 
-                  color="bg-indigo-100" 
+                  icon={<ListChecks />} 
+                  iconBgColor="bg-indigo-100"
+                  iconColor="text-indigo-500"
                 />
                 <StatCard 
                   title="Task Completion Rate" 
                   value={`${taskSummary.completionRate || 0}%`} 
-                  icon={<CheckCircle2 className="h-6 w-6 text-green-500" />} 
-                  color="bg-green-100" 
+                  icon={<CheckCircle2 />} 
+                  iconBgColor="bg-green-100"
+                  iconColor="text-green-500"
                 />
               </div>
 
@@ -489,20 +493,23 @@ export default function ReportsPage() {
                 <StatCard 
                   title="Total Projects" 
                   value={projectSummary.totalProjects || userProjects.length} 
-                  icon={<ClipboardList className="h-6 w-6 text-blue-500" />} 
-                  color="bg-blue-100" 
+                  icon={<ClipboardList />} 
+                  iconBgColor="bg-blue-100"
+                  iconColor="text-blue-500"
                 />
                 <StatCard 
                   title="Completed Projects" 
                   value={projectSummary.completedProjects || 0} 
-                  icon={<CheckCircle2 className="h-6 w-6 text-green-500" />} 
-                  color="bg-green-100" 
+                  icon={<CheckCircle2 />} 
+                  iconBgColor="bg-green-100"
+                  iconColor="text-green-500"
                 />
                 <StatCard 
                   title="In Progress Projects" 
                   value={projectSummary.inProgressProjects || 0} 
-                  icon={<Clock className="h-6 w-6 text-yellow-500" />} 
-                  color="bg-yellow-100" 
+                  icon={<Clock />} 
+                  iconBgColor="bg-yellow-100"
+                  iconColor="text-yellow-500"
                 />
               </div>
 
@@ -535,26 +542,30 @@ export default function ReportsPage() {
                 <StatCard 
                   title="Total Tasks" 
                   value={taskSummary.totalTasks || 0} 
-                  icon={<ListChecks className="h-6 w-6 text-blue-500" />} 
-                  color="bg-blue-100" 
+                  icon={<ListChecks />} 
+                  iconBgColor="bg-blue-100"
+                  iconColor="text-blue-500"
                 />
                 <StatCard 
                   title="Completed Tasks" 
                   value={taskSummary.completedTasks || 0} 
-                  icon={<CheckCircle2 className="h-6 w-6 text-green-500" />} 
-                  color="bg-green-100" 
+                  icon={<CheckCircle2 />} 
+                  iconBgColor="bg-green-100"
+                  iconColor="text-green-500"
                 />
                 <StatCard 
                   title="In Progress Tasks" 
                   value={taskSummary.inProgressTasks || 0} 
-                  icon={<Clock className="h-6 w-6 text-yellow-500" />} 
-                  color="bg-yellow-100" 
+                  icon={<Clock />} 
+                  iconBgColor="bg-yellow-100"
+                  iconColor="text-yellow-500"
                 />
                 <StatCard 
                   title="Overdue Tasks" 
                   value={taskSummary.overdueTasks || 0} 
-                  icon={<AlertTriangle className="h-6 w-6 text-red-500" />} 
-                  color="bg-red-100" 
+                  icon={<AlertTriangle />} 
+                  iconBgColor="bg-red-100"
+                  iconColor="text-red-500"
                 />
               </div>
 

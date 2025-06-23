@@ -550,13 +550,13 @@ export default function HeroSection() {
           {/* Left: Text/CTA/Avatars */}
           <div className="w-full lg:col-span-6 flex flex-col justify-center items-center lg:items-start text-center lg:text-left mt-10 lg:mt-0">
             <div className="w-full max-w-lg">
-              <h1 className="text-3xl xs:text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4 font-serif">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl tracking-tight text-white mb-4 font-serif">
                 Track Your Time.
                 <div className="text-lime-500 text-3xl xs:text-4xl sm:text-5xl mt-1 font-serif">
                   Boost Your <span className="block">Productivity.</span>
                 </div>
               </h1>
-              <p className="mt-4 text-base xs:text-lg text-white/90">
+              <p className="mt-4 text-base xs:text-lg text-white   font-serif tracking-wide">
                 The ultimate time tracking solution for freelancers and small teams. Track time, manage projects, and boost your productivity with our intuitive platform.
               </p>
               <div className="mt-8 flex flex-row flex-wrap gap-4 justify-center lg:justify-start">

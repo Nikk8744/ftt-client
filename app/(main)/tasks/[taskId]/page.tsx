@@ -392,7 +392,7 @@ export default function TaskDetailsPage() {
                 <Card className="hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center gap-2 mb-4">
                     <AlignLeft className="w-5 h-5 text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-0">
                       Description
                     </h3>
                   </div>
@@ -426,13 +426,13 @@ export default function TaskDetailsPage() {
                 <Card className="hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-blue-600" />
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <Clock className="w-5 h-5 text-brand-700" />
+                      <h3 className="text-lg font-semibold text-gray-900 mb-0">
                         Time Logs
                       </h3>
                     </div>
                     <Button
-                      variant="default"
+                      variant="brandBtn"
                       onClick={handleStartTimer}
                       size="sm"
                       className="flex items-center gap-1.5"
@@ -549,7 +549,7 @@ export default function TaskDetailsPage() {
                 <Card className="hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center gap-2 mb-4">
                     <Info className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
                       Task Info
                     </h3>
                   </div>
@@ -661,7 +661,7 @@ export default function TaskDetailsPage() {
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <div className="flex items-center gap-2">
                       <Users className="w-5 h-5 text-green-600" />
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
                         Assignees
                       </h3>
                       {assignees.length > 0 && (
@@ -739,7 +739,7 @@ export default function TaskDetailsPage() {
                 <Card className="hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center gap-2 mb-4">
                     <Eye className="w-5 h-5 text-yellow-600" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
                       Followers
                     </h3>
                     {followers.length > 0 && (

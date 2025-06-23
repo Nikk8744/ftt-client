@@ -74,7 +74,7 @@ export default function CreateProjectModal({
             Cancel
           </Button>
           <Button
-            variant="default"
+            variant="brandBtn"
             onClick={handleSubmit(onSubmit)}
             isLoading={isLoading}
             disabled={isLoading}

@@ -48,7 +48,7 @@ export default function Navbar() {
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg> */}
-              <span className="text-lg font-semibold text-white font-serif border-2 border-atlantis-500 px-7 py-3 rounded-xl">Tracksy</span>
+              <span className="text-lg font-semibold text-white font-serif border-2 border-atlantis-500 px-7 py-3 rounded-xl tracking-widest">Tracksy</span>
             </Link>
           </div>
 
@@ -74,7 +74,7 @@ export default function Navbar() {
           <div className="flex-none w-40 hidden md:flex justify-end">
             <Link 
               href="/login" 
-              className="px-5 py-3 rounded-xl border-2 border-atlantis-500 text-white text-base font-medium hover:bg-atlantis-500 transition-colors"
+              className="px-5 py-3 rounded-xl border-2 border-atlantis-500 text-white text-base tracking-wider font-serif hover:bg-atlantis-500 transition-colors"
             >
               Log in
             </Link>

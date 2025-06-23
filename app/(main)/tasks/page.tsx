@@ -11,6 +11,7 @@ import { TasksTable } from "@/components/feature/TasksTable";
 import { Task } from "@/types";
 import { getCurrentUser } from "@/services/user";
 import Loader from "@/components/ui/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 
 export default function TasksPage() {
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
@@ -116,18 +117,12 @@ export default function TasksPage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
-      <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between shadow-[inset_-1px_-4px_0px_#465fff] rounded-b-3xl">
-          <div className="mb-4 md:mb-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-              Tasks
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
-              Manage your tasks across all projects
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Tasks"
+        description="Manage your tasks across all projects"
+        // variant="brand"  
+      />
+      
       <div className="flex-1 bg-gray-50">
         <div className="p-3 sm:p-6">
           {/* Tab Navigation */}
@@ -135,7 +130,7 @@ export default function TasksPage() {
             <button
               className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
                 activeTab === "all"
-                  ? "bg-white shadow text-blue-700"
+                  ? "bg-white shadow text-brand-700"
                   : "text-gray-700 hover:bg-white/[0.5]"
               }`}
               onClick={() => setActiveTab("all")}
@@ -145,7 +140,7 @@ export default function TasksPage() {
             <button
               className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
                 activeTab === "assigned"
-                  ? "bg-white shadow text-blue-700"
+                  ? "bg-white shadow text-brand-700"
                   : "text-gray-700 hover:bg-white/[0.5]"
               }`}
               onClick={() => setActiveTab("assigned")}

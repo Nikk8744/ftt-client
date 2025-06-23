@@ -15,3 +15,9 @@
 - when creating a task right now i am able to put the due date less than the current date, so need to sovlve this.
 - chekc the above for projects too.
 
+
+## Feedback changes
+- use same font throughout the website
+- use same color(as used in the login button) throughout the website.
+- 
+

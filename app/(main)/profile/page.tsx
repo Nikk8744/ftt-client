@@ -14,6 +14,8 @@ import { UserUpdateData } from '@/types';
 import Avatar from '@/components/ui/Avatar';
 import { getAllProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
+import PageHeader from '@/components/layout/PageHeader';
+import { Pencil } from 'lucide-react';
 
 // Form validation schema
 const profileSchema = z.object({
@@ -101,25 +103,15 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
-      <div className="border-b border-gray-400 rounded-b-3xl">
-        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
-          <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-              Your Profile
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
-              View and update your profile information
-            </p>
-          </div>
-          {!isEditing && (
-            <div className="flex flex-shrink-0 space-x-2">
-              <Button variant="default" onClick={handleEdit}>
-                Edit Profile
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+      <PageHeader
+        title="Your Profile"
+        description="View and update your profile information"
+        actionLabel={!isEditing ? "Edit Profile" : undefined}
+        onActionClick={!isEditing ? handleEdit : undefined}
+        actionIcon={<Pencil className="h-4 w-4" />}
+        variant="default"
+      />
+      
       <div className="flex-1 bg-gray-50">
         <div className="p-6">
           <div className="max-w-4xl mx-auto">
@@ -242,7 +234,7 @@ export default function ProfilePage() {
                           Cancel
                         </Button>
                         <Button
-                          variant="default"
+                          variant="brandBtn"
                           type="submit"
                           isLoading={updateUserMutation.isPending}
                           disabled={updateUserMutation.isPending}

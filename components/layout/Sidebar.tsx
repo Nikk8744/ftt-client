@@ -13,7 +13,6 @@ import {
   BarChart2,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
-
 interface NavItem {
   name: string;
   href: string;
@@ -146,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="px-6 py-8">
             <div className=" mb-1">
               <div className="flex items-center justify-normal gap-3 mb-3">
-                <div className="p-2 bg-[#465fff] rounded-lg shadow-lg">
+                <div className="p-2 bg-brand rounded-lg shadow-lg">
                   <Clock className="w-6 h-6 text-white" />
                 </div>
                 <Link href="/dashboard" className="text-2xl font-bold text-gray-800">
@@ -175,7 +174,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50
                     ${
                       isActive
-                        ? "bg-[#ecf3ff] text-[#465fff] font-semibold shadow-sm"
+                        ? "bg-[#ecf3ff] text-brand font-semibold shadow-sm"
                         : "text-gray-700 font-semibold hover:text-indigo-700"
                     }
                   `}
@@ -184,7 +183,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className={`
                     mr-3 transition-transform duration-200 ease-in-out
                     group-hover:scale-110
-                    ${isActive ? "text-[#465fff] scale-110" : "text-gray-600"}
+                    ${isActive ? "text-brand scale-110" : "text-gray-600"}
                   `}
                   >
                     {item.icon}

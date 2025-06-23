@@ -24,6 +24,7 @@ import Button from "@/components/ui/Button";
 import { Clock, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDate, formatDuration } from "@/lib/utils";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface LogsTableProps {
   data: TimeLog[];
@@ -190,13 +191,17 @@ export function LogsTable({
   });
 
   return (
-    <div className="rounded-md border overflow-hidden">
-      <Table>
+    <div className="rounded-md border border-gray-200 overflow-hidden">
+      <Table className="border-collapse">
         <TableHeader className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="border-b border-gray-200">
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} style={{ width: `${header.getSize()}px` }}>
+                <TableHead 
+                  key={header.id} 
+                  style={{ width: `${header.getSize()}px` }}
+                  className="border-r border-gray-200 last:border-r-0 text-gray-700"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -214,10 +219,13 @@ export function LogsTable({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="hover:bg-gray-50/50"
+                className="hover:bg-gray-50/50 border-b border-gray-200 last:border-b-0"
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell 
+                    key={cell.id}
+                    className="border-r border-gray-200 last:border-r-0"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -237,7 +245,7 @@ export function LogsTable({
       </Table>
       
       {showPagination && data.length > 0 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t">
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
           <div className="text-sm text-gray-600">
             Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to {Math.min(
               (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
@@ -250,7 +258,9 @@ export function LogsTable({
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="h-8 w-8 p-0 border-gray-300"
+              className={cn("h-8 w-8 p-0", 
+                !table.getCanPreviousPage() ? "border-gray-100" : "border-gray-200"
+              )}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -262,7 +272,9 @@ export function LogsTable({
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="h-8 w-8 p-0 border-gray-300"
+              className={cn("h-8 w-8 p-0", 
+                !table.getCanNextPage() ? "border-gray-100" : "border-gray-200"
+              )}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

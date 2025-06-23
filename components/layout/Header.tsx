@@ -167,7 +167,7 @@ const activeProjects = projects.filter((project: any)  =>
             {/* Timer Control Button */}
             {isRunning ? (
               <Button
-                variant="default"
+                variant="brandBtn"
                 size="sm"
                 onClick={() => setIsStopTimerModalOpen(true)}
                 isLoading={timerIsLoading}
@@ -178,7 +178,7 @@ const activeProjects = projects.filter((project: any)  =>
               </Button>
             ) : (
               <Button
-                variant="default"
+                variant="brandBtn"
                 size="sm"
                 onClick={startTimer}
                 isLoading={timerIsLoading}
