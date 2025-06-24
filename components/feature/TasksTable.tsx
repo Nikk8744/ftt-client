@@ -52,6 +52,7 @@ import {
   CircleX,
   SquarePen,
   Trash2,
+  CalendarCheck2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -63,6 +64,7 @@ interface TasksTableProps {
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
   onStatusChange: (task: Task, status: string) => void;
+  onPriorityChange?: (task: Task, priority: string) => void;
 }
 
 export function TasksTable({
@@ -71,6 +73,7 @@ export function TasksTable({
   onEdit,
   onDelete,
   onStatusChange,
+  onPriorityChange,
 }: TasksTableProps) {
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -78,6 +81,7 @@ export function TasksTable({
     description: false,
     createdAt: false,
     dueDate: false,
+    completedAt: false,
   });
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -106,6 +110,34 @@ export function TasksTable({
       textColor: "text-green-700",
     },
   ];
+
+  const priorities = [
+    {
+      value: "Low",
+      label: "Low",
+      color: "bg-blue-400",
+      textColor: "text-blue-700",
+    },
+    {
+      value: "Medium",
+      label: "Medium",
+      color: "bg-yellow-400",
+      textColor: "text-yellow-700",
+    },
+    {
+      value: "High",
+      label: "High",
+      color: "bg-orange-500",
+      textColor: "text-orange-700",
+    },
+    {
+      value: "Urgent",
+      label: "Urgent",
+      color: "bg-red-500",
+      textColor: "text-red-700",
+    },
+  ];
+
   const columns: ColumnDef<Task>[] = [
     {
       header: "Task",
@@ -131,6 +163,66 @@ export function TasksTable({
       size: 150,
     },
     {
+      header: "Priority",
+      accessorKey: "priority",
+      cell: ({ row }) => {
+        const priority = row.getValue("priority") as string || "Medium";
+        const priorityConfig = priorities.find(p => p.value === priority) || priorities[1]; // Default to Medium
+        
+        return (
+          <Select
+            value={priority}
+            onValueChange={(newPriority) => onPriorityChange && onPriorityChange(row.original, newPriority)}
+          >
+            <SelectTrigger className={cn(
+              "w-[90px] sm:w-[110px] h-8 px-2 sm:px-3 py-1 rounded-full border-0",
+              priority === "Urgent" ? "bg-red-50 hover:bg-red-100/70" :
+              priority === "High" ? "bg-orange-50 hover:bg-orange-100/70" :
+              priority === "Medium" ? "bg-yellow-50 hover:bg-yellow-100/70" :
+              "bg-blue-50 hover:bg-blue-100/70",
+              "focus:ring-1",
+              priority === "Urgent" ? "focus:ring-red-200" :
+              priority === "High" ? "focus:ring-orange-200" :
+              priority === "Medium" ? "focus:ring-yellow-200" :
+              "focus:ring-blue-200"
+            )}>
+              <SelectValue>
+                <div className="flex items-center gap-1.5">
+                  <div className={cn(
+                    "h-2 w-2 rounded-full",
+                    priorityConfig.color
+                  )} />
+                  <span className={cn(
+                    "text-xs sm:text-sm font-medium",
+                    priorityConfig.textColor
+                  )}>
+                    {priority}
+                  </span>
+                </div>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {priorities.map((priority) => (
+                <SelectItem key={priority.value} value={priority.value} className="py-2 border-b border-gray-200">
+                  <div className="flex items-center gap-1.5">
+                    <div className={cn(
+                      "h-2 w-2 rounded-full",
+                      priority.color
+                    )} />
+                    <span className={cn(
+                      "text-sm font-medium",
+                      priority.textColor
+                    )}>{priority.label}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      },
+      size: 110,
+    },
+    {
       header: "Description",
       accessorKey: "description",
       cell: ({ row }) => (
@@ -145,17 +237,7 @@ export function TasksTable({
       accessorKey: "status",
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-        // const getVariant = (status: string) => {
-        //   switch (status) {
-        //     case "Done":
-        //       return "success";
-        //     case "In-Progress":
-        //       return "warning";
-        //     default:
-        //       return "secondary";
-        //   }
-        // };
-
+        
         return (
           <Select
             value={status}
@@ -209,6 +291,25 @@ export function TasksTable({
       size: 120,
     },
     {
+      header: "Completed At",
+      accessorKey: "completedAt",
+      cell: ({ row }) => {
+        const completedAt = row.original.completedAt;
+        const status = row.getValue("status") as string;
+        
+        if (status === "Done" && completedAt) {
+          return (
+            <div className="flex items-center gap-1 text-green-600">
+              <CalendarCheck2 className="h-3 w-3" />
+              <span>{formatDate(completedAt)}</span>
+            </div>
+          );
+        }
+        return "-";
+      },
+      size: 120,
+    },
+    {
       header: "Created At",
       accessorKey: "createdAt",
       cell: ({ row }) => formatDate(row.getValue("createdAt")),
@@ -258,6 +359,14 @@ export function TasksTable({
       columnFilters,
       columnVisibility,
     },
+    filterFns: {
+      // Custom filter function for priority field
+      priorityFilter: (row, id, filterValue) => {
+        const priority = row.getValue(id) as string;
+        if (!filterValue || filterValue === "all") return true;
+        return priority === filterValue;
+      },
+    },
   });
 
   // Set default column visibility based on screen size
@@ -267,6 +376,7 @@ export function TasksTable({
         description: window.innerWidth >= 1024,
         createdAt: window.innerWidth >= 768,
         dueDate: window.innerWidth >= 640,
+        completedAt: window.innerWidth >= 640,
       });
     };
     
@@ -279,6 +389,22 @@ export function TasksTable({
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Check if any filters are active
+  const hasActiveFilters = () => {
+    const subjectFilter = table.getColumn("subject")?.getFilterValue();
+    const priorityFilter = table.getColumn("priority")?.getFilterValue();
+    const statusFilter = table.getColumn("status")?.getFilterValue();
+
+    return Boolean(subjectFilter) || Boolean(priorityFilter) || Boolean(statusFilter);
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    table.getColumn("subject")?.setFilterValue("");
+    table.getColumn("priority")?.setFilterValue("");
+    table.getColumn("status")?.setFilterValue("");
+  };
 
   return (
     <div className="space-y-4">
@@ -317,6 +443,68 @@ export function TasksTable({
             )}
           </div>
 
+          {/* Filter by priority */}
+          <div className="flex items-center">
+            <Select
+              value={(table.getColumn("priority")?.getFilterValue() as string) ?? "all"}
+              onValueChange={(value) => {
+                table.getColumn("priority")?.setFilterValue(value === "all" ? "" : value);
+              }}
+            >
+              <SelectTrigger className="h-9 w-[170px] text-xs sm:text-sm">
+                <SelectValue placeholder="All Priorities" />
+              </SelectTrigger>
+              <SelectContent align="start" className="border border-gray-200">
+                <SelectItem value="all" className="text-xs sm:text-sm border-b border-gray-200">All Priorities</SelectItem>
+                {priorities.map((priority) => (
+                  <SelectItem 
+                    key={priority.value} 
+                    value={priority.value}
+                    className="text-xs sm:text-sm border-b border-gray-200"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <div className={cn("h-2 w-2 rounded-full", priority.color)} />
+                      <span className={cn("text-sm font-medium", priority.textColor)}>
+                        {priority.label}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Filter by status */}
+          <div className="flex items-center">
+            <Select
+              value={(table.getColumn("status")?.getFilterValue() as string) ?? "all"}
+              onValueChange={(value) => {
+                table.getColumn("status")?.setFilterValue(value === "all" ? "" : value);
+              }}
+            >
+              <SelectTrigger className="h-9 w-[170px] text-xs sm:text-sm">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent align="start" className="border border-gray-200">
+                <SelectItem value="all" className="text-xs sm:text-sm border-b border-gray-200">All Statuses</SelectItem>
+                {statuses.map((status) => (
+                  <SelectItem 
+                    key={status.value} 
+                    value={status.value}
+                    className="text-xs sm:text-sm border-b border-gray-200"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <div className={cn("h-2 w-2 rounded-full", status.color)} />
+                      <span className={cn("text-sm font-medium", status.textColor)}>
+                        {status.label}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -351,6 +539,23 @@ export function TasksTable({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        {/* Clear Filters Button - Only show if any filter is active */}
+        {hasActiveFilters() && (
+          <Button
+            variant="ghost"
+            onClick={clearAllFilters}
+            className="text-xs sm:text-sm px-2 sm:px-3 text-red-500 hover:text-red-600"
+          >
+            <CircleX
+              className="opacity-60 mr-1 text-red-500"
+              size={16}
+              strokeWidth={2}
+              aria-hidden="true"
+            />
+            Clear Filters
+          </Button>
+        )}
       </div>
 
       {/* Table */}

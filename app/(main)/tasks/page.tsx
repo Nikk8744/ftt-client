@@ -53,11 +53,6 @@ export default function TasksPage() {
 
   const ownedTasks = tasksData?.tasks || [];
   const assignedTasks = assignedTasksData?.tasks.data || [];
-  // const assignedTasksFiltered = Array.isArray(assignedTasks) 
-  //   ? assignedTasks.filter(
-  //       (assignedTask: Task) => !ownedTasks.some((createdTask: Task) => createdTask.id === assignedTask.id)
-  //     )
-  //   : [];
 
   // Combine owned and assigned tasks for the "All Tasks" view, removing duplicates
   const allTasks = [...ownedTasks];
@@ -70,15 +65,17 @@ export default function TasksPage() {
   });
 
   // Determine which tasks to display based on active tab
-  const displayTasks = activeTab === "all" ? allTasks : assignedTasks;
-  const isLoading = userLoading || tasksLoading || assignedTasksLoading || projectsLoading;
+  const filteredTasks = activeTab === "all" ? allTasks : assignedTasks;
+  const isLoading =
+    userLoading || tasksLoading || assignedTasksLoading || projectsLoading;
 
   // Update task status mutation
   const updateTaskMutation = useMutation({
     mutationFn: (data: {
       id: number;
-      status: "Pending" | "In-Progress" | "Done";
-    }) => updateTask(data.id, { status: data.status }),
+      status?: "Pending" | "In-Progress" | "Done";
+      priority?: "Low" | "Medium" | "High" | "Urgent";
+    }) => updateTask(data.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["assignedTasks"] });
@@ -103,6 +100,14 @@ export default function TasksPage() {
     });
   };
 
+  // Handle priority change
+  const handlePriorityChange = (task: Task, newPriority: string) => {
+    updateTaskMutation.mutate({
+      id: task.id,
+      priority: newPriority as "Low" | "Medium" | "High" | "Urgent",
+    });
+  };
+
   // Open edit task modal
   const openEditTaskModal = (task: Task) => {
     setSelectedTask(task);
@@ -120,44 +125,45 @@ export default function TasksPage() {
       <PageHeader
         title="Tasks"
         description="Manage your tasks across all projects"
-        // variant="brand"  
+        // variant="brand"
       />
-      
+
       <div className="flex-1 bg-gray-50">
         <div className="p-3 sm:p-6">
-          {/* Tab Navigation */}
-          <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-4 sm:mb-6 max-w-md">
-            <button
-              className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-                activeTab === "all"
-                  ? "bg-white shadow text-brand-700"
-                  : "text-gray-700 hover:bg-white/[0.5]"
-              }`}
-              onClick={() => setActiveTab("all")}
-            >
-              All Tasks
-            </button>
-            <button
-              className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-                activeTab === "assigned"
-                  ? "bg-white shadow text-brand-700"
-                  : "text-gray-700 hover:bg-white/[0.5]"
-              }`}
-              onClick={() => setActiveTab("assigned")}
-            >
-              Assigned
-            </button>
-          </div>
+            {/* Tab Navigation */}
+            <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mb-4 sm:mb-6 max-w-md">
+              <button
+                className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
+                  activeTab === "all"
+                    ? "bg-white shadow text-brand-700"
+                    : "text-gray-700 hover:bg-white/[0.5]"
+                }`}
+                onClick={() => setActiveTab("all")}
+              >
+                All Tasks
+              </button>
+              <button
+                className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
+                  activeTab === "assigned"
+                    ? "bg-white shadow text-brand-700"
+                    : "text-gray-700 hover:bg-white/[0.5]"
+                }`}
+                onClick={() => setActiveTab("assigned")}
+              >
+                Assigned
+              </button>
+            </div>
 
           {isLoading ? (
             <Loader centered text="Loading tasks..." />
           ) : (
             <TasksTable
-              data={displayTasks}
+              data={filteredTasks}
               projects={projectsData?.projects || []}
               onEdit={openEditTaskModal}
               onDelete={openDeleteTaskModal}
               onStatusChange={handleStatusChange}
+              onPriorityChange={handlePriorityChange}
             />
           )}
         </div>

@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronDown, CalendarCheck2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -42,11 +42,14 @@ export default function EditProjectModal({
   isLoading = false,
   error = null,
 }: EditProjectModalProps) {
+  const [currentStatus, setCurrentStatus] = useState<string | undefined>(undefined);
+  
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -57,6 +60,14 @@ export default function EditProjectModal({
       status: undefined,
     },
   });
+
+  // Watch status for conditional rendering
+  const watchedStatus = watch("status");
+  
+  // Update current status when it changes in the form
+  useEffect(() => {
+    setCurrentStatus(watchedStatus);
+  }, [watchedStatus]);
 
   // Load project data into form when available
   useEffect(() => {
@@ -72,8 +83,22 @@ export default function EditProjectModal({
           : "",
         status: project.status || undefined,
       });
+      setCurrentStatus(project.status || undefined);
     }
   }, [project, reset]);
+
+  // Format date for display
+  const formatDateString = (dateString: string | null) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <Modal
@@ -219,6 +244,23 @@ export default function EditProjectModal({
             )}
           </div>
         </div>
+
+        {/* Completion Date - Show only when project is completed */}
+        {project?.completedAt && (currentStatus === "Completed" || project?.status === "Completed") && (
+          <div className="rounded-md bg-green-50 p-3 text-sm">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <CalendarCheck2 className="h-5 w-5 text-green-400" />
+              </div>
+              <div className="ml-3">
+                <h3 className="font-medium text-green-800">Project Completed</h3>
+                <div className="mt-1 text-green-700">
+                  This project was completed on {formatDateString(project.completedAt)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">

@@ -36,6 +36,7 @@ export interface Project {
   startDate: string;
   endDate: string;
   status: 'Pending' | 'In-Progress' | 'Completed' | null;
+  completedAt: string | null;
   userId: number; // Owner ID
   totalHours: number | string | null;
   createdAt: string;
@@ -67,8 +68,10 @@ export interface Task {
   subject: string;
   description: string | null;
   status: 'Pending' | 'In-Progress' | 'Done' |  null;
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent' | null;
   startDate: string;
   dueDate: string | null;
+  completedAt: string | null;
   totalTimeSpent: number | null;
   assignedUserId: number;
   projectId: number;
@@ -80,6 +83,7 @@ export interface TaskCreateData {
   subject: string;
   description?: string;
   status?: 'Pending' | 'In-Progress' | 'Done';
+  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
   dueDate?: string;
   assignedUserId?: number;
   checklistItems?: string[];
@@ -89,6 +93,7 @@ export interface TaskUpdateData {
   subject?: string;
   description?: string;
   status?: 'Pending' | 'In-Progress' | 'Done';
+  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
   dueDate?: string;
   assignedUserId?: number;
 }

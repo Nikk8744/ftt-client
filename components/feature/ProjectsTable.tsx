@@ -64,6 +64,7 @@ import {
   Columns3,
   Filter,
   ListFilter,
+  CalendarCheck2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -164,6 +165,25 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
       ),
       size: 100,
       filterFn: statusFilterFn,
+    },
+    {
+      header: "Completed At",
+      accessorKey: "completedAt",
+      cell: ({ row }) => {
+        const completedAt = row.original.completedAt;
+        const status = row.getValue("status") as string;
+        
+        if (status === "Completed" && completedAt) {
+          return (
+            <div className="flex items-center gap-1 text-green-600">
+              <CalendarCheck2 className="h-3 w-3" />
+              <span>{formatDate(completedAt)}</span>
+            </div>
+          );
+        }
+        return "-";
+      },
+      size: 120,
     },
     {
       header: "Created At",

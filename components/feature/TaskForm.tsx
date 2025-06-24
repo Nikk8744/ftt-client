@@ -33,6 +33,7 @@ const taskSchema = z.object({
     .max(50, "Task subject must be less than 50 characters"),
   description: z.string().optional(),
   status: z.enum(["Pending", "In-Progress", "Done"]),
+  priority: z.enum(["Low", "Medium", "High", "Urgent"]),
   dueDate: z
     .string()
     .refine((val) => !val || !isNaN(Date.parse(val)), {
@@ -140,15 +141,20 @@ const   TaskForm = ({
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       subject: task?.subject || "",
       description: task?.description || "",
       status: task?.status || "Pending",
+      priority: task?.priority || "Medium",
       dueDate: task?.dueDate ? task.dueDate.split('T')[0] : "", // Only use date part without time for display
     },
   });
+
+  // Watch status for conditionally displaying completedAt
+  const currentStatus = watch("status");
 
   // Fetch existing checklist items if editing a task
   const { data: checklistData, isLoading: checklistLoading } = useQuery<{ data: ChecklistItem[] }, Error>({
@@ -185,6 +191,7 @@ const   TaskForm = ({
         subject: data.subject.trim(),
         description: data.description?.trim() || undefined,
         status: data.status || "Pending",
+        priority: data.priority || "Medium",
         dueDate: data.dueDate, // No need to modify here as it's already set to end of day in the schema
         // Include checklist items if there are any
         checklistItems: temporaryItems.length > 0 ? temporaryItems.map(item => item.text) : undefined
@@ -478,24 +485,43 @@ const   TaskForm = ({
           </div>
         </div>
 
-        {/* Status and Due Date */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Status, Priority and Due Date */}
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-1.5">
             <Label htmlFor="status" className="text-sm font-medium text-gray-900">
               Status
             </Label>
             <select
-                id="status"
-                className={cn(
-                  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-                  "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                )}
-                {...register("status")}
-              >
-                <option value="Pending">Not Started</option>
-                <option value="In-Progress">In Progress</option>
-                <option value="Done">Completed</option>
-              </select>
+              id="status"
+              className={cn(
+                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
+                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              )}
+              {...register("status")}
+            >
+              <option value="Pending">Not Started</option>
+              <option value="In-Progress">In Progress</option>
+              <option value="Done">Completed</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="priority" className="text-sm font-medium text-gray-900">
+              Priority
+            </Label>
+            <select
+              id="priority"
+              className={cn(
+                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
+                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              )}
+              {...register("priority")}
+            >
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Urgent">Urgent</option>
+            </select>
           </div>
 
           <div className="space-y-1.5">
@@ -509,6 +535,25 @@ const   TaskForm = ({
             />
           </div>
         </div>
+
+        {/* Completion Date - Show only when status is Done and in edit mode */}
+        {isEditMode && currentStatus === "Done" && task?.completedAt && (
+          <div className="rounded-md bg-green-50 p-3 text-sm">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="font-medium text-green-800">Task Completed</h3>
+                <div className="mt-1 text-green-700">
+                  This task was completed on {new Date(task.completedAt).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Assignees Section */}
         <div className="space-y-1.5">
