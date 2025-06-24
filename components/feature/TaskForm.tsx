@@ -23,6 +23,7 @@ import { getAllMembersOfProject } from "@/services/projectMember";
 import { X } from "lucide-react";
 import Input from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Form validation schema
 const taskSchema = z.object({
@@ -35,9 +36,16 @@ const taskSchema = z.object({
   dueDate: z
     .string()
     .refine((val) => !val || !isNaN(Date.parse(val)), {
-      message: "Invalid datetime",
+      message: "Invalid date",
     })
-    .transform((val) => (val ? new Date(val).toISOString() : undefined))
+    .transform((val) => {
+      if (!val) return undefined;
+      
+      // Set the time to 23:59:59 for the selected date
+      const date = new Date(val);
+      date.setHours(23, 59, 59, 999);
+      return date.toISOString();
+    })
     .optional(),
 });
 
@@ -71,6 +79,10 @@ const   TaskForm = ({
   const [newItemText, setNewItemText] = useState("");
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   const [temporaryItems, setTemporaryItems] = useState<
+    { id: string; text: string; isCompleted: boolean }[]
+  >([]);
+  // New state for temporary items in edit mode
+  const [editModeTemporaryItems, setEditModeTemporaryItems] = useState<
     { id: string; text: string; isCompleted: boolean }[]
   >([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -134,7 +146,7 @@ const   TaskForm = ({
       subject: task?.subject || "",
       description: task?.description || "",
       status: task?.status || "Pending",
-      dueDate: task?.dueDate ? task.dueDate : new Date().toISOString().slice(0, 16),
+      dueDate: task?.dueDate ? task.dueDate.split('T')[0] : "", // Only use date part without time for display
     },
   });
 
@@ -157,6 +169,14 @@ const   TaskForm = ({
     }
   }, [checklistData]);
 
+  // Reset temporary items when modal is opened/closed
+  useEffect(() => {
+    if (isOpen) {
+      setTemporaryItems([]);
+      setEditModeTemporaryItems([]);
+    }
+  }, [isOpen]);
+
   // Create task mutation
   const createTaskMutation = useMutation({
     mutationFn: async (data: TaskFormData) => {
@@ -165,23 +185,14 @@ const   TaskForm = ({
         subject: data.subject.trim(),
         description: data.description?.trim() || undefined,
         status: data.status || "Pending",
-        dueDate: data.dueDate
-          ? new Date(data.dueDate).toISOString()
-          : undefined,
+        dueDate: data.dueDate, // No need to modify here as it's already set to end of day in the schema
+        // Include checklist items if there are any
+        checklistItems: temporaryItems.length > 0 ? temporaryItems.map(item => item.text) : undefined
       };
 
       try {
         const response = await createTask(projectId, taskData);
         console.log("Task creation response:", response);
-
-        // Create checklist items for the new task
-        if (response.task && temporaryItems.length > 0) {
-          const newTaskId = response.task.id;
-          const promises = temporaryItems.map((item) =>
-            addChecklistItem({ taskId: newTaskId, item: item.text })
-          );
-          await Promise.all(promises);
-        }
 
         // Assign all selected users to the task
         if (response.task && selectedAssignees.length > 0) {
@@ -195,18 +206,17 @@ const   TaskForm = ({
         return response;
       } catch (error) {
         console.error("Error in task creation:", error);
-        // console.error("Error in task creation:", error.response?.data);
         if (axios.isAxiosError(error)) {
           console.log("🚀 ~ mutationFn: ~ error:", error)
           console.error("Error response:", error.response?.data.message);
           const errorData = error.response?.data;
-        if (errorData?.message?.includes("Due date") || errorData?.errors?.dueDate) {
-          console.log("🚀 ~ mutationFn: ~ errorData:", errorData)
-          setDueDateError(errorData?.errors?.dueDate || errorData?.message || "Invalid due date");
-        }
+          if (errorData?.message?.includes("Due date") || errorData?.errors?.dueDate) {
+            console.log("🚀 ~ mutationFn: ~ errorData:", errorData)
+            setDueDateError(errorData?.errors?.dueDate || errorData?.message || "Invalid due date");
+          }
           // Throw a more descriptive error
           throw new Error(
-              error.response?.data.message
+            error.response?.data.message
           );
         }
         throw error;
@@ -231,12 +241,26 @@ const   TaskForm = ({
 
   // Update task mutation
   const updateTaskMutation = useMutation({
-    mutationFn: (data: TaskFormData) => updateTask(task!.id, data),
+    mutationFn: async (data: TaskFormData) => {
+      // First update the task
+      const updatedTask = await updateTask(task!.id, data);
+      
+      // Then add any new checklist items
+      if (editModeTemporaryItems.length > 0) {
+        const promises = editModeTemporaryItems.map((item) =>
+          addChecklistItem({ taskId: task!.id, item: item.text })
+        );
+        await Promise.all(promises);
+      }
+      
+      return updatedTask;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["assignedTasks"] });
       queryClient.invalidateQueries({ queryKey: ["checklist", task!.id] });
       setDueDateError(null);
+      setEditModeTemporaryItems([]);
       onClose();
     },
     onError: (error) => {
@@ -260,18 +284,7 @@ const   TaskForm = ({
     },
   });
 
-  // Add checklist item mutation (only for edit mode)
-  const addItemMutation = useMutation({
-    mutationFn: (text: string) =>
-      addChecklistItem({
-        taskId: task!.id,
-        item: text,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["checklist", task!.id] });
-      setNewItemText("");
-    },
-  });
+  // We'll use this function in the updateTaskMutation instead of a separate mutation
 
   // Update checklist item mutation
   const updateItemMutation = useMutation({
@@ -295,8 +308,16 @@ const   TaskForm = ({
     if (!newItemText.trim()) return;
 
     if (isEditMode && task) {
-      // For existing tasks, directly add to the database
-      addItemMutation.mutate(newItemText.trim());
+      // For existing tasks, store items temporarily until Save Changes is clicked
+      setEditModeTemporaryItems([
+        ...editModeTemporaryItems,
+        {
+          id: `temp-edit-${Date.now()}`,
+          text: newItemText.trim(),
+          isCompleted: false,
+        },
+      ]);
+      setNewItemText("");
     } else {
       // For new tasks, temporarily store items to be added once the task is created
       setTemporaryItems([
@@ -322,12 +343,21 @@ const   TaskForm = ({
         });
       }
     } else if (typeof id === "string") {
-      // Toggle temporary item
-      setTemporaryItems(
-        temporaryItems.map((item) =>
-          item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
-        )
-      );
+      // Check if it's a temporary item in edit mode
+      if (id.startsWith('temp-edit-') && isEditMode) {
+        setEditModeTemporaryItems(
+          editModeTemporaryItems.map((item) =>
+            item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
+          )
+        );
+      } else {
+        // Toggle temporary item for new task
+        setTemporaryItems(
+          temporaryItems.map((item) =>
+            item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
+          )
+        );
+      }
     }
   };
 
@@ -336,8 +366,13 @@ const   TaskForm = ({
       // Delete existing item from database
       deleteItemMutation.mutate(id);
     } else if (typeof id === "string") {
-      // Delete temporary item
-      setTemporaryItems(temporaryItems.filter((item) => item.id !== id));
+      // Check if it's a temporary item in edit mode
+      if (id.startsWith('temp-edit-') && isEditMode) {
+        setEditModeTemporaryItems(editModeTemporaryItems.filter((item) => item.id !== id));
+      } else {
+        // Delete temporary item for new task
+        setTemporaryItems(temporaryItems.filter((item) => item.id !== id));
+      }
     }
   };
 
@@ -427,7 +462,7 @@ const   TaskForm = ({
         {/* Description */}
         <div className="space-y-1.5">
           <Label htmlFor="description" className="text-sm font-medium text-gray-900">
-            Description (Optional)
+            Description
           </Label>
           <div className="relative">
             <textarea
@@ -449,7 +484,7 @@ const   TaskForm = ({
             <Label htmlFor="status" className="text-sm font-medium text-gray-900">
               Status
             </Label>
-                                        <select
+            <select
                 id="status"
                 className={cn(
                   "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
@@ -468,7 +503,7 @@ const   TaskForm = ({
               Due Date  
             </Label>
             <Input
-              type="datetime-local"
+              type="date"
               id="dueDate"
               {...register("dueDate")}
             />
@@ -593,20 +628,21 @@ const   TaskForm = ({
                   key={item.id}
                   className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5"
                 >
-                  <input
-                    type="checkbox"
+                  <Checkbox
+                    id={`item-${item.id}`}
                     checked={!!item.isCompleted}
-                    onChange={() => handleToggleItem(item.id)}
-                    className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    onCheckedChange={() => handleToggleItem(item.id)}
+                    className="h-4 w-4"
                   />
-                  <span
+                  <label
+                    htmlFor={`item-${item.id}`}
                     className={cn(
-                      "flex-1 text-sm",
+                      "flex-1 text-sm cursor-pointer",
                       item.isCompleted && "line-through text-gray-500"
                     )}
                   >
                     {item.item}
-                  </span>
+                  </label>
                   <Button
                     type="button"
                     variant="ghost"
@@ -619,25 +655,60 @@ const   TaskForm = ({
                 </div>
               ))}
 
-            {temporaryItems.map((item) => (
+            {/* Render temporary items for edit mode */}
+            {isEditMode && editModeTemporaryItems.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5"
               >
-                <input
-                  type="checkbox"
+                <Checkbox
+                  id={`temp-item-${item.id}`}
                   checked={item.isCompleted}
-                  onChange={() => handleToggleItem(item.id)}
-                  className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  onCheckedChange={() => handleToggleItem(item.id)}
+                  className="h-4 w-4"
                 />
-                <span
+                <label
+                  htmlFor={`temp-item-${item.id}`}
                   className={cn(
-                    "flex-1 text-sm",
+                    "flex-1 text-sm cursor-pointer",
                     item.isCompleted && "line-through text-gray-500"
                   )}
                 >
                   {item.text}
-                </span>
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteItem(item.id)}
+                  className="text-gray-400 hover:text-gray-500"
+                >                  
+                  <X className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            ))}
+
+            {/* Render temporary items for create mode */}
+            {!isEditMode && temporaryItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5"
+              >
+                <Checkbox
+                  id={`temp-item-${item.id}`}
+                  checked={item.isCompleted}
+                  onCheckedChange={() => handleToggleItem(item.id)}
+                  className="h-4 w-4"
+                />
+                <label
+                  htmlFor={`temp-item-${item.id}`}
+                  className={cn(
+                    "flex-1 text-sm cursor-pointer",
+                    item.isCompleted && "line-through text-gray-500"
+                  )}
+                >
+                  {item.text}
+                </label>
                 <Button
                   type="button"
                   variant="ghost"
@@ -658,7 +729,7 @@ const   TaskForm = ({
               </div>
             )}
 
-            {(isEditMode && checklistItems.length === 0 && temporaryItems.length === 0 && !checklistLoading) && (
+            {(isEditMode && checklistItems.length === 0 && editModeTemporaryItems.length === 0 && !checklistLoading) && (
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
                 <p className="text-sm text-gray-500">
                   No checklist items. Start by adding one above.

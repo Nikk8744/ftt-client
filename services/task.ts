@@ -6,14 +6,18 @@ import axios from 'axios';
  * Create a new task within a project
  */
 export const createTask = async (projectId: number, data: TaskCreateData) => {
+  const { checklistItems, ...taskData } = data;
   const requestData = {
-    ...data,
+    ...taskData,
     projectId
   };
   console.log("🚀 ~ createTask ~ requestData:", requestData);
 
   try {
-    const response = await apiClient.post(`/tasks/createTask/${projectId}`, requestData);
+    const response = await apiClient.post(`/tasks/createTask/${projectId}`, {
+      ...requestData,
+      checklistItems
+    });
     return response.data;
   } catch (error) {
     console.error('Error creating task:', error);

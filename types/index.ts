@@ -82,6 +82,7 @@ export interface TaskCreateData {
   status?: 'Pending' | 'In-Progress' | 'Done';
   dueDate?: string;
   assignedUserId?: number;
+  checklistItems?: string[];
 }
 
 export interface TaskUpdateData {
