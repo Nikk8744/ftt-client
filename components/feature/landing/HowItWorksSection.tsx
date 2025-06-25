@@ -153,9 +153,9 @@ export default function HowItWorksSection() {
   return (
     <section ref={sectionRef} className="py-12 px-6 max-w-7xl mx-auto relative" id="how-it-works">
       <h2 className="text-4xl font-bold text-slate-50 text-center mb-6">
-        How <span className="text-lime-500 bg-clip-text">TimeTracker</span> Works
+        How <span className="text-atlantis-500 bg-clip-text">TimeTracker</span> Works
       </h2>
-      <p className="text-xl text-lime-500 text-center max-w-2xl mx-auto mb-20">
+      <p className="text-xl text-atlantis-400 text-center max-w-2xl mx-auto mb-20">
         Our simple 4-step process helps you track time efficiently and get paid faster
       </p>
       
@@ -186,7 +186,7 @@ export default function HowItWorksSection() {
             
             {/* Status badge */}
             <div
-              className={`absolute top-[15px] md:left-1/2 right-[10px] md:-translate-x-1/2 py-1 px-4 bg-atlantis-800/75 md:bg-sky-500/20 text-atlantis-400 md:text-sky-400 rounded-full text-sm font-bold whitespace-nowrap opacity-0 transition-all duration-300 ${
+              className={`absolute top-[15px] md:left-1/2 right-[10px] md:-translate-x-1/2 py-1 px-4 bg-sky-500/25 text-atlantis-400 md:text-sky-400 rounded-full text-sm font-bold whitespace-nowrap opacity-0 transition-all duration-300 ${
                 index === activeStep ? 'opacity-100 md:-translate-y-10 -translate-x-24' : ''
               }`}
             >

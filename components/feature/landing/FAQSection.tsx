@@ -10,18 +10,18 @@ import {
 const faqData = [
   {
     id: "item-1",
-    question: "What is TimeTracker and how does it work?",
-    answer: "TimeTracker is a comprehensive time management solution designed for freelancers and small teams. It allows you to track time spent on projects, manage tasks, generate detailed reports, and streamline your workflow. Simply create projects, add tasks, and start tracking time with our intuitive interface."
+    question: "What is Tracksy and how does it work?",
+    answer: "Tracksy is a comprehensive time management solution designed for freelancers and small teams. It allows you to track time spent on projects, manage tasks, generate detailed reports, and streamline your workflow. Simply create projects, add tasks, and start tracking time with our intuitive interface."
   },
   {
     id: "item-2",
-    question: "Is TimeTracker suitable for teams or just individual users?",
-    answer: "TimeTracker is perfect for both individual freelancers and teams. You can invite team members to projects, assign tasks, track collective progress, and generate team reports. Our collaboration features make it easy to manage projects with multiple contributors."
+    question: "Is Tracksy suitable for teams or just individual users?",
+    answer: "Tracksy is perfect for both individual freelancers and teams. You can invite team members to projects, assign tasks, track collective progress, and generate team reports. Our collaboration features make it easy to manage projects with multiple contributors."
   },
   {
     id: "item-3",
     question: "Can I generate reports and invoices?",
-    answer: "Yes! TimeTracker provides comprehensive reporting features. You can generate detailed time reports, project summaries, and export data in various formats (PDF, CSV, Excel). While we don't have built-in invoicing yet, our reports contain all the information you need for billing clients."
+    answer: "Yes! Tracksy provides comprehensive reporting features. You can generate detailed time reports, project summaries, and export data in various formats (PDF, CSV, Excel). While we don't have built-in invoicing yet, our reports contain all the information you need for billing clients."
   },
   {
     id: "item-4",
@@ -31,7 +31,7 @@ const faqData = [
   {
     id: "item-5",
     question: "Do you offer mobile apps?",
-    answer: "Currently, TimeTracker is a web-based application that works perfectly on mobile browsers. We're working on dedicated mobile apps for iOS and Android, which will be available soon. The web version is fully responsive and provides a great mobile experience."
+    answer: "Currently, Tracksy is a web-based application that works perfectly on mobile browsers. We're working on dedicated mobile apps for iOS and Android, which will be available soon. The web version is fully responsive and provides a great mobile experience."
   },
   {
     id: "item-6",
@@ -40,7 +40,7 @@ const faqData = [
   },
   {
     id: "item-7",
-    question: "How do I get started with TimeTracker?",
+    question: "How do I get started with Tracksy?",
     answer: "Getting started is easy! Simply sign up for a free account, create your first project, add some tasks, and start tracking time. Our onboarding process will guide you through the key features. You can also check our documentation and video tutorials for detailed guidance."
   }
 ];
@@ -57,7 +57,7 @@ export default function FAQSection() {
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Frequently Asked{' '}
-            <span className="bg-lime-400 bg-clip-text text-transparent">
+            <span className="bg-atlantis-400 bg-clip-text text-transparent">
               Questions
             </span>
           </h2>
@@ -75,7 +75,7 @@ export default function FAQSection() {
                 value={faq.id}
                 className="rounded-lg backdrop-blur-sm transition-all duration-300"
               >
-                <AccordionTrigger className="text-left bg-lime-400/100 text-black px-6 py-4 text-lg font-medium">
+                <AccordionTrigger className="text-left bg-atlantis-400/75 text-white px-6 py-4 text-lg font-medium">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-slate-900 px-6 pb-4 text-base leading-relaxed">

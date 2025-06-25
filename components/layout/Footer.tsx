@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 // import Threads from '@/components/ui/Threads/Threads';
-import { ChevronUp, Clock } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Aurora from "../ui/Aurora/Aurora";
+import Logo from "@/components/ui/Logo";
 
 // Social media icons as separate components for better organization
 const TwitterIcon = () => (
@@ -151,7 +152,7 @@ export default function Footer() {
 
         <div className="absolute inset-0 z-0">
           <Aurora
-            colorStops={["#e53935","", "#3b8Ff6"]}
+            colorStops={["#e53935", "", "#3b8Ff6"]}
             blend={0.2}
             amplitude={1.6}
             speed={0.6}
@@ -161,11 +162,12 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Company name and description at the top */}
           <div className="mb-10 flex flex-col items-center text-center gap-4">
-            <div className="flex items-center space-x-2 justify-center">
+            <div className="flex items-center space-x-2 justify-center p-4 rounded-2xl">
               <div className="w-8 h-8 rounded-md flex items-center justify-center">
-                <Clock className="w-7 h-7 text-white" />
+                {/* <Clock className="w-7 h-7 text-white" /> */}
+                <Logo size="lg" showText={false} />
               </div>
-              <h3 className="text-3xl font-bold text-white font-mono tracking-wide">
+              <h3 className="text-3xl font-bold text-white font-mono tracking-wide mb-0">
                 Tracksy
               </h3>
             </div>
@@ -202,7 +204,6 @@ export default function Footer() {
                   <FooterLink href="#features">Features</FooterLink>
                   <FooterLink href="#pricing">Pricing</FooterLink>
                   <FooterLink href="/dashboard">Dashboard</FooterLink>
-                  <FooterLink href="#integrations">Integrations</FooterLink>
                   <FooterLink href="#updates">Updates</FooterLink>
                 </div>
               </div>

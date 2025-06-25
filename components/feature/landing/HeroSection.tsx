@@ -552,7 +552,7 @@ export default function HeroSection() {
             <div className="w-full max-w-lg">
               <h1 className="text-3xl xs:text-4xl sm:text-5xl tracking-tight text-white mb-4 font-serif">
                 Track Your Time.
-                <div className="text-lime-500 text-3xl xs:text-4xl sm:text-5xl mt-1 font-serif">
+                <div className="text-atlantis-400 text-3xl xs:text-4xl sm:text-5xl mt-1 font-serif">
                   Boost Your <span className="block">Productivity.</span>
                 </div>
               </h1>
@@ -562,7 +562,7 @@ export default function HeroSection() {
               <div className="mt-8 flex flex-col xs:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href="/register"
-                  className="inline-block px-6 py-3 rounded-md bg-atlantis-400 text-slate-900 font-medium hover:bg-atlantis-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-base xs:text-lg w-full xs:w-48 text-center"
+                  className="inline-block px-6 py-3 rounded-md bg-brand-600 text-white font-medium hover:bg-atlantis-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-base xs:text-lg w-full xs:w-48 text-center"
                 >
                   Get Started - It&apos;s Free
                 </Link>
