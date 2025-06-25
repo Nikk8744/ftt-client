@@ -13,6 +13,7 @@ import {
   BarChart2,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
+import Logo from "../ui/Logo";
 interface NavItem {
   name: string;
   href: string;
@@ -143,16 +144,17 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col h-full">
           {/* Logo and Title */}
           <div className="px-6 py-8">
-            <div className=" mb-1">
-              <div className="flex items-center justify-normal gap-3 mb-3">
-                <div className="p-2 bg-brand rounded-lg shadow-lg">
-                  <Clock className="w-6 h-6 text-white" />
+            <div className="flex flex-col gap-1 justify-center">
+              <div className="flex items-center justify-normal gap-1">
+                <div className="p-2 bg-transparent">
+                  {/* <Clock className="w-6 h-6 text-white" /> */}
+                  <Logo size="md" showText={false} />
                 </div>
-                <Link href="/dashboard" className="text-2xl font-bold text-gray-800">
+                <Link href="/dashboard" className="text-3xl font-semibold font-serif text-black">
                   Tracksy
                 </Link>
               </div>
-              <p className="text-xs text-gray-800 font-mono">
+              <p className="px-2 text-xs text-black font-serif">
                 Manage your time effectively
               </p>
             </div>

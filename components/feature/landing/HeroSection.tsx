@@ -6,6 +6,7 @@ import { AvatarCircles } from '@/components/magicui/avatar-circles';
 import React, { forwardRef, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { AnimatedBeam } from "@/components/magicui/animated-beam";
+import Logo from '@/components/ui/Logo';
 
 const Icons = {
   notion: () => (
@@ -387,6 +388,9 @@ const Icons = {
       />
     </svg>
   ),
+  tracksy: () => (
+    <Logo size="lg" showText={false} />
+  ),
 };
 
 const Circle = forwardRef<
@@ -425,13 +429,14 @@ function AnimatedBeamDemo() {
       <div className="flex flex-row items-center justify-around w-full max-w-lg gap-6">
         <div className="flex flex-col items-center justify-between gap-8 h-[250px]">
           <Circle ref={div1Ref}><Icons.googleDrive /></Circle>
-          <Circle ref={div2Ref}><Icons.notion /></Circle>
+          <Circle ref={div2Ref}><Icons.openai /></Circle>
           <Circle ref={div3Ref}><Icons.whatsapp /></Circle>
         </div>
 
         <div className="flex items-center justify-center">
           <Circle ref={div4Ref} className="size-16">
-            <Icons.openai />
+            {/* <Icons.openai /> */}
+            <Logo size="md" showText={false} />
           </Circle>
         </div>
 
