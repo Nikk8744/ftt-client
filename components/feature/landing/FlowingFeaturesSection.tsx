@@ -1,6 +1,6 @@
 'use client';
 
-import FlowingMenu from '../ui/FlowingMenu/FlowingMenu';
+import FlowingMenu from '../../ui/FlowingMenu/FlowingMenu';
 
 export default function FlowingFeaturesSection() {
   // Feature items for the flowing menu

@@ -6,8 +6,8 @@ import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import { TasksTable } from "@/components/feature/TasksTable";
-import TeamMembers from "@/components/TeamMembers";
+import { TasksTable } from "@/components/feature/tasks/TasksTable";
+import TeamMembers from "@/components/feature/members/TeamMembers";
 import {
   getProjectById,
   updateProject,
@@ -21,12 +21,12 @@ import {
 } from "@/services/projectMember";
 import useAuth from "@/lib/hooks/useAuth";
 import { formatDate } from "@/lib/utils";
-import TaskForm from "@/components/feature/TaskForm";
+import TaskForm from "@/components/feature/tasks/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { Task } from "@/types";
 import { AlignLeft, Calendar, CircleCheck, Clock, Info, Pencil, Plus, User, UserPlus } from "lucide-react";
-import EditProjectModal from "@/components/feature/EditProjectModal";
-import AddMemberModal from "@/components/feature/AddMemberModal";
+import EditProjectModal from "@/components/feature/project/EditProjectModal";
+import AddMemberModal from "@/components/feature/members/AddMemberModal";
 import Loader from "@/components/ui/Loader";
 
 // Add back the project form data type

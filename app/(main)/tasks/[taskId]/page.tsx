@@ -20,8 +20,8 @@ import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import Modal, { ConfirmModal } from "@/components/ui/Modal";
 import { formatDate, formatDuration } from "@/lib/utils";
-import TaskForm from "@/components/feature/TaskForm";
-import TaskChecklist from "@/components/feature/TaskChecklist";
+import TaskForm from "@/components/feature/tasks/TaskForm";
+import TaskChecklist from "@/components/feature/tasks/TaskChecklist";
 import Link from "next/link";
 import useTimer from "@/lib/hooks/useTimer";
 import Avatar from "@/components/ui/Avatar";
@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
+import { EditTimeLogModal } from "@/components/feature/logs/EditTimeLogModal";
 
 export default function TaskDetailsPage() {
   const { taskId } = useParams();
@@ -827,115 +828,24 @@ export default function TaskDetailsPage() {
 
       {/* Edit Log Modal */}
       {editLogModalOpen && selectedLog && (
-        <Modal
+        <EditTimeLogModal
           isOpen={editLogModalOpen}
           onClose={() => {
             setEditLogModalOpen(false);
             setSelectedLog(null);
           }}
-          title="Edit Time Log"
-          footer={
-            <>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setEditLogModalOpen(false);
-                  setSelectedLog(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                onClick={() => {
-                  if (!selectedLog) return;
-                  updateLogMutation.mutate({
-                    id: selectedLog.id,
-                    updateData: {
-                      description: selectedLog.description || undefined,
-                      startTime: selectedLog.startTime,
-                      endTime: selectedLog.endTime || undefined,
-                    },
-                  });
-                }}
-                isLoading={updateLogMutation.isPending}
-              >
-                Save Changes
-              </Button>
-            </>
-          }
-        >
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Description
-              </label>
-              <textarea
-                id="description"
-                rows={3}
-                className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                value={selectedLog.description || ""}
-                onChange={(e) =>
-                  setSelectedLog({
-                    ...selectedLog,
-                    description: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="startTime"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Start Time
-                </label>
-                <input
-                  type="datetime-local"
-                  id="startTime"
-                  className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  value={new Date(selectedLog.startTime)
-                    .toISOString()
-                    .slice(0, 16)}
-                  onChange={(e) =>
-                    setSelectedLog({
-                      ...selectedLog,
-                      startTime: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="endTime"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  End Time
-                </label>
-                <input
-                  type="datetime-local"
-                  id="endTime"
-                  className="w-full rounded-md border border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  value={
-                    selectedLog.endTime
-                      ? new Date(selectedLog.endTime).toISOString().slice(0, 16)
-                      : ""
-                  }
-                  onChange={(e) =>
-                    setSelectedLog({
-                      ...selectedLog,
-                      endTime: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        </Modal>
+          onSubmit={(updateData) => {
+            if (!selectedLog) return;
+            updateLogMutation.mutate({
+              id: selectedLog.id,
+              updateData,
+            });
+          }}
+          isLoading={updateLogMutation.isPending}
+          timeLog={selectedLog}
+          projects={[project].filter(Boolean)}
+          tasks={task ? [task] : []}
+        />
       )}
 
       {/* Delete Log Modal */}

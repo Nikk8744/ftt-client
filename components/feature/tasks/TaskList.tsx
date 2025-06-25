@@ -6,12 +6,12 @@ import Badge from '@/components/ui/Badge';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { ConfirmModal } from '@/components/ui/Modal';
-import TaskForm from './TaskForm';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import Avatar from '@/components/ui/Avatar';
 import useAuth from '@/lib/hooks/useAuth';
 import { getTaskAssignees } from '@/services/taskMembers';
+import TaskForm from './TaskForm';
 
 interface TaskListProps {
   tasks: Task[];

@@ -12,8 +12,8 @@ import Button from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { Project, TimeLog, TimeLogUpdateData } from "@/types";
 import { Calendar, Check, ChevronDown, FilterIcon, FolderOpenDot, X, Zap } from "lucide-react";
-import { LogsTable } from "@/components/feature/LogsTable";
-import EditTimeLogModal from "@/components/feature/EditTimeLogModal";
+import { LogsTable } from "@/components/feature/logs/LogsTable";
+import EditTimeLogModal from "@/components/feature/logs/EditTimeLogModal";
 import Loader from "@/components/ui/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 

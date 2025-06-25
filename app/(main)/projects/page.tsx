@@ -12,11 +12,11 @@ import { getAllProjectsUserIsMemberOf } from "@/services/projectMember";
 import { ProjectCreateData, Project } from "@/types";
 import Button from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/Modal";
-import { ProjectsTable } from "@/components/feature/ProjectsTable";
+import { ProjectsTable } from "@/components/feature/project/ProjectsTable";
 import { Plus } from "lucide-react";
 // import Card from "@/components/ui/Card";
-import EditProjectModal from "@/components/feature/EditProjectModal";
-import CreateProjectModal from "@/components/feature/CreateProjectModal";
+import EditProjectModal from "@/components/feature/project/EditProjectModal";
+import CreateProjectModal from "@/components/feature/project/CreateProjectModal";
 import Loader from "@/components/ui/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 

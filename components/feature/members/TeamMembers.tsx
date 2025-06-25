@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import Button from './ui/Button';
+import Button from '../../ui/Button';
 import { EllipsisVertical, Trash2, User, UserPlus } from 'lucide-react';
 
 interface TeamMember {

@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import HeroSection from '@/components/feature/HeroSection';
-import FlowingFeaturesSection from '@/components/feature/FlowingFeaturesSection';
-import TestimonialsSection from '@/components/feature/TestimonialsSection';
-import FAQSection from '@/components/feature/FAQSection';
-import HowItWorksSection from '@/components/feature/HowItWorksSection';
-import CTASection from '@/components/feature/CTASection';
+import HeroSection from '@/components/feature/landing/HeroSection';
+import FlowingFeaturesSection from '@/components/feature/landing/FlowingFeaturesSection';
+import TestimonialsSection from '@/components/feature/landing/TestimonialsSection';
+import FAQSection from '@/components/feature/landing/FAQSection';
+import HowItWorksSection from '@/components/feature/landing/HowItWorksSection';
+import CTASection from '@/components/feature/landing/CTASection';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 

@@ -10,7 +10,7 @@ import { getUserTasks } from '@/services/task';
 import { getUserAssignedTasks } from '@/services/taskMembers';
 import { useQuery } from '@tanstack/react-query';
 import { Project, Task } from '@/types';
-import NotificationBell from '@/components/feature/NotificationBell';
+import NotificationBell from '@/components/feature/notifications/NotificationBell';
 import { useNotifications } from '@/lib/hooks/useNotifications';
 import { AlertCircle, ChartNoAxesGantt, CirclePause, ClipboardList, FolderOpenDot, LogOut, Pause, Play, Settings, User } from 'lucide-react';
 import { StopIcon } from '@heroicons/react/24/outline';

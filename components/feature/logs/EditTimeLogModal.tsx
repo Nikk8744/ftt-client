@@ -126,7 +126,7 @@ export function EditTimeLogModal({
       title="Edit Time Log"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="danger" onClick={onClose}>
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button

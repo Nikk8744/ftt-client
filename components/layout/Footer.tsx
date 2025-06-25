@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 // import Threads from '@/components/ui/Threads/Threads';
 import { ChevronUp, Clock } from "lucide-react";
 import Button from "@/components/ui/Button";
+import Aurora from "../ui/Aurora/Aurora";
 
 // Social media icons as separate components for better organization
 const TwitterIcon = () => (
@@ -67,7 +68,7 @@ const FooterLink = ({
 }) => (
   <Link
     href={href}
-    className="text-slate-900 font-mono hover:text-atlantis-700 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
+    className="text-slate-300 font-mono hover:text-atlantis-400 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
   >
     {children}
   </Link>
@@ -85,7 +86,7 @@ const SocialLink = ({
 }) => (
   <a
     href={href}
-    className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 hover:text-blue-300 transition-all duration-300 ease-in-out hover:-translate-y-1 transform"
+    className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-700 text-white hover:text-atlantis-400 hover:bg-slate-800 transition-all duration-300 ease-in-out hover:-translate-y-1 transform"
     aria-label={label}
   >
     {children}
@@ -134,7 +135,7 @@ export default function Footer() {
   return (
     <div className="px-4 md:px-6 lg:px-12 xl:px-12 pb-6 md:pb-12 pt-6 md:pt-12 bg-[#0a0a0a]">
       <div
-        className={`relative py-12 md:py-16 px-5 md:px-8 bg-atlantis-400 border border-atlantis-500/50 rounded-3xl overflow-hidden transition-opacity duration-1000 ${
+        className={`relative py-12 md:py-16 px-5 md:px-8 bg-slate-900/80 border border-slate-700/50 rounded-3xl overflow-hidden transition-opacity duration-1000 ${
           visible ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -148,18 +149,27 @@ export default function Footer() {
           />  
         </div> */}
 
+        <div className="absolute inset-0 z-0">
+          <Aurora
+            colorStops={["#84cc16", "#3b8Ff6", "#517c0f"]}
+            blend={0.6}
+            amplitude={1.2}
+            speed={0.3}
+          />
+        </div>
+
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Company name and description at the top */}
           <div className="mb-10 flex flex-col items-center text-center gap-4">
             <div className="flex items-center space-x-2 justify-center">
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br flex items-center justify-center">
-                <Clock className="w-7 h-7 text-black" />
+              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-atlantis-500 to-atlantis-700 flex items-center justify-center">
+                <Clock className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 font-serif tracking-wide">
+              <h3 className="text-3xl font-bold text-white font-serif tracking-wide">
                 Tracksy
               </h3>
             </div>
-            <p className="text-slate-800 font-serif font-semibold tracking-wider max-w-xl mx-auto">
+            <p className="text-slate-200 font-serif font-semibold tracking-wider max-w-xl mx-auto">
               The best time tracking solution for freelancers and small teams.
               Track time, manage projects, and get paid.
             </p>
@@ -185,7 +195,7 @@ export default function Footer() {
                 className="space-y-4 items-center text-center
               "
               >
-                <h3 className="text-base md:text-lg font-bold uppercase text-slate-900 tracking-wider font-serif">
+                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider font-serif">
                   Product
                 </h3>
                 <div className="flex flex-col space-y-2">
@@ -199,7 +209,7 @@ export default function Footer() {
 
               {/* Resources column */}
               <div className="space-y-4 items-center text-center">
-                <h3 className="text-base md:text-lg font-bold uppercase text-slate-900 tracking-wider font-serif">
+                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider font-serif">
                   Resources
                 </h3>
                 <div className="flex flex-col space-y-2">
@@ -212,7 +222,7 @@ export default function Footer() {
 
               {/* Company column */}
               <div className="space-y-4 items-center text-center">
-                <h3 className="text-base md:text-lg font-bold uppercase text-slate-900 tracking-wider font-serif">
+                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider font-serif">
                   Company
                 </h3>
                 <div className="flex flex-col space-y-2">
@@ -247,7 +257,7 @@ export default function Footer() {
           </div> */}
 
           {/* Bottom bar with copyright and Back to Top */}
-          <div className="mt-12 pt-8 border-t border-atlantis-600/50 flex flex-col md:flex-row justify-between items-center text-slate-800 text-sm gap-4 md:gap-0 font-sans font-normal">
+          <div className="mt-12 pt-8 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center text-slate-300 text-sm gap-4 md:gap-0 font-sans font-normal">
             <div className="mb-2 md:mb-0">
               © {new Date().getFullYear()} TimeTracker. All rights reserved.
             </div>

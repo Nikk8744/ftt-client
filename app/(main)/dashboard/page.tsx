@@ -14,7 +14,7 @@ import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
 import { getUserAssignedTasks } from '@/services/taskMembers';
 import { useEffect, useState } from 'react';
 import { Clock, Plus, FolderOpenDot, ClipboardCheck } from 'lucide-react';
-import { LogsTable } from '@/components/feature/LogsTable';
+import { LogsTable } from '@/components/feature/logs/LogsTable';
 import StatCard from '@/components/feature/reports/StatCard';
 // import Loader from '@/components/ui/Loader';
 

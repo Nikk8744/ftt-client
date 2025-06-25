@@ -1,6 +1,6 @@
 'use client';
 
-import SpotlightCard from '../ui/SpotlightCard/SpotlightCard';
+import SpotlightCard from '../../ui/SpotlightCard/SpotlightCard';
 
 export default function FeaturesSection() {
   const features = [

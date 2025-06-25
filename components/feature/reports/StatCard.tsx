@@ -15,10 +15,10 @@ interface StatCardProps {
   subtitle?: ReactNode;
 }
 
-const StatCard: React.FC<StatCardProps> = ({
-  title,
-  value,
-  icon,
+const StatCard: React.FC<StatCardProps> = ({ 
+  title, 
+  value, 
+  icon, 
   iconBgColor,
   iconColor,
   tooltip,
@@ -28,7 +28,7 @@ const StatCard: React.FC<StatCardProps> = ({
     <TooltipProvider>
       <Card className="p-6 border border-gray-200 rounded-xl bg-white relative">
         <div className="flex justify-between items-start">
-          <div>
+        <div>
             <p className="text-sm font-medium text-gray-500">
               {title}
             </p>
@@ -65,7 +65,7 @@ const StatCard: React.FC<StatCardProps> = ({
             </Tooltip>
           </div>
         )}
-      </Card>
+    </Card>
     </TooltipProvider>
   );
 };
