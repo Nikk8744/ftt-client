@@ -186,7 +186,7 @@ export default function HowItWorksSection() {
             
             {/* Status badge */}
             <div
-              className={`absolute top-[15px] md:left-1/2 right-[21px] md:-translate-x-1/2 py-1 px-4 bg-sky-500/20 text-sky-400 rounded-full text-sm font-bold whitespace-nowrap opacity-0 transition-all duration-300 ${
+              className={`absolute top-[15px] md:left-1/2 right-[10px] md:-translate-x-1/2 py-1 px-4 bg-atlantis-800/75 md:bg-sky-500/20 text-atlantis-400 md:text-sky-400 rounded-full text-sm font-bold whitespace-nowrap opacity-0 transition-all duration-300 ${
                 index === activeStep ? 'opacity-100 md:-translate-y-10 -translate-x-24' : ''
               }`}
             >

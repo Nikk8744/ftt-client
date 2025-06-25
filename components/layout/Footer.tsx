@@ -68,7 +68,7 @@ const FooterLink = ({
 }) => (
   <Link
     href={href}
-    className="text-slate-300 font-mono hover:text-atlantis-400 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
+    className="text-slate-200 font-serif hover:text-atlantis-400 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
   >
     {children}
   </Link>
@@ -151,10 +151,10 @@ export default function Footer() {
 
         <div className="absolute inset-0 z-0">
           <Aurora
-            colorStops={["#84cc16", "#3b8Ff6", "#517c0f"]}
-            blend={0.6}
-            amplitude={1.2}
-            speed={0.3}
+            colorStops={["#e53935","", "#3b8Ff6"]}
+            blend={0.2}
+            amplitude={1.6}
+            speed={0.6}
           />
         </div>
 
@@ -162,14 +162,14 @@ export default function Footer() {
           {/* Company name and description at the top */}
           <div className="mb-10 flex flex-col items-center text-center gap-4">
             <div className="flex items-center space-x-2 justify-center">
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-atlantis-500 to-atlantis-700 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-md flex items-center justify-center">
                 <Clock className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-white font-serif tracking-wide">
+              <h3 className="text-3xl font-bold text-white font-mono tracking-wide">
                 Tracksy
               </h3>
             </div>
-            <p className="text-slate-200 font-serif font-semibold tracking-wider max-w-xl mx-auto">
+            <p className="text-white font-thin text-lg tracking-wider max-w-xl mx-auto">
               The best time tracking solution for freelancers and small teams.
               Track time, manage projects, and get paid.
             </p>
@@ -257,7 +257,7 @@ export default function Footer() {
           </div> */}
 
           {/* Bottom bar with copyright and Back to Top */}
-          <div className="mt-12 pt-8 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center text-slate-300 text-sm gap-4 md:gap-0 font-sans font-normal">
+          <div className="mt-12 pt-8 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center text-slate-200 text-sm gap-4 md:gap-0 font-serif tracking-wider font-normal">
             <div className="mb-2 md:mb-0">
               © {new Date().getFullYear()} TimeTracker. All rights reserved.
             </div>

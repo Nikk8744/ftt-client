@@ -541,7 +541,7 @@ export default function HeroSection() {
           colorStops={["#4338ca", "#3b82f6", "#2dd4bf"]} 
           blend={0.6}
           amplitude={1.2}
-          speed={0.3}
+          speed={0.4}
         />
       </div>
       
