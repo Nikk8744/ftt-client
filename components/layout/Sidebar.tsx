@@ -154,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   Tracksy
                 </Link>
               </div>
-              <p className="px-2 text-xs text-black font-serif">
+              <p className="pxj-2 text-xs text-black font-serif">
                 Manage your time effectively
               </p>
             </div>

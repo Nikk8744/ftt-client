@@ -17,7 +17,7 @@ export default function TasksPage() {
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
   const [deleteTaskModalOpen, setDeleteTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [activeTab, setActiveTab] = useState<"all" | "assigned">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "owned" | "assigned">("all");
 
   const queryClient = useQueryClient();
 
@@ -50,9 +50,10 @@ export default function TasksPage() {
     queryKey: ["allUserProjects"],
     queryFn: getCombinedProjectsOfUser,
   });
-
+  
   const ownedTasks = tasksData?.tasks || [];
   const assignedTasks = assignedTasksData?.tasks.data || [];
+  console.log("🚀 ~ TasksPage ~ assignedTasks:", assignedTasks)
 
   // Combine owned and assigned tasks for the "All Tasks" view, removing duplicates
   const allTasks = [...ownedTasks];
@@ -65,7 +66,19 @@ export default function TasksPage() {
   });
 
   // Determine which tasks to display based on active tab
-  const filteredTasks = activeTab === "all" ? allTasks : assignedTasks;
+  let filteredTasks: Task[] = [];
+  switch (activeTab) {
+    case "all":
+      filteredTasks = allTasks;
+      break;
+    case "owned":
+      filteredTasks = ownedTasks;
+      break;
+    case "assigned":
+      filteredTasks = assignedTasks;
+      break;
+  }
+
   const isLoading =
     userLoading || tasksLoading || assignedTasksLoading || projectsLoading;
 
@@ -141,6 +154,16 @@ export default function TasksPage() {
                 onClick={() => setActiveTab("all")}
               >
                 All Tasks
+              </button>
+              <button
+                className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
+                  activeTab === "owned"
+                    ? "bg-white shadow text-brand-700"
+                    : "text-gray-700 hover:bg-white/[0.5]"
+                }`}
+                onClick={() => setActiveTab("owned")}
+              >
+                Created
               </button>
               <button
                 className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
