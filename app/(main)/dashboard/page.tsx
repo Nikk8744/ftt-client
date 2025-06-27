@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { Clock, Plus, FolderOpenDot, ClipboardCheck } from 'lucide-react';
 import { LogsTable } from '@/components/feature/logs/LogsTable';
 import StatCard from '@/components/feature/reports/StatCard';
+import Loader from '@/components/ui/Loader';
 // import Loader from '@/components/ui/Loader';
 
 export default function DashboardPage() {
@@ -172,6 +173,10 @@ export default function DashboardPage() {
   
   // Loading state for all task-related data
   const tasksDataLoading = tasksLoading || assignedTasksLoading;
+
+  if(tasksDataLoading || projectsDataLoading || memberProjectsLoading || logsLoading || totalTimeTodayLoading) {
+    return <Loader centered text="Loading details..." />
+  }
   
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">

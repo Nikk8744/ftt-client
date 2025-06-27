@@ -19,7 +19,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import Modal, { ConfirmModal } from "@/components/ui/Modal";
-import { formatDate, formatDuration } from "@/lib/utils";
+
 import TaskForm from "@/components/feature/tasks/TaskForm";
 import TaskChecklist from "@/components/feature/tasks/TaskChecklist";
 import Link from "next/link";
@@ -34,20 +34,17 @@ import {
   Eye,
   EyeOff,
   Trash2,
-  AlignLeft,
-  Info,
   Users,
-  Calendar,
-  PlusCircle,
-  X,
   Check,
-  UserIcon,
   FolderOpenDot,
-  UserPlus,
 } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Loader from "@/components/ui/Loader";
 import { EditTimeLogModal } from "@/components/feature/logs/EditTimeLogModal";
+import { LogsTable } from "@/components/feature/logs/LogsTable";
+import { TaskInfo } from "@/components/feature/tasks/TaskInfo";
+import { DescriptionSection } from "@/components/feature/common";
+import { TaskAssignees } from "@/components/feature/tasks/TaskAssignees";
 
 export default function TaskDetailsPage() {
   const { taskId } = useParams();
@@ -294,6 +291,7 @@ export default function TaskDetailsPage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      {/* Page Header */}
       <div className="border-b border-gray-400 rounded-b-3xl">
         <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
@@ -390,33 +388,10 @@ export default function TaskDetailsPage() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Task Description */}
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center gap-2 mb-4">
-                    <AlignLeft className="w-5 h-5 text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-0">
-                      Description
-                    </h3>
-                  </div>
-                  {task.description ? (
-                    <div className="prose prose-sm max-w-none">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {task.description}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlignLeft className="w-8 h-8 text-gray-400" />
-                      </div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">
-                        No description provided
-                      </h4>
-                      <p className="text-xs text-gray-500">
-                        Add a description to provide more context for this task
-                      </p>
-                    </div>
-                  )}
-                </Card>
+                <DescriptionSection 
+                  description={task.description} 
+                  entityType="task" 
+                />
 
                 {/* Task Checklist */}
                 <Card className="hover:shadow-md transition-shadow duration-200">
@@ -436,7 +411,7 @@ export default function TaskDetailsPage() {
                       variant="brandBtn"
                       onClick={handleStartTimer}
                       size="sm"
-                      className="flex items-center gap-1.5"
+                      className="flex items-center gap-1.5" 
                     >
                       <Clock className="w-4 h-4" />
                       <span className="hidden sm:inline">Start Timer</span>
@@ -458,88 +433,15 @@ export default function TaskDetailsPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Date
-                            </th>
-                            <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Time
-                            </th>
-                            <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Duration
-                            </th>
-                            <th className="hidden sm:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Description
-                            </th>
-                            <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Actions
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {logs.map((log: TimeLog) => (
-                            <tr key={log.id} className="hover:bg-gray-50">
-                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                                {formatDate(log.startTime)}
-                              </td>
-                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                                {new Date(log.startTime).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  }
-                                )}
-                                {log.endTime &&
-                                  ` - ${new Date(
-                                    log.endTime
-                                  ).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}`}
-                              </td>
-                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                                {log.timeSpent
-                                  ? formatDuration(log.timeSpent)
-                                  : "In Progress"}
-                              </td>
-                              <td className="hidden sm:table-cell px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-500 max-w-xs truncate">
-                                {log.description || "-"}
-                              </td>
-                              <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-xs sm:text-sm font-medium">
-                                {log.userId === currentUser?.id ? (
-                                  <div className="flex items-center justify-end gap-2">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => openEditLogModal(log)}
-                                      className="text-blue-600 hover:text-blue-700"
-                                    >
-                                      <Edit className="w-3 h-3" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => openDeleteLogModal(log)}
-                                      className="text-red-600 hover:text-red-700"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center justify-end gap-2">
-                                    --
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    <LogsTable
+                      data={logs}
+                      projects={project ? [project] : []}
+                      tasks={task ? [task] : []}
+                      showActions={true}
+                      showPagination={true}
+                      onEdit={(log) => log.userId === currentUser?.id ? openEditLogModal(log) : null}
+                      onDelete={(log) => log.userId === currentUser?.id ? openDeleteLogModal(log) : null}
+                    />
                   )}
                 </Card>
               </div>
@@ -547,194 +449,22 @@ export default function TaskDetailsPage() {
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Task Info */}
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Info className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
-                      Task Info
-                    </h3>
-                  </div>
-                  <div className="space-y-4">
-                    {/* Created By */}
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                      <div className="flex items-center gap-2">
-                        <UserIcon className="w-4 h-4 text-indigo-600" />
-                        <span className="text-xs sm:text-sm font-medium text-gray-700">
-                          Created By
-                        </span>
-                      </div>
-                      {creatorLoading ? (
-                        <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
-                      ) : creatorData?.data ? (
-                        <div className="flex items-center gap-2">
-                          <Avatar name={creatorData.data.name} size="xs" />
-                          <span className="text-xs sm:text-sm font-medium text-gray-900">
-                            {creatorData.data.name}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-xs sm:text-sm font-medium text-gray-500">
-                          Unknown
-                        </span>
-                      )}
-                    </div>
-                    {/* Status */}
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-600" />
-                        <span className="text-xs sm:text-sm font-medium text-gray-700">
-                          Status
-                        </span>
-                      </div>
-                      <Badge
-                        variant={getStatusBadgeVariant(task.status)}
-                        className="text-xs"
-                      >
-                        {task.status || "Not Set"}
-                      </Badge>
-                    </div>
-
-                    {/* Project */}
-                    {project && (
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                        <div className="flex items-center gap-2">
-                          <FolderOpenDot className="w-4 h-4 text-purple-600" />
-                          <span className="text-xs sm:text-sm font-medium text-gray-700">
-                            Project
-                          </span>
-                        </div>
-                        <Link
-                          href={`/projects/${project.id}`}
-                          className="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
-                        >
-                          {project.name}
-                        </Link>
-                      </div>
-                    )}
-
-                    {/* Due Date */}
-                    {task.dueDate && (
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-orange-600" />
-                          <span className="text-xs sm:text-sm font-medium text-gray-700">
-                            Due Date
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-gray-900">
-                          {formatDate(task.dueDate)}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Time Spent */}
-                    {task && (
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-teal-600" />
-                          <span className="text-xs sm:text-sm font-medium text-gray-700">
-                            Time Spent
-                          </span>
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-gray-900">
-                          {formatDuration(task.totalTimeSpent)}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Created */}
-                    <div className="flex items-center justify-between py-2">
-                      <div className="flex items-center gap-2">
-                        <PlusCircle className="w-4 h-4 text-gray-600" />
-                        <span className="text-xs sm:text-sm font-medium text-gray-700">
-                          Created
-                        </span>
-                      </div>
-                      <span className="text-xs sm:text-sm font-medium text-gray-900">
-                        {formatDate(task.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                </Card>
+                <TaskInfo 
+                  task={task}
+                  project={project}
+                  creator={creatorData?.data}
+                  creatorLoading={creatorLoading}
+                  statusVariant={getStatusBadgeVariant(task.status)}
+                />
 
                 {/* Assignee Section */}
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-green-600" />
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
-                        Assignees
-                      </h3>
-                      {assignees.length > 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                          {assignees.length}
-                        </Badge>
-                      )}
-                    </div>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => setAssignUserModalOpen(true)}
-                      className="text-xs"
-                    >
-                      <UserPlus className="h-4 w-4 md:mr-1" />
-                      <span className="hidden md:inline">
-                        {assignees.length > 0 ? "Add More" : "Assign"}
-                      </span>
-                    </Button>
-                  </div>
-                  {assigneeLoading ? (
-                    <div className="flex items-center gap-3 animate-pulse">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                      </div>
-                    </div>
-                  ) : assignees.length > 0 ? (
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {assignees.map((assignee: User) => (
-                        <div
-                          key={assignee.id}
-                          className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg"
-                        >
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <Avatar name={assignee.name} size="sm" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
-                                {assignee.name}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate hidden sm:block">
-                                {assignee.email}
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleUnassignUser(assignee.id)}
-                            disabled={unassignUserMutation.isPending}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Users className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">
-                        No assignees
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        This task hasn&apos;t been assigned yet
-                      </p>
-                    </div>
-                  )}
-                </Card>
+                <TaskAssignees
+                  assignees={assignees}
+                  assigneeLoading={assigneeLoading}
+                  setAssignUserModalOpen={setAssignUserModalOpen}
+                  handleUnassignUser={handleUnassignUser}
+                  unassignUserMutation={unassignUserMutation}
+                />
 
                 {/* Followers Section */}
                 <Card className="hover:shadow-md transition-shadow duration-200">

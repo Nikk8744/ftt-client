@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import Badge from "@/components/ui/Badge";
 import { TasksTable } from "@/components/feature/tasks/TasksTable";
 import TeamMembers from "@/components/feature/members/TeamMembers";
 import {
@@ -20,14 +19,15 @@ import {
   getTeamMembers,
 } from "@/services/projectMember";
 import useAuth from "@/lib/hooks/useAuth";
-import { formatDate } from "@/lib/utils";
 import TaskForm from "@/components/feature/tasks/TaskForm";
 import { ConfirmModal } from "@/components/ui/Modal";
 import { Task } from "@/types";
-import { AlignLeft, Calendar, CircleCheck, Clock, Info, Pencil, Plus, User, UserPlus } from "lucide-react";
+import { Pencil, Plus, UserPlus } from "lucide-react";
 import EditProjectModal from "@/components/feature/project/EditProjectModal";
 import AddMemberModal from "@/components/feature/members/AddMemberModal";
 import Loader from "@/components/ui/Loader";
+import { ProjectInfo } from "@/components/feature/project/ProjectInfo";
+import { DescriptionSection } from "@/components/feature/common";
 
 // Add back the project form data type
 type ProjectFormData = {
@@ -251,33 +251,10 @@ export default function ProjectDetailsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 {/* Project Description */}
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center gap-2 mb-4">
-                    <AlignLeft className="w-5 h-5 text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-0">
-                      Description
-                    </h3>
-                  </div>
-                  {project.description ? (
-                    <div className="prose prose-sm max-w-none">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {project.description}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlignLeft className="w-8 h-8 text-gray-400" />
-                      </div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">
-                        No description provided
-                      </h4>
-                      <p className="text-xs text-gray-500">
-                        Add a description to provide more context for this project
-                      </p>
-                    </div>
-                  )}
-                </Card>
+                <DescriptionSection 
+                  description={project.description} 
+                  entityType="project" 
+                />
 
                 {/* Tasks Section */}
                 <div>
@@ -313,123 +290,12 @@ export default function ProjectDetailsPage() {
 
               <div className="space-y-6">
                 {/* Project Info */}
-                <Card className="border border-gray-100 rounded-xl bg-white overflow-hidden">
-                  <div className="border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white px-3 sm:px-4 py-2 sm:py-3">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 flex items-center gap-2">
-                      <Info className="h-4 w-4 text-indigo-600" />
-                      Project Info
-                    </h3>
-                  </div>
-
-                  <div className="p-3 sm:p-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      {/* Owner */}
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
-                          <User className="h-3 w-3 sm:h-4 sm:w-4 text-indigo-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Owner
-                          </p>
-                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
-                            {isOwner
-                              ? `${user?.name} (You)`
-                              : ownerLoading
-                              ? "Loading..."
-                              : projectOwner?.name || "Unknown User"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Status */}
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                          <CircleCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </p>
-                          <div className="mt-1">
-                            <Badge
-                              variant={
-                                project.status === "Completed"
-                                  ? "success"
-                                  : project.status === "In-Progress"
-                                  ? "warning"
-                                  : "primary"
-                              }
-                              className="text-xs"
-                            >
-                              {project.status || "Pending"}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Created Date */}
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Created
-                          </p>
-                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
-                            {formatDate(project.createdAt)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Total Hours */}
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-orange-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Total Hours
-                          </p>
-                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
-                            {project.totalHours || "0"} hrs
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Start Date */}
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-teal-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-teal-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Start Date
-                          </p>
-                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
-                            {formatDate(project.startDate)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* End Date */}
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
-                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            End Date
-                          </p>
-                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
-                            {formatDate(project.endDate)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
+                <ProjectInfo 
+                  project={project}
+                  ownerName={projectOwner?.name || ""}
+                  isCurrentUserOwner={isOwner}
+                  ownerLoading={ownerLoading}
+                />
 
                 {/* Team Members */}
                 <TeamMembers

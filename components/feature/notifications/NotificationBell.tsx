@@ -20,7 +20,7 @@ export default function NotificationBell() {
     markAsRead, 
     markAllAsRead 
   } = useNotificationStore();
-    console.log("🚀 ~ NotificationBell ~ unreadCount:", unreadCount)
+    // console.log("🚀 ~ NotificationBell ~ unreadCount:", unreadCount)
   
   const handleNotificationClick = (id: number) => {
     markAsRead(id);
@@ -59,7 +59,7 @@ export default function NotificationBell() {
           )}
         </Button> 
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-1">
+      <PopoverContent className="w-80 p-1 mr-4 lg:mr-6 mt-2 ">
         <div className="flex items-baseline justify-between gap-4 px-3 py-2">
           <Link href="/notifications" className="text-sm font-semibold">Notifications</Link>
           {unreadCount > 0 && (

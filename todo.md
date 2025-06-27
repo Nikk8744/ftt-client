@@ -5,7 +5,6 @@
 - add dark mode(in dashboard)
 - also remove the unwanted code from pages and components.
 - improve the extra code that we have written.
-- add the priority field at task level and filters according to it. (would need to update the db)
 
 
 - so a task assignee should be able to edit the checklist in that task but not delete the task.
@@ -19,5 +18,8 @@
 ## Feedback changes
 - use same font throughout the website
 - use same color(as used in the login button) throughout the website.
+  
+
+- edit proj btn - in the projects tbl only show edit proj to applicable users
 - 
 

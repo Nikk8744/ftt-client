@@ -221,11 +221,11 @@ export default function DateRangePicker({
             {/* Calendar */}
             <div className="p-4 w-full">
               <DayPicker
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
+            mode="range"
+            defaultMonth={date?.from}
+            selected={date}
                 onSelect={handleDateSelect}
-                numberOfMonths={2}
+            numberOfMonths={2}
                 showOutsideDays
                 classNames={{
                   months: "flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4",

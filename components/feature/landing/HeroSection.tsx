@@ -434,7 +434,7 @@ function AnimatedBeamDemo() {
         </div>
 
         <div className="flex items-center justify-center">
-          <Circle ref={div4Ref} className="size-16">
+          <Circle ref={div4Ref} className="size-14 bg-gray-400/60 ">
             {/* <Icons.openai /> */}
             <Logo size="md" showText={false} />
           </Circle>
