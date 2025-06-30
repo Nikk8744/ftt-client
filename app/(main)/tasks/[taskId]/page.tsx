@@ -31,8 +31,6 @@ import { getAllMembersOfProject } from "@/services/projectMember";
 import {
   Edit,
   Clock,
-  Eye,
-  EyeOff,
   Trash2,
   Users,
   Check,
@@ -45,6 +43,7 @@ import { LogsTable } from "@/components/feature/logs/LogsTable";
 import { TaskInfo } from "@/components/feature/tasks/TaskInfo";
 import { DescriptionSection } from "@/components/feature/common";
 import { TaskAssignees } from "@/components/feature/tasks/TaskAssignees";
+import { TaskFollowers } from "@/components/feature/tasks/TaskFollowers";
 
 export default function TaskDetailsPage() {
   const { taskId } = useParams();
@@ -205,16 +204,14 @@ export default function TaskDetailsPage() {
   const task = taskData?.data;
   const project = projectData?.data;
   const assignees = assigneeData?.data || [];
-  const followers = followersData?.users || [];
-  // console.log("🚀 ~ TaskDetailsPage ~ followersData:", followersData)
+  const followers = followersData?.data || [];
   const logs = logsData?.data || [];
-  // console.log("🚀 ~ TaskDetailsPage ~ logsData:", logsData)
 
   const isTaskOwner: boolean = task?.ownerId === currentUser?.id;
 
   // Check if current user is following this task
   const isUserFollowing = currentUser
-    ? followers.some((follower) => follower.id === currentUser.id)
+    ? followers.some((follower: User) => follower.id === currentUser.id)
     : false;
 
   // Handle follow/unfollow
@@ -316,22 +313,6 @@ export default function TaskDetailsPage() {
             </div>
           </div>
           <div className="flex flex-shrink-0 space-x-2">
-            <Button variant="outline" onClick={handleFollowToggle}>
-              {followersData?.users?.some(
-                (follower) => follower.id === currentUser?.id
-              ) ? (
-                <>
-                  <EyeOff className="h-4 w-4 md:mr-1" />
-                  <span className="hidden md:inline">Unfollow</span>
-                </>
-              ) : (
-                <>
-                  <Eye className="h-4 w-4 md:mr-1" />
-                  <span className="hidden md:inline">Follow</span>
-                </>
-              )}
-            </Button>
-
             {isTaskOwner && (
               <>
                 <Button
@@ -359,13 +340,6 @@ export default function TaskDetailsPage() {
                 </Button>
               </>
             )}
-
-              {/* <Button variant="myBtn" onClick={handleStartTimer}>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4 mr-1" />
-                  Track Time
-                </div>
-              </Button> */}
           </div>
         </div>
       </div>
@@ -467,66 +441,13 @@ export default function TaskDetailsPage() {
                 />
 
                 {/* Followers Section */}
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Eye className="w-5 h-5 text-yellow-600" />
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
-                      Followers
-                    </h3>
-                    {followers.length > 0 && (
-                      <Badge variant="secondary" className="text-xs">
-                        {followers.length}
-                      </Badge>
-                    )}
-                  </div>
-                  {followersLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2].map((i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-3 animate-pulse"
-                        >
-                          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                          <div className="flex-1">
-                            <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                            <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : followers.length > 0 ? (
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {followers.map((follower) => (
-                        <div
-                          key={follower.id}
-                          className="flex items-center gap-2 sm:gap-3 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <Avatar name={follower.name} size="sm" />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
-                              {follower.name}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate hidden sm:block">
-                              {follower.email}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Eye className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">
-                        No followers
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        No one is following this task yet
-                      </p>
-                    </div>
-                  )}
-                </Card>
+                <TaskFollowers
+                  followers={followers}
+                  followersLoading={followersLoading}
+                  isUserFollowing={isUserFollowing}
+                  handleFollowToggle={handleFollowToggle}
+                  currentUserId={currentUser?.id}
+                />
               </div>
             </div>
           )}

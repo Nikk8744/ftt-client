@@ -1,5 +1,5 @@
 import apiClient from './api-client';
-import { User } from '@/types';
+// import { User } from '@/types';
 // import { mockUser } from '@/lib/mockData';
 // import apiClient from './api-client';
 
@@ -14,9 +14,9 @@ import { User } from '@/types';
 /**
  * Get followers for a specific task
  */
-export const getTaskFollowers = async (taskId: number): Promise<{ users: User[] }> => {
+export const getTaskFollowers = async (taskId: number) => {
   try {
-    const response = await apiClient.get(`/taskMembers/task/${taskId}/followers`);
+    const response = await apiClient.get(`/taskAssignment/task/${taskId}/followers`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching followers for task ${taskId}:`, error);
@@ -29,7 +29,7 @@ export const getTaskFollowers = async (taskId: number): Promise<{ users: User[] 
  */
 export const addTaskFollower = async (taskId: number, userId: number) => {
   try {
-    const response = await apiClient.post(`/taskMembers/follow/${taskId}`, { userId });
+    const response = await apiClient.post(`/taskAssignment/follow/${taskId}/${userId}`);
     return response.data;
   } catch (error) {
     console.error(`Error adding follower to task ${taskId}:`, error);
@@ -42,7 +42,7 @@ export const addTaskFollower = async (taskId: number, userId: number) => {
  */
 export const removeTaskFollower = async (taskId: number, userId: number) => {
   try {
-    const response = await apiClient.delete(`/taskMembers/unfollow/${taskId}/${userId}`);
+    const response = await apiClient.delete(`/taskAssignment/unfollow/${taskId}/${userId}`);
     return response.data;
   } catch (error) {
     console.error(`Error removing follower from task ${taskId}:`, error);
@@ -125,7 +125,6 @@ export const bulkAssignUsersToTask = async (taskId: number, userIds: number[]) =
  * Get all tasks assigned to a user
  */
 export const getUserAssignedTasks = async (userId: number) => {
-  console.log("🚀 ~ getUserAssignedTasks ~ userId:", userId)
   try {
     const response = await apiClient.get(`/taskAssignment/user/${userId}/assigned`);
     // console.log("Assigned tasks API response:", response.data);

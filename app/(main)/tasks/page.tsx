@@ -53,8 +53,6 @@ export default function TasksPage() {
   
   const ownedTasks = tasksData?.tasks || [];
   const assignedTasks = assignedTasksData?.tasks.data || [];
-  console.log("🚀 ~ TasksPage ~ assignedTasks:", assignedTasks)
-
   // Combine owned and assigned tasks for the "All Tasks" view, removing duplicates
   const allTasks = [...ownedTasks];
 

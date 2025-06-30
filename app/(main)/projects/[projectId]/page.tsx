@@ -69,7 +69,6 @@ export default function ProjectDetailsPage() {
     queryFn: () => getProjectById(Number(projectId)),
     enabled: !!projectId,
   });
-  console.log("🚀 ~ ProjectDetailsPage ~ projectData:", projectData);
 
   // Get project owner information
   const { data: ownerData, isLoading: ownerLoading } = useQuery({

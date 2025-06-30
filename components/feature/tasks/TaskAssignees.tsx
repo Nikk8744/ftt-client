@@ -24,7 +24,7 @@ export const TaskAssignees = ({
 }: TaskAssigneesProps) => {
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
-      <div className="flex items-center justify-between gap-2 mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-green-600" />
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">

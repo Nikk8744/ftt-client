@@ -63,8 +63,6 @@ export function LogsTable({
 
   // Get task subject by ID
   const getTaskSubject = (taskId: number) => {
-    console.log("🚀 ~ getTaskSubject ~ taskId:", taskId)
-    console.log("🚀 ~ getTaskSubject ~ task:", tasks)
     const task = tasks.find((t) => t.id === taskId);
     return task ? task.subject : "No Task";
   };
@@ -94,7 +92,6 @@ export function LogsTable({
       accessorKey: "taskId",
       cell: ({ row }) => {
         const taskId = row.original.taskId;
-        console.log("🚀 ~ taskId from original:", taskId);
         return taskId ? (
           <Link href={`/tasks/${taskId}`} className="hover:underline text-blue-600">
             {getTaskSubject(taskId)}

@@ -124,9 +124,6 @@ export default function DashboardPage() {
   
   // All unique tasks
   const allTasks = [...createdTasks, ...assignedTasksFiltered];
-  console.log("🚀 ~ DashboardPage ~ allTasks:", allTasks)
-  console.log("🚀 ~ DashboardPage ~ createdTasks:", createdTasks)
-  console.log("🚀 ~ DashboardPage ~ assignedTasksFiltered:", assignedTasksFiltered)
 
   const logs = logsData?.logs || [];
   const totalTimeToday = totalTimeTodayData?.data.totalTimeSpent || 0;

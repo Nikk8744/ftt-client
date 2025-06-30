@@ -38,7 +38,6 @@ export const getProjectOwner = getUserById;
 export const getAllProjectsOfUser = async () => {
   try {
     const response = await apiClient.get('/project/getAllProjectsOfUser');
-    console.log("🚀 ~ getAllProjectsOfUser ~ response:", response)
     return {
       projects: response.data.data || []
     };
