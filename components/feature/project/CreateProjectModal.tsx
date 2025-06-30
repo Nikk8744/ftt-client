@@ -1,10 +1,26 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ChevronDown } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useEffect, useState } from "react";
 
 // Form validation schema
 const projectSchema = z.object({
@@ -18,7 +34,7 @@ const projectSchema = z.object({
     .max(1000, "Project description cannot exceed 1000 characters"),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
-  status: z.enum(["Pending", "In-Progress", "Completed"]).optional(),
+  status: z.enum(["Pending", "In-Progress", "Completed"]),
 });
 
 type ProjectFormData = z.infer<typeof projectSchema>;
@@ -38,12 +54,22 @@ export default function CreateProjectModal({
   isLoading = false,
   error = null,
 }: CreateProjectModalProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<ProjectFormData>({
+  // Add a state to track if the modal is fully mounted
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    // Set mounted state after a small delay to ensure the modal is fully rendered
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setIsMounted(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setIsMounted(false);
+    }
+  }, [isOpen]);
+
+  const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       name: "",
@@ -55,7 +81,7 @@ export default function CreateProjectModal({
   });
 
   const handleClose = () => {
-    reset();
+    form.reset();
     onClose();
   };
 
@@ -75,7 +101,7 @@ export default function CreateProjectModal({
           </Button>
           <Button
             variant="brandBtn"
-            onClick={handleSubmit(onSubmit)}
+            onClick={form.handleSubmit(onSubmit)}
             isLoading={isLoading}
             disabled={isLoading}
             className="px-4 py-2"
@@ -85,130 +111,123 @@ export default function CreateProjectModal({
         </div>
       }
     >
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-5 py-2"
-      >
-        <div className="space-y-1.5">
-          <Input
-            id="name"
-            label="Project Name"
-            placeholder="Enter project name"
-            error={errors.name?.message}
-            {...register("name")}
-            className="focus:ring-2 focus:ring-primary-500/30"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
+      <div className="relative">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-5 py-2 w-full"
           >
-            Description
-          </label>
-          <textarea
-            id="description"
-            rows={4}
-            placeholder="Enter project description"
-            className={`w-full rounded-md border ${
-              errors.description ? "border-red-500" : "border-gray-300"
-            } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 px-3 py-2 text-sm`}
-            {...register("description")}
-          ></textarea>
-          {errors.description && (
-            <p className="mt-1 text-xs text-red-600">
-              {errors.description.message}
-            </p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label
-              htmlFor="startDate"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Start Date
-            </label>
-            <div className="relative">
-              <input
-                type="date"
-                id="startDate"
-                className={`w-full rounded-md border ${
-                  errors.startDate ? "border-red-500" : "border-gray-300"
-                } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 py-2 px-3 text-sm`}
-                {...register("startDate")}
-              />
-              {errors.startDate && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.startDate.message}
-                </p>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Project Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter project name"
+                      {...field}
+                      className="w-full"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-          </div>
+            />
 
-          <div className="space-y-1.5">
-            <label
-              htmlFor="endDate"
-              className="block text-sm font-medium text-gray-700"
-            >
-              End Date
-            </label>
-            <div className="relative">
-              <input
-                type="date"
-                id="endDate"
-                className={`w-full rounded-md border ${
-                  errors.endDate ? "border-red-500" : "border-gray-300"
-                } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 py-2 px-3 text-sm`}
-                {...register("endDate")}
-              />
-              {errors.endDate && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.endDate.message}
-                </p>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter project description"
+                      className="w-full resize-none"
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-          </div>
-        </div>
+            />
 
-        <div className="space-y-1.5">
-          <label
-            htmlFor="status"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Status
-          </label>
-          <div className="relative">
-            <select
-              id="status"
-              className={`w-full rounded-md border ${
-                errors.status ? "border-red-500" : "border-gray-300"
-              } shadow-sm focus:border-primary-500 focus:ring-primary-500/30 focus:ring-2 py-2 px-3 text-sm bg-white appearance-none`}
-              {...register("status")}
-            >
-              <option value="Pending">Pending</option>
-              <option value="In-Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <ChevronDown className="h-4 w-4 text-gray-700" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Start Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        className="w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>End Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        className="w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            {errors.status && (
-              <p className="mt-1 text-xs text-red-600">
-                {errors.status.message}
-              </p>
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  {isMounted && (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="z-[9999]">
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="In-Progress">In Progress</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
             )}
-          </div>
-        </div>
-
-        {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
-      </form>
+          </form>
+        </Form>
+      </div>
     </Modal>
   );
 } 

@@ -35,7 +35,7 @@ export const addTaskFollower = async (taskId: number, userId: number) => {
     console.error(`Error adding follower to task ${taskId}:`, error);
     throw error;
   }
-};
+};  
 
 /**
  * Remove a user as a follower from a task

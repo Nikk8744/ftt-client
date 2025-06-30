@@ -236,7 +236,9 @@ export default function ProjectsPage() {
           isLoading={createProjectMutation.isPending}
           error={
             createProjectMutation.isError
-              ? "Failed to create project. Please try again."
+              ? (createProjectMutation.error instanceof Error
+                  ? createProjectMutation.error.message
+                  : "Failed to create project. Please try again.")
               : null
           }
         />

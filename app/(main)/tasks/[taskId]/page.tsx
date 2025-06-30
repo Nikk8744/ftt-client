@@ -385,7 +385,7 @@ export default function TaskDetailsPage() {
                       variant="brandBtn"
                       onClick={handleStartTimer}
                       size="sm"
-                      className="flex items-center gap-1.5" 
+                      className="flex items-center gap-1.5"
                     >
                       <Clock className="w-4 h-4" />
                       <span className="hidden sm:inline">Start Timer</span>
@@ -486,13 +486,13 @@ export default function TaskDetailsPage() {
             setSelectedLog(null);
           }}
           onSubmit={(updateData) => {
-            if (!selectedLog) return;
-            updateLogMutation.mutate({
-              id: selectedLog.id,
+                  if (!selectedLog) return;
+                  updateLogMutation.mutate({
+                    id: selectedLog.id,
               updateData,
-            });
-          }}
-          isLoading={updateLogMutation.isPending}
+                  });
+                }}
+                isLoading={updateLogMutation.isPending}
           timeLog={selectedLog}
           projects={[project].filter(Boolean)}
           tasks={task ? [task] : []}

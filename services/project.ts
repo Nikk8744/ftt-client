@@ -11,6 +11,11 @@ export const createProject = async (data: ProjectCreateData) => {
     const response = await apiClient.post('/project/createProject', data);
     return response.data;
   } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+      const errorMessage = error.response.data?.message || 'Error creating project';
+      console.error('Error creating project:', error);
+      throw new Error(errorMessage);
+    }
     console.error('Error creating project:', error);
     throw error;
   }
