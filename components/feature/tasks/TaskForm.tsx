@@ -166,7 +166,6 @@ const   TaskForm = ({
     },
     enabled: !!task?.id && isOpen,
   });
-  console.log("🚀 ~ checklistData:", checklistData)
 
   // Load checklist items when available
   useEffect(() => {
