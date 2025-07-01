@@ -128,6 +128,7 @@ export default function CreateProjectModal({
                       placeholder="Enter project name"
                       {...field}
                       className="w-full"
+                      fullWidth={true}
                     />
                   </FormControl>
                   <FormMessage />

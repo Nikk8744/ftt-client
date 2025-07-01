@@ -115,7 +115,7 @@ export default function EditProjectModal({
             Cancel
           </Button>
           <Button
-            variant="default"
+            variant="brandBtn"
             onClick={handleSubmit(onSubmit)}
             isLoading={isLoading}
             disabled={isLoading}
@@ -138,6 +138,7 @@ export default function EditProjectModal({
             error={errors.name?.message}
             {...register("name")}
             className="focus:ring-2 focus:ring-primary-500/30"
+            fullWidth={true}
           />
         </div>
 

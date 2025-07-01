@@ -80,6 +80,7 @@ export default function AddMemberModal({
           placeholder="Enter user ID to add"
           error={errors.userId?.message}
           {...register("userId")}
+          fullWidth
         />
         
         {error && (

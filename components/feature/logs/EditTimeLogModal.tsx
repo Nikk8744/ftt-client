@@ -145,6 +145,7 @@ export function EditTimeLogModal({
           type="datetime-local"
           error={errors.startTime?.message}
           {...register("startTime")}
+          fullWidth={true}
         />
 
         <Input
@@ -152,6 +153,7 @@ export function EditTimeLogModal({
           type="datetime-local"
           error={errors.endTime?.message}
           {...register("endTime")}
+          fullWidth={true}
         />
 
         <div className="space-y-1.5">

@@ -460,6 +460,7 @@ const   TaskForm = ({
             placeholder="Enter task name"
             className={errors.subject ? "border-red-500" : ""}
             {...register("subject")}
+            fullWidth={true}
           />
           {errors.subject && (
             <p className="text-sm text-red-600">{errors.subject.message}</p>
@@ -654,6 +655,7 @@ const   TaskForm = ({
                   handleAddItem(e);
                 }
               }}
+              fullWidth={true}
             />
             <Button
               type="button"

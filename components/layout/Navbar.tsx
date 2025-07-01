@@ -36,13 +36,13 @@ export default function Navbar() {
         <div className="flex items-center h-full">
           {/* Left - Logo */}
           <div className="flex-none w-44">
-            <Link href="/" className="flex items-center">
+            <div className="flex items-center">
               {/* <Clock className="w-4 h-4 lg:w-6 lg:h-6 text-white mr-2 mb-0" /> */}
               <Logo size="md" showText={false} />
               <span className="text-xl lg:text-2xl font-semibold text-white font-serif pr-7 py-3 rounded-xl tracking-widest ml-3">
                 Tracksy
               </span>
-            </Link>
+            </div>
           </div>
 
           {/* Center - Navigation Links */}
@@ -50,7 +50,7 @@ export default function Navbar() {
             <div className="flex ">
               <Link
                 href="#features"
-                className="text-white  hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl"
+                className="text-white hover:border-atlantis-400 border-b-2 border-transparent text-sm transition-colors px-5 py-3 rounded-xl"
               >
                 Features
               </Link>
