@@ -251,7 +251,8 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
   const selectedStatuses = useMemo(() => {
     const filterValue = table.getColumn("status")?.getFilterValue() as string[];
     return filterValue ?? [];
-  }, [table]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnFilters, table]);
 
   const handleStatusChange = (checked: boolean, value: string) => {
     const filterValue = table.getColumn("status")?.getFilterValue() as string[] || [];
