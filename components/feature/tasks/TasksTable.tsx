@@ -176,15 +176,15 @@ export function TasksTable({
           >
             <SelectTrigger className={cn(
               "w-[90px] sm:w-[110px] h-8 px-2 sm:px-3 py-1 rounded-full border-0",
-              priority === "Urgent" ? "bg-red-50 hover:bg-red-100/70" :
-              priority === "High" ? "bg-orange-50 hover:bg-orange-100/70" :
-              priority === "Medium" ? "bg-yellow-50 hover:bg-yellow-100/70" :
-              "bg-blue-50 hover:bg-blue-100/70",
+              priority === "Urgent" ? "bg-red-50 dark:bg-red-900/50 hover:bg-red-100/70 dark:hover:bg-red-900/70" :
+              priority === "High" ? "bg-orange-50 dark:bg-orange-900/50 hover:bg-orange-100/70 dark:hover:bg-orange-900/70" :
+              priority === "Medium" ? "bg-yellow-50 dark:bg-yellow-900/50 hover:bg-yellow-100/70 dark:hover:bg-yellow-900/70" :
+              "bg-blue-50 dark:bg-blue-900/50 hover:bg-blue-100/70 dark:hover:bg-blue-900/70",
               "focus:ring-1",
-              priority === "Urgent" ? "focus:ring-red-200" :
-              priority === "High" ? "focus:ring-orange-200" :
-              priority === "Medium" ? "focus:ring-yellow-200" :
-              "focus:ring-blue-200"
+              priority === "Urgent" ? "focus:ring-red-200 dark:focus:ring-red-500" :
+              priority === "High" ? "focus:ring-orange-200 dark:focus:ring-orange-500" :
+              priority === "Medium" ? "focus:ring-yellow-200 dark:focus:ring-yellow-500" :
+              "focus:ring-blue-200 dark:focus:ring-blue-500"
             )}>
               <SelectValue>
                 <div className="flex items-center gap-1.5">
@@ -194,16 +194,17 @@ export function TasksTable({
                   )} />
                   <span className={cn(
                     "text-xs sm:text-sm font-medium",
-                    priorityConfig.textColor
+                    priorityConfig.textColor,
+                    "dark:text-gray-300"
                   )}>
                     {priority}
                   </span>
                 </div>
               </SelectValue>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {priorities.map((priority) => (
-                <SelectItem key={priority.value} value={priority.value} className="py-2 border-b border-gray-200">
+                <SelectItem key={priority.value} value={priority.value} className="py-2 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-1.5">
                     <div className={cn(
                       "h-2 w-2 rounded-full",
@@ -211,7 +212,8 @@ export function TasksTable({
                     )} />
                     <span className={cn(
                       "text-sm font-medium",
-                      priority.textColor
+                      priority.textColor,
+                      "dark:text-gray-300"
                     )}>{priority.label}</span>
                   </div>
                 </SelectItem>
@@ -243,7 +245,7 @@ export function TasksTable({
             value={status}
             onValueChange={(newStatus) => onStatusChange && onStatusChange(row.original, newStatus)}
           >
-            <SelectTrigger className="w-[90px] sm:w-[130px] h-8 px-2 sm:px-3 py-1 rounded-full border-0 bg-blue-50/50 hover:bg-blue-100/50 focus:ring-1 focus:ring-blue-200">
+            <SelectTrigger className="w-[90px] sm:w-[130px] h-8 px-2 sm:px-3 py-1 rounded-full border-0 bg-blue-50/50 dark:bg-blue-900/50 hover:bg-blue-100/50 dark:hover:bg-blue-900/70 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-500">
               <SelectValue>
                 <div className="flex items-center gap-1.5">
                   <div className={cn(
@@ -254,18 +256,18 @@ export function TasksTable({
                   )} />
                   <span className={cn(
                     "text-xs sm:text-sm font-medium",
-                    status === "Done" ? "text-green-700" :
-                    status === "In-Progress" ? "text-yellow-700" :
-                    "text-gray-600"
+                    status === "Done" ? "text-green-700 dark:text-green-300" :
+                    status === "In-Progress" ? "text-yellow-700 dark:text-yellow-300" :
+                    "text-gray-600 dark:text-gray-300"
                   )}>
                     {status}
                   </span>
                 </div>
               </SelectValue>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               {statuses.map((status) => (
-                <SelectItem key={status.value} value={status.value} className="py-2 border-b border-gray-200">
+                <SelectItem key={status.value} value={status.value} className="py-2 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-1.5">
                     <div className={cn(
                       "h-2 w-2 rounded-full",
@@ -273,7 +275,8 @@ export function TasksTable({
                     )} />
                     <span className={cn(
                       "text-sm font-medium",
-                      status.textColor
+                      status.textColor,
+                      "dark:text-gray-300"
                     )}>{status.label}</span>
                   </div>
                 </SelectItem>
@@ -710,4 +713,4 @@ export function TasksTable({
       </div>
     </div>
   );
-} 
+}

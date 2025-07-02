@@ -23,18 +23,18 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   children
 }) => {
   return (
-    <div className="border-b border-gray-400 rounded-b-3xl">
+    <div className="border-b border-gray-400 dark:border-gray-700 rounded-b-3xl">
       <div className={`px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between ${
         variant === 'brand' 
           ? 'shadow-[inset_-1px_-4px_2px_var(--color-brand)]' 
           : ''
       } rounded-b-3xl`}>
         <div className="mb-4 md:mb-0">
-          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
             {title}
           </h1>
           {description && (
-            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-4xl">
               {description}
             </p>
           )}
@@ -59,4 +59,4 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   );
 };
 
-export default PageHeader; 
+export default PageHeader;

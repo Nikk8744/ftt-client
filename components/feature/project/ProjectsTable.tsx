@@ -292,12 +292,12 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
               type="text"
               aria-label="Filter by name or description"
             />
-            <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+            <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50 dark:text-gray-400">
               <ListFilter size={16} strokeWidth={2} aria-hidden="true" />
             </div>
             {Boolean(table.getColumn("name")?.getFilterValue()) && (
               <button
-                className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
                 aria-label="Clear filter"
                 onClick={() => {
                   table.getColumn("name")?.setFilterValue("");
@@ -328,12 +328,12 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="min-w-36 p-3 border border-gray-200" align="start">
+            <PopoverContent className="w-44 p-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-800" align="start">
               <div className="space-y-3">
-                <div className="text-xs font-medium text-muted-foreground border-b border-gray-200 pb-2">Filters</div>
+                <div className="text-xs font-medium text-muted-foreground dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2">Filters</div>
                 <div className="space-y-3">
                   {uniqueStatusValues.map((value, i, array) => (
-                    <div key={value} className={`flex items-center gap-2 ${i !== array.length - 1 ? 'pb-2 border-b border-gray-200' : ''}`}>
+                    <div key={value} className={`flex items-center gap-2 ${i !== array.length - 1 ? 'pb-2 border-b border-gray-200 dark:border-gray-700' : ''}`}>
                       <Checkbox
                         id={`${id}-${i}`}
                         checked={selectedStatuses.includes(value)}
@@ -347,7 +347,15 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                         htmlFor={`${id}-${i}`}
                         className="flex grow justify-between gap-2 font-normal"
                       >
-                        {value}{" "}
+                        <Badge variant={
+                          value === "Completed"
+                            ? "primary"
+                            : value === "In-Progress"
+                            ? "secondary"
+                            : "default"
+                        }>
+                          {value}
+                        </Badge>
                         <span className="ms-2 text-xs ted-foreground">
                           {statusCounts.get(value)}
                         </span>
@@ -371,8 +379,8 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                 View
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="border border-gray-200">
-              <DropdownMenuLabel className="border-b border-gray-200">Toggle columns</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <DropdownMenuLabel className="border-b border-gray-200 dark:border-gray-700">Toggle columns</DropdownMenuLabel>
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -380,7 +388,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize border-b border-gray-200"
+                      className="capitalize border-b border-gray-200 dark:border-gray-700"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                     >
@@ -394,17 +402,17 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-background">
+      <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-background dark:bg-gray-800">
         <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow key={headerGroup.id} className="hover:bg-transparent dark:hover:bg-transparent border-b-gray-200 dark:border-b-gray-700">
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
                       style={{ width: `${header.getSize()}px` }}
-                      className="h-11 border-gray-200"
+                      className="h-11 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300"
                     >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
@@ -456,9 +464,9 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="dark:border-gray-700">
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="last:py-0 border-gray-200">
+                    <TableCell key={cell.id} className="last:py-0 border-gray-200 dark:border-gray-700">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -466,7 +474,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500 dark:text-gray-400">
                   No results.
                 </TableCell>
               </TableRow>
@@ -491,12 +499,12 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
             <SelectTrigger id={id} className="w-fit whitespace-nowrap">
               <SelectValue placeholder="Select number of results" />
             </SelectTrigger>
-            <SelectContent className="[&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2 border border-gray-200">
+            <SelectContent className="[&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               {[5, 10, 25, 50].map((pageSize, index, array) => (
                 <SelectItem 
                   key={pageSize} 
                   value={pageSize.toString()}
-                  className={index !== array.length - 1 ? 'border-b border-gray-200' : ''}
+                  className={index !== array.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}
                 >
                   {pageSize}
                 </SelectItem>
@@ -584,4 +592,4 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
       </div>
     </div>
   );
-} 
+}

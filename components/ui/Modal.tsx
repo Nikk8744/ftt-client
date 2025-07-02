@@ -139,7 +139,7 @@ export default function Modal({
       <div
         ref={modalRef}
         className={cn(
-          "relative w-full rounded-lg bg-white shadow-xl transition-all duration-300",
+          "relative w-full rounded-lg bg-white dark:bg-gray-800 shadow-xl transition-all duration-300",
           widthClasses[maxWidth],
           isVisible 
             ? "translate-y-0 opacity-100" 
@@ -148,12 +148,12 @@ export default function Modal({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
             <div>
               {title && (
                 <h3 
                   id="modal-title"
-                  className="text-lg font-medium text-gray-900"
+                  className="text-lg font-medium text-gray-900 dark:text-gray-100"
                 >
                   {title}
                 </h3>
@@ -161,7 +161,7 @@ export default function Modal({
               {description && (
                 <p 
                   id="modal-description"
-                  className="mt-1 text-sm text-gray-500"
+                  className="mt-1 text-sm text-gray-500 dark:text-gray-400"
                 >
                   {description}
                 </p>
@@ -171,7 +171,7 @@ export default function Modal({
               <button 
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="rounded-lg p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 aria-label="Close modal"
               >
                 <XMarkIcon className="h-5 w-5" aria-hidden="true" />
@@ -187,7 +187,7 @@ export default function Modal({
         
         {/* Footer */}
         {footer && (
-          <div className="border-t border-gray-200 px-6 py-4">
+          <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
             {footer}
           </div>
         )}
@@ -259,7 +259,7 @@ export function ConfirmModal({
         </div>
       }
     >
-      <p className="text-gray-700">{message}</p>
+      <p className="text-gray-700 dark:text-gray-300">{message}</p>
     </Modal>
   );
 }

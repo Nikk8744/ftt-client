@@ -66,27 +66,27 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({ onChange, defaultValue = 
       onValueChange={onChange}
       disabled={isLoading}
     >
-      <SelectTrigger className="w-full bg-white border border-gray-200 rounded-md shadow-sm">
+      <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm text-gray-900 dark:text-gray-100">
         <div className="flex items-center gap-2">
-          <FolderKanban className="h-4 w-4 text-blue-500" />
+          <FolderKanban className="h-4 w-4 text-blue-500 dark:text-blue-400" />
           <SelectValue placeholder="Select Project" />
         </div>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
         <SelectGroup>
-          <SelectLabel className="text-xs font-semibold text-gray-500 px-2 py-1">
+          <SelectLabel className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 py-1">
             Projects
           </SelectLabel>
-          <SelectItem value="all" className="flex items-center gap-2">
+          <SelectItem value="all" className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700">
             <div className="flex items-center gap-2">
-              <Layers className="h-4 w-4 text-blue-500" />
+              <Layers className="h-4 w-4 text-blue-500 dark:text-blue-400" />
               <span>All Projects</span>
             </div>
           </SelectItem>
           {projects.map((project) => (
-            <SelectItem key={project.id} value={String(project.id)} className="flex items-center gap-2">
+            <SelectItem key={project.id} value={String(project.id)} className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700">
               <div className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-indigo-500" />
+                <Briefcase className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
                 <span>{project.name}</span>
               </div>
             </SelectItem>
@@ -97,4 +97,4 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({ onChange, defaultValue = 
   );
 };
 
-export default ProjectFilter; 
+export default ProjectFilter;

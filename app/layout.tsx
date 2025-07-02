@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display, DM_Sans } from 'next/font/google';
 import { Providers } from './providers';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -40,7 +41,14 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${playfair.variable} ${dmSans.variable}`}>
       <body className={`${inter.className} antialiased m-0 p-0`}>
         <Providers>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
           {children}
+          </ThemeProvider>
         </Providers>
       </body>
     </html>

@@ -222,8 +222,8 @@ export default function CreateProjectModal({
             />
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-600">{error}</p>
+              <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/50 rounded-md">
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
           </form>
@@ -231,4 +231,4 @@ export default function CreateProjectModal({
       </div>
     </Modal>
   );
-} 
+}

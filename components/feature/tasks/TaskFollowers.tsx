@@ -25,7 +25,7 @@ export const TaskFollowers = ({
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <Eye className="w-5 h-5 text-yellow-600" />
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0 dark:text-gray-100">
             Followers
           </h3>
           {followers.length > 0 && (
@@ -102,4 +102,4 @@ export const TaskFollowers = ({
       )}
     </Card>
   );
-}; 
+};

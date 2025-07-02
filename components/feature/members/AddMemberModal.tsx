@@ -84,15 +84,15 @@ export default function AddMemberModal({
         />
         
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/50 rounded-md">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
         
-        <div className="text-sm text-gray-500 bg-blue-50 p-3 rounded-md border border-blue-100">
+        <div className="text-sm text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/30 p-3 rounded-md border border-blue-100 dark:border-blue-500/50">
           <p>Note: You need to know the user ID to add them to this project. {!isOwner && "Only the project owner can add members."}</p>
         </div>
       </form>
     </Modal>
   );
-} 
+}

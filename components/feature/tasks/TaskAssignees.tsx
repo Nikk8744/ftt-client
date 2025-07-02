@@ -26,8 +26,8 @@ export const TaskAssignees = ({
     <Card className="hover:shadow-md transition-shadow duration-200">
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-green-600" />
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-0">
+          <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
+          <h3 className="text-base sm:text-lg font-semibold text-foreground mb-0">
             Assignees
           </h3>
           {assignees.length > 0 && (
@@ -50,10 +50,10 @@ export const TaskAssignees = ({
       </div>
       {assigneeLoading ? (
         <div className="flex items-center gap-3 animate-pulse">
-          <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+          <div className="w-10 h-10 bg-muted rounded-full"></div>
           <div className="flex-1">
-            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+            <div className="h-4 bg-muted rounded mb-2"></div>
+            <div className="h-3 bg-muted rounded w-2/3"></div>
           </div>
         </div>
       ) : assignees.length > 0 ? (
@@ -61,25 +61,25 @@ export const TaskAssignees = ({
           {assignees.map((assignee: User) => (
             <div
               key={assignee.id}
-              className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg"
+              className="flex items-center justify-between p-2 sm:p-3 bg-muted rounded-lg"
             >
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex flex-col items-start gap-2 sm:gap-3">
+                <div className="flex flex-row gap-3 items-center justify-center">
                 <Avatar name={assignee.name} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
+                  <p className="text-xs sm:text-sm font-semibold text-foreground truncate m-0">
                     {assignee.name}
                   </p>
-                  <p className="text-xs text-gray-500 truncate hidden sm:block">
+                </div>
+                  <p className="pl-11 text-xs text-muted-foreground truncate hidden sm:block">
                     {assignee.email}
                   </p>
-                </div>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleUnassignUser(assignee.id)}
                 disabled={unassignUserMutation.isPending}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-600"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -88,11 +88,11 @@ export const TaskAssignees = ({
         </div>
       ) : (
         <div className="text-center py-6">
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Users className="w-6 h-6 text-gray-400" />
+          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+            <Users className="w-6 h-6 text-muted-foreground" />
           </div>
-          <p className="text-sm font-medium text-gray-500 mb-1">No assignees</p>
-          <p className="text-xs text-gray-400">
+          <p className="text-sm font-medium text-muted-foreground mb-1">No assignees</p>
+          <p className="text-xs text-muted-foreground">
             This task hasn&apos;t been assigned yet
           </p>
         </div>

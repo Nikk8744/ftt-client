@@ -188,16 +188,16 @@ export function LogsTable({
   });
 
   return (
-    <div className="rounded-md border border-gray-200 overflow-hidden">
+    <div className="rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
       <Table className="border-collapse">
-        <TableHeader className="bg-gray-50">
+        <TableHeader className="bg-gray-50 dark:bg-gray-800">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="border-b border-gray-200">
+            <TableRow key={headerGroup.id} className="border-b border-gray-200 dark:border-gray-700">
               {headerGroup.headers.map((header) => (
                 <TableHead 
                   key={header.id} 
                   style={{ width: `${header.getSize()}px` }}
-                  className="border-r border-gray-200 last:border-r-0 text-gray-700"
+                  className="border-r border-gray-200 dark:border-gray-700 last:border-r-0 text-gray-700 dark:text-gray-300"
                 >
                   {header.isPlaceholder
                     ? null
@@ -216,12 +216,12 @@ export function LogsTable({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="hover:bg-gray-50/50 border-b border-gray-200 last:border-b-0"
+                className="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell 
                     key={cell.id}
-                    className="border-r border-gray-200 last:border-r-0"
+                    className="border-r border-gray-200 dark:border-gray-700 last:border-r-0"
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
@@ -232,7 +232,7 @@ export function LogsTable({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="h-24 text-center"
+                className="h-24 text-center text-gray-500 dark:text-gray-400"
               >
                 No logs found
               </TableCell>
@@ -242,8 +242,8 @@ export function LogsTable({
       </Table>
       
       {showPagination && data.length > 0 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to {Math.min(
               (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
               data.length
@@ -280,4 +280,4 @@ export function LogsTable({
       )}
     </div>
   );
-} 
+}

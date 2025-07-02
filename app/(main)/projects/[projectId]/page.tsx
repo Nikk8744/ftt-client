@@ -192,13 +192,13 @@ export default function ProjectDetailsPage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
-      <div className="border-b border-gray-400 rounded-b-3xl">
+      <div className="border-b border-gray-400 dark:border-gray-700 rounded-b-3xl">
         <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
               {projectLoading ? "Loading..." : projectData?.data?.name}
             </h1>
-            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-4xl">
               {projectData?.data?.description}
             </p>
           </div>
@@ -236,7 +236,7 @@ export default function ProjectDetailsPage() {
           </div>
         </div>
       </div>
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-gray-50 dark:bg-gray-900">
         <div className="p-3 sm:p-6">
           {projectLoading ? (
             <div className="text-center py-8">
@@ -258,19 +258,19 @@ export default function ProjectDetailsPage() {
                 {/* Tasks Section */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-medium text-gray-900">Tasks</h2>
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tasks</h2>
                   </div>
 
                   {tasksLoading ? (
                     <Card className="p-8 text-center">
-                      <p>Loading tasks...</p>
+                      <p className="dark:text-gray-300">Loading tasks...</p>
                     </Card>
                   ) : tasks.length === 0 ? (
                     <Card className="p-8 text-center">
-                      <p className="text-gray-500 mb-4">
+                      <p className="text-gray-500 dark:text-gray-400 mb-4">
                         No tasks found in this project.
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Click the &quot;Add Task&quot; button to create your
                         first task.
                       </p>
@@ -380,9 +380,7 @@ export default function ProjectDetailsPage() {
           onClose={() => setIsDeleteTaskModalOpen(false)}
           onConfirm={() => deleteTaskMutation.mutate(selectedTask.id)}
           title="Delete Task"
-          message={`Are you sure you want to delete "${
-            selectedTask.name || selectedTask.subject
-          }"? This action cannot be undone.`}
+          message={`Are you sure you want to delete "${selectedTask.name || selectedTask.subject}"? This action cannot be undone.`}
           confirmText="Delete"
           cancelText="Cancel"
           variant="danger"

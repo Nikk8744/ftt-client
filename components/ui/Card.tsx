@@ -19,10 +19,10 @@ export default function Card({
 
   // Variant styles
   const variantStyles = {
-    default: "bg-white shadow",
-    elevated: "bg-white shadow-md",
-    outline: "bg-white border border-gray-200",
-    flat: "bg-gray-50",
+    default: "bg-white dark:bg-gray-800 shadow",
+    elevated: "bg-white dark:bg-gray-800 shadow-md",
+    outline: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
+    flat: "bg-gray-50 dark:bg-gray-900",
   };
 
   // Padding styles

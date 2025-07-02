@@ -14,6 +14,7 @@ import NotificationBell from '@/components/feature/notifications/NotificationBel
 import { useNotifications } from '@/lib/hooks/useNotifications';
 import { AlertCircle, ChartNoAxesGantt, CirclePause, ClipboardList, FolderOpenDot, LogOut, Pause, Play, Settings, User } from 'lucide-react';
 import { StopIcon } from '@heroicons/react/24/outline';
+import { ThemeToggle } from './ThemeToggle';
 
 interface HeaderProps {
   sidebarOpen: boolean;
@@ -151,15 +152,15 @@ const activeProjects = projects.filter((project: any)  =>
   };
 
   return (
-    <header className={`bg-white/90 backdrop-blur-md border-b border-gray-100 fixed ${sidebarOpen && !isMobile ? 'lg:left-[280px]' : 'left-0'} right-0 z-10 shadow-sm transition-all duration-300`}>
+    <header className={`bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 fixed ${sidebarOpen && !isMobile ? 'lg:left-[280px]' : 'left-0'} right-0 z-10 shadow-sm transition-all duration-300`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-end h-16">
           {/* Timer Display & Controls */}
           <div className="flex items-center gap-3">
             {/* Timer Display */}
-            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
               <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
-              <span className="text-sm sm:text-lg font-mono font-semibold text-gray-900 min-w-[60px] sm:min-w-[80px]">
+              <span className="text-sm sm:text-lg font-mono font-semibold text-gray-900 dark:text-gray-100 min-w-[60px] sm:min-w-[80px]">
                 {formattedTime}
               </span>
             </div>
@@ -207,14 +208,14 @@ const activeProjects = projects.filter((project: any)  =>
             
             {/* Dropdown Menu */}
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20 animate-in fade-in slide-in-from-top-5 duration-200">
-                <div className="px-4 py-2 text-sm text-gray-900 border-b border-gray-100">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-20 animate-in fade-in slide-in-from-top-5 duration-200">
+                <div className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100 border-b border-gray-100 dark:border-gray-700">
                   <div className="font-medium truncate">{user?.name || 'User'}</div>
-                  <div className="truncate text-gray-500 text-xs">{user?.email || ''}</div>
+                  <div className="truncate text-gray-500 dark:text-gray-400 text-xs">{user?.email || ''}</div>
                 </div>
                 <Link 
                   href="/profile" 
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => setIsUserMenuOpen(false)}
                 >
                   <User className="w-4 h-4" />
@@ -222,19 +223,23 @@ const activeProjects = projects.filter((project: any)  =>
                 </Link>
                 <Link
                   href="/profile"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => setIsUserMenuOpen(false)}
                 >
                   <Settings className="w-4 h-4" />
                   Settings
                 </Link>
-                <hr className="my-1 border-gray-100" />
+                <hr className="my-1 border-gray-100 dark:border-gray-700" />
+                <div className="p-2">
+                  <ThemeToggle />
+                </div>
+                <hr className="my-1 border-gray-100 dark:border-gray-700" />
                 <button
                   onClick={() => {
                     setIsUserMenuOpen(false);
                     logout();
                   }}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout

@@ -22,8 +22,24 @@ import { assignUserToTask, getTaskAssignees } from "@/services/taskMembers";
 import { getAllMembersOfProject } from "@/services/projectMember";
 import { X } from "lucide-react";
 import Input from "@/components/ui/Input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { AssignUserModal } from "./AssignUserModal";
 
 // Form validation schema
 const taskSchema = z.object({
@@ -67,7 +83,7 @@ interface TaskFormProps {
   onClose: () => void;
 }
 
-const   TaskForm = ({
+const TaskForm = ({
   projectId,
   task,
   isOpen,
@@ -75,6 +91,18 @@ const   TaskForm = ({
 }: TaskFormProps): React.ReactElement => {
   const queryClient = useQueryClient();
   const isEditMode = !!task;
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setIsMounted(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setIsMounted(false);
+    }
+  }, [isOpen]);
 
   // Checklist state
   const [newItemText, setNewItemText] = useState("");
@@ -136,13 +164,7 @@ const   TaskForm = ({
     }
   }, [currentUser, isEditMode, selectedAssignees.length]);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm<TaskFormData>({
+  const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       subject: task?.subject || "",
@@ -154,7 +176,7 @@ const   TaskForm = ({
   });
 
   // Watch status for conditionally displaying completedAt
-  const currentStatus = watch("status");
+  const currentStatus = form.watch("status");
 
   // Fetch existing checklist items if editing a task
   const { data: checklistData, isLoading: checklistLoading } = useQuery<{ data: ChecklistItem[] }, Error>({
@@ -232,7 +254,7 @@ const   TaskForm = ({
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["assignedTasks"] });
       onClose();
-      reset();
+      form.reset();
       setTemporaryItems([]);
       setSelectedAssignees([]);
       setDueDateError(null);
@@ -431,7 +453,7 @@ const   TaskForm = ({
       </Button>
       <Button
         variant="brandBtn"
-        onClick={handleSubmit(onSubmit)}
+        onClick={form.handleSubmit(onSubmit)}
         isLoading={isPending}
         disabled={isPending}
       >
@@ -448,466 +470,414 @@ const   TaskForm = ({
       maxWidth="xl"
       footer={footerContent}
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Task Name */}
-        <div className="space-y-1.5">
-          <Label htmlFor="subject" className="text-sm font-medium text-gray-900">
-            Task Name
-          </Label>
-          <Input
-            id="subject"
-            placeholder="Enter task name"
-            className={errors.subject ? "border-red-500" : ""}
-            {...register("subject")}
-            fullWidth={true}
-          />
-          {errors.subject && (
-            <p className="text-sm text-red-600">{errors.subject.message}</p>
-          )}
-        </div>
-
-        {/* Description */}
-        <div className="space-y-1.5">
-          <Label htmlFor="description" className="text-sm font-medium text-gray-900">
-            Description
-          </Label>
-          <div className="relative">
-            <textarea
-              id="description"
-              rows={3}
-              className={cn(
-                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+      <div className="relative">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+            {/* Task Name */}
+            <FormField
+              control={form.control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Task Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter task name"
+                      {...field}
+                      className="w-full"
+                      fullWidth={true}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-              placeholder="Add more details about the task..."
-              {...register("description")}
             />
-          </div>
-        </div>
 
-        {/* Status, Priority and Due Date */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="status" className="text-sm font-medium text-gray-900">
-              Status
-            </Label>
-            <select
-              id="status"
-              className={cn(
-                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Add more details about the task..."
+                      className="w-full resize-none"
+                      rows={3}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-              {...register("status")}
-            >
-              <option value="Pending">Not Started</option>
-              <option value="In-Progress">In Progress</option>
-              <option value="Done">Completed</option>
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="priority" className="text-sm font-medium text-gray-900">
-              Priority
-            </Label>
-            <select
-              id="priority"
-              className={cn(
-                "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm",
-                "focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              )}
-              {...register("priority")}
-            >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Urgent">Urgent</option>
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="dueDate" className="text-sm font-medium text-gray-900">
-              Due Date  
-            </Label>
-            <Input
-              type="date"
-              id="dueDate"
-              {...register("dueDate")}
             />
-          </div>
-        </div>
 
-        {/* Completion Date - Show only when status is Done and in edit mode */}
-        {isEditMode && currentStatus === "Done" && task?.completedAt && (
-          <div className="rounded-md bg-green-50 p-3 text-sm">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="font-medium text-green-800">Task Completed</h3>
-                <div className="mt-1 text-green-700">
-                  This task was completed on {new Date(task.completedAt).toLocaleString()}
-                </div>
-              </div>
+            {/* Status, Priority and Due Date */}
+            <div className="grid grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    {isMounted && (
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="z-[9999]">
+                          <SelectItem value="Pending">Not Started</SelectItem>
+                          <SelectItem value="In-Progress">In Progress</SelectItem>
+                          <SelectItem value="Done">Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    {isMounted && (
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select priority" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="z-[9999]">
+                          <SelectItem value="Low">Low</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="High">High</SelectItem>
+                          <SelectItem value="Urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Due Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        className="w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          </div>
-        )}
 
-        {/* Assignees Section */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="block text-sm font-medium text-gray-900">
-              Assignees
-            </label>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setAssignUserModalOpen(true)}
-              className="text-xs"
-            >
-              {isEditMode 
-                ? (assignees.length > 0 ? "Add More" : "Assign") 
-                : (selectedAssignees.length > 0 ? "Add More" : "Assign")}
-            </Button>
-          </div>
-          
-          {isEditMode ? (
-            assignees.length > 0 ? (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {assignees.map((assignee: User) => (
-                  <div key={assignee.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5">
-                    <Avatar name={assignee.name} size="sm" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {assignee.name}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {assignee.email}
-                      </p>
+            {/* Completion Date - Show only when status is Done and in edit mode */}
+            {isEditMode && currentStatus === "Done" && task?.completedAt && (
+              <div className="rounded-md bg-green-50 dark:bg-green-900/30 p-3 text-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-green-400 dark:text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="font-medium text-green-800 dark:text-green-300">Task Completed</h3>
+                    <div className="mt-1 text-green-700 dark:text-green-400">
+                      This task was completed on {new Date(task.completedAt).toLocaleString()}
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
-            ) : (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
-                <p className="text-sm text-gray-500">
-                  No assignees yet. Click &quot;Assign&quot; to add users.
-                </p>
+            )}
+
+            {/* Assignees Section */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                  Assignees
+                </label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAssignUserModalOpen(true)}
+                  className="text-xs"
+                >
+                  {isEditMode 
+                    ? (assignees.length > 0 ? "Add More" : "Assign") 
+                    : (selectedAssignees.length > 0 ? "Add More" : "Assign")}
+                </Button>
               </div>
-            )
-          ) : (
-            // For new tasks, show selected assignees
-            selectedAssignees.length > 0 ? (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {selectedAssignees.map((assignee: User) => (
-                  <div key={assignee.id} className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5">
-                    <Avatar name={assignee.name} size="sm" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {assignee.name}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {assignee.email}
-                      </p>
-                    </div>
-                    {selectedAssignees.length > 0 && (
+              
+              {isEditMode ? (
+                assignees.length > 0 ? (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {assignees.map((assignee: User) => (
+                      <div key={assignee.id} className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-2.5">
+                        <Avatar name={assignee.name} size="sm" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                            {assignee.name}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {assignee.email}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No assignees yet. Click &quote;Assign&quote; to add users.
+                    </p>
+                  </div>
+                )
+              ) : (
+                // For new tasks, show selected assignees
+                selectedAssignees.length > 0 ? (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {selectedAssignees.map((assignee: User) => (
+                      <div key={assignee.id} className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-2.5">
+                        <Avatar name={assignee.name} size="sm" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                            {assignee.name}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {assignee.email}
+                          </p>
+                        </div>
+                        {selectedAssignees.length > 0 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveAssignee(assignee.id)}
+                            className="text-gray-400 hover:text-gray-500"
+                          >
+                            <X className="h-4 w-4 text-red-500" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No assignees yet. Click &quote;Assign&quote; to add users.
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* Checklist */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                Checklist
+              </label>
+
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  value={newItemText}
+                  onChange={(e) => setNewItemText(e.target.value)}
+                  placeholder="Add checklist item..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newItemText.trim()) {
+                      e.preventDefault();
+                      handleAddItem(e);
+                    }
+                  }}
+                  fullWidth={true}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleAddItem}
+                  disabled={!newItemText.trim()}
+                  className="px-4"
+                >
+                  Add
+                </Button>
+              </div>
+
+              <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                {isEditMode &&
+                  checklistItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-2.5"
+                    >
+                      <Checkbox
+                        id={`item-${item.id}`}
+                        checked={!!item.isCompleted}
+                        onCheckedChange={() => handleToggleItem(item.id)}
+                        className="h-4 w-4"
+                      />
+                      <label
+                        htmlFor={`item-${item.id}`}
+                        className={cn(
+                          "flex-1 text-sm cursor-pointer dark:text-gray-300",
+                          item.isCompleted && "line-through text-gray-500 dark:text-gray-400"
+                        )}
+                      >
+                        {item.item}
+                      </label>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleRemoveAssignee(assignee.id)}
+                        onClick={() => handleDeleteItem(item.id)}
                         className="text-gray-400 hover:text-gray-500"
                       >
                         <X className="h-4 w-4 text-red-500" />
                       </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
-                <p className="text-sm text-gray-500">
-                  No assignees yet. Click &quot;Assign&quot; to add users.
-                </p>
-              </div>
-            )
-          )}
-        </div>
-
-        {/* Checklist */}
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-900">
-            Checklist
-          </label>
-
-          <div className="flex items-center gap-2">
-            <Input
-              type="text"
-              value={newItemText}
-              onChange={(e) => setNewItemText(e.target.value)}
-              placeholder="Add checklist item..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && newItemText.trim()) {
-                  e.preventDefault();
-                  handleAddItem(e);
-                }
-              }}
-              fullWidth={true}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleAddItem}
-              disabled={!newItemText.trim()}
-              className="px-4"
-            >
-              Add
-            </Button>
-          </div>
-
-          <div className="space-y-2 max-h-[200px] overflow-y-auto">
-            {isEditMode &&
-              checklistItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5"
-                >
-                  <Checkbox
-                    id={`item-${item.id}`}
-                    checked={!!item.isCompleted}
-                    onCheckedChange={() => handleToggleItem(item.id)}
-                    className="h-4 w-4"
-                  />
-                  <label
-                    htmlFor={`item-${item.id}`}
-                    className={cn(
-                      "flex-1 text-sm cursor-pointer",
-                      item.isCompleted && "line-through text-gray-500"
-                    )}
-                  >
-                    {item.item}
-                  </label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteItem(item.id)}
-                    className="text-gray-400 hover:text-gray-500"
-                  >
-                    <X className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
-              ))}
-
-            {/* Render temporary items for edit mode */}
-            {isEditMode && editModeTemporaryItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5"
-              >
-                <Checkbox
-                  id={`temp-item-${item.id}`}
-                  checked={item.isCompleted}
-                  onCheckedChange={() => handleToggleItem(item.id)}
-                  className="h-4 w-4"
-                />
-                <label
-                  htmlFor={`temp-item-${item.id}`}
-                  className={cn(
-                    "flex-1 text-sm cursor-pointer",
-                    item.isCompleted && "line-through text-gray-500"
-                  )}
-                >
-                  {item.text}
-                </label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteItem(item.id)}
-                  className="text-gray-400 hover:text-gray-500"
-                >                  
-                  <X className="h-4 w-4 text-red-500" />
-                </Button>
-              </div>
-            ))}
-
-            {/* Render temporary items for create mode */}
-            {!isEditMode && temporaryItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-2.5"
-              >
-                <Checkbox
-                  id={`temp-item-${item.id}`}
-                  checked={item.isCompleted}
-                  onCheckedChange={() => handleToggleItem(item.id)}
-                  className="h-4 w-4"
-                />
-                <label
-                  htmlFor={`temp-item-${item.id}`}
-                  className={cn(
-                    "flex-1 text-sm cursor-pointer",
-                    item.isCompleted && "line-through text-gray-500"
-                  )}
-                >
-                  {item.text}
-                </label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteItem(item.id)}
-                  className="text-gray-400 hover:text-gray-500"
-                >                  
-                  <X className="h-4 w-4 text-red-500" />
-                </Button>
-              </div>
-            ))}
-
-            {(!isEditMode && temporaryItems.length === 0) && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
-                <p className="text-sm text-gray-500">
-                  No checklist items yet
-                </p>
-              </div>
-            )}
-
-            {(isEditMode && checklistItems.length === 0 && editModeTemporaryItems.length === 0 && !checklistLoading) && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
-                <p className="text-sm text-gray-500">
-                  No checklist items. Start by adding one above.
-                </p>
-              </div>
-            )}
-
-            {(isEditMode && checklistLoading) && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
-                <p className="text-sm text-gray-500">
-                  Loading checklist...
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {(createTaskMutation.isError || updateTaskMutation.isError || dueDateError) && (
-          <div className="rounded-lg bg-red-50 border-l-4 border-red-400 p-4 text-sm text-red-700" role="alert">
-            <p className="font-medium">Error</p>
-            {dueDateError ? (
-              <p>{dueDateError}</p>
-            ) : (
-              <p>Failed to {isEditMode ? "update" : "create"} task. Please try again.</p>
-            )}
-          </div>
-        )}
-      </form>
-
-      {/* Assign User Modal */}
-      <Modal
-        isOpen={assignUserModalOpen}
-        onClose={() => {
-          setAssignUserModalOpen(false);
-          setSelectedUserId(null);
-          setFilterText('');
-        }}
-        title="Assign User to Task"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setAssignUserModalOpen(false);
-                setSelectedUserId(null);
-                setFilterText('');
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              onClick={handleAssignUser}
-              disabled={!selectedUserId || (isEditMode && assignUserMutation.isPending)}
-              isLoading={isEditMode && assignUserMutation.isPending}
-            >
-              Assign
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="search" className="text-sm font-medium text-gray-700 mb-1">
-              Filter Users
-            </Label>
-            <Input
-              type="text"
-              id="search"
-              placeholder="Filter by name or email..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-            />
-          </div>
-          
-          <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
-            {projectMembersLoading ? (
-              <div className="p-4 space-y-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3 animate-pulse">
-                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                      <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : projectMembersData?.data && projectMembersData.data.length > 0 ? (
-              <div className="divide-y divide-gray-100">
-                {projectMembersData.data
-                  .filter((user: User) => 
-                    !filterText || 
-                    user.name.toLowerCase().includes(filterText.toLowerCase()) || 
-                    user.email.toLowerCase().includes(filterText.toLowerCase())
-                  )
-                  // For create mode, exclude already selected users
-                  .filter((user: User) => 
-                    isEditMode || !selectedAssignees.some(assignee => assignee.id === user.id)
-                  )
-                  .map((user: User) => (
-                    <div 
-                      key={user.id}
-                      className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${selectedUserId === user.id ? 'bg-blue-50' : ''}`}
-                      onClick={() => setSelectedUserId(user.id)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar name={user.name} size="sm" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                          <p className="text-xs text-gray-500">{user.email}</p>
-                        </div>
-                      </div>
-                      {selectedUserId === user.id && (
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          asasasdasd
-                        </svg>
-                        
-                      )}
                     </div>
                   ))}
+
+                {/* Render temporary items for edit mode */}
+                {isEditMode && editModeTemporaryItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-2.5"
+                  >
+                    <Checkbox
+                      id={`temp-item-${item.id}`}
+                      checked={item.isCompleted}
+                      onCheckedChange={() => handleToggleItem(item.id)}
+                      className="h-4 w-4"
+                    />
+                    <label
+                      htmlFor={`temp-item-${item.id}`}
+                      className={cn(
+                        "flex-1 text-sm cursor-pointer dark:text-gray-300",
+                        item.isCompleted && "line-through text-gray-500 dark:text-gray-400"
+                      )}
+                    >
+                      {item.text}
+                    </label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-gray-400 hover:text-gray-500"
+                    >                  
+                      <X className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+
+                {/* Render temporary items for create mode */}
+                {!isEditMode && temporaryItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-2.5"
+                  >
+                    <Checkbox
+                      id={`temp-item-${item.id}`}
+                      checked={item.isCompleted}
+                      onCheckedChange={() => handleToggleItem(item.id)}
+                      className="h-4 w-4"
+                    />
+                    <label
+                      htmlFor={`temp-item-${item.id}`}
+                      className={cn(
+                        "flex-1 text-sm cursor-pointer dark:text-gray-300",
+                        item.isCompleted && "line-through text-gray-500 dark:text-gray-400"
+                      )}
+                    >
+                      {item.text}
+                    </label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-gray-400 hover:text-gray-500"
+                    >                  
+                      <X className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+
+                {(!isEditMode && temporaryItems.length === 0) && (
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No checklist items yet
+                    </p>
+                  </div>
+                )}
+
+                {(isEditMode && checklistItems.length === 0 && editModeTemporaryItems.length === 0 && !checklistLoading) && (
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No checklist items. Start by adding one above.
+                    </p>
+                  </div>
+                )}
+
+                {(isEditMode && checklistLoading) && (
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Loading checklist...
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                <p>No project members found</p>
+            </div>
+
+            {/* Error Message */}
+            {(createTaskMutation.isError || updateTaskMutation.isError || dueDateError) && (
+              <div className="rounded-lg bg-red-50 dark:bg-red-900/30 border-l-4 border-red-400 dark:border-red-500/50 p-4 text-sm text-red-700 dark:text-red-400" role="alert">
+                <p className="font-medium">Error</p>
+                {dueDateError ? (
+                  <p>{dueDateError}</p>
+                ) : (
+                  <p>Failed to {isEditMode ? "update" : "create"} task. Please try again.</p>
+                )}
               </div>
             )}
-          </div>
-        </div>
-      </Modal>
+          </form>
+        </Form>
+      </div>
+
+      {/* Assign User Modal */}
+      <AssignUserModal
+        assignUserModalOpen={assignUserModalOpen}
+        setAssignUserModalOpen={setAssignUserModalOpen}
+        selectedUserId={selectedUserId}
+        setSelectedUserId={setSelectedUserId}
+        filterText={filterText}
+        setFilterText={setFilterText}
+        handleAssignUser={handleAssignUser}
+        assignUserMutation={assignUserMutation}
+        projectMembersLoading={projectMembersLoading}
+        projectMembersData={projectMembersData}
+        isEditMode={isEditMode}
+        selectedAssignees={selectedAssignees}
+      />
     </Modal>
   );
 };

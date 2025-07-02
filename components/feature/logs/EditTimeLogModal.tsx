@@ -234,4 +234,4 @@ export function EditTimeLogModal({
   );
 }
 
-export default EditTimeLogModal; 
+export default EditTimeLogModal;

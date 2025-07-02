@@ -162,16 +162,16 @@ export default function LogsPage() {
         // variant="brand"
       />
       
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-gray-50 dark:bg-gray-900">
         <div className="p-3 sm:p-6">
           {/* Filters */}
-          <Card className="mb-6 border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
+          <Card className="mb-6 border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="p-4">
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <FilterIcon className="w-5 h-5" />
-                  <h3 className="text-base font-semibold text-gray-900">
+                  <FilterIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                     Filters
                   </h3>
                 </div>
@@ -181,7 +181,7 @@ export default function LogsPage() {
                   dateRange.startDate ||
                   dateRange.endDate) && (
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
                       {
                         [
                           selectedProjectId && "Project",
@@ -198,7 +198,7 @@ export default function LogsPage() {
                         setSelectedProjectId("");
                         setDateRange({ startDate: "", endDate: "" });
                       }}
-                      className="text-xs px-2 py-1 flex items-center gap-1"
+                      className="text-xs px-2 py-1 flex items-center gap-1 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                      <X color="red" className="w-3 h-3" />
                       Clear All
@@ -213,7 +213,7 @@ export default function LogsPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="project-filter"
-                    className="flex items-center gap-2 text-sm font-medium text-gray-700"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     <FolderOpenDot color="blue" className="w-4 h-4" />
                     Project
@@ -221,7 +221,7 @@ export default function LogsPage() {
                   <div className="relative">
                     <select
                       id="project-filter"
-                      className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white appearance-none"
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm py-2.5 px-3 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-700 dark:text-white appearance-none"
                       value={selectedProjectId}
                       onChange={handleProjectChange}
                     >
@@ -237,7 +237,7 @@ export default function LogsPage() {
                     </div>
                   </div>
                   {selectedProjectId && (
-                    <div className="flex items-center gap-1 text-xs text-blue-600">
+                    <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
                       <Check color="blue" className="w-3 h-3" />
                       Project filter applied
                     </div>
@@ -248,7 +248,7 @@ export default function LogsPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="startDate"
-                    className="flex items-center gap-2 text-sm font-medium text-gray-700"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     <Calendar color="blue" className="w-4 h-4" />
                     From Date
@@ -257,7 +257,7 @@ export default function LogsPage() {
                     <input
                       type="date"
                       id="startDate"
-                      className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-700 dark:text-white"
                       value={dateRange.startDate}
                       onChange={(e) =>
                         setDateRange({ ...dateRange, startDate: e.target.value })
@@ -265,7 +265,7 @@ export default function LogsPage() {
                     />
                   </div>
                   {dateRange.startDate && (
-                    <div className="flex items-center gap-1 text-xs text-blue-600">
+                    <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
                       <Check color="blue" className="w-3 h-3" />
                       Start date set
                     </div>
@@ -276,7 +276,7 @@ export default function LogsPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="endDate"
-                    className="flex items-center gap-2 text-sm font-medium text-gray-700"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     <Calendar color="blue" className="w-4 h-4" />
                     To Date
@@ -285,7 +285,7 @@ export default function LogsPage() {
                     <input
                       type="date"
                       id="endDate"
-                      className="w-full rounded-lg border border-gray-200 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white dark:bg-gray-700 dark:text-white"
                       value={dateRange.endDate}
                       onChange={(e) =>
                         setDateRange({ ...dateRange, endDate: e.target.value })
@@ -294,7 +294,7 @@ export default function LogsPage() {
                     />
                   </div>
                   {dateRange.endDate && (
-                    <div className="flex items-center gap-1 text-xs text-blue-600">
+                    <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
                       <Check color="blue" className="w-3 h-3" />
                       End date set
                     </div>
@@ -303,10 +303,10 @@ export default function LogsPage() {
               </div>
 
               {/* Quick Filter Options */}
-              <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                 <div className="flex items-center gap-2 mb-2">
                   <Zap color="blue" className="w-4 h-4" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Quick Filters
                   </span>
                 </div>
@@ -318,7 +318,7 @@ export default function LogsPage() {
                       const today = new Date().toISOString().split("T")[0];
                       setDateRange({ startDate: today, endDate: today });
                     }}
-                    className="text-xs px-3 py-1.5"
+                    className="text-xs px-3 py-1.5 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Today
                   </Button>
@@ -335,7 +335,7 @@ export default function LogsPage() {
                         endDate: today.toISOString().split("T")[0],
                       });
                     }}
-                    className="text-xs px-3 py-1.5"
+                    className="text-xs px-3 py-1.5 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Last 7 Days
                   </Button>
@@ -352,7 +352,7 @@ export default function LogsPage() {
                         endDate: today.toISOString().split("T")[0],
                       });
                     }}
-                    className="text-xs px-3 py-1.5"
+                    className="text-xs px-3 py-1.5 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Last 30 Days
                   </Button>
@@ -371,7 +371,7 @@ export default function LogsPage() {
                         endDate: today.toISOString().split("T")[0],
                       });
                     }}
-                    className="text-xs px-3 py-1.5"
+                    className="text-xs px-3 py-1.5 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     This Month
                   </Button>
@@ -382,19 +382,19 @@ export default function LogsPage() {
 
           {/* Time Logs Table */}
           {logsLoading ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8 text-gray-700 dark:text-gray-300">
               <Loader text="Loading time logs..." centered/>
             </div>
           ) : logsError ? (
-            <div className="text-center py-8 text-red-500">
+            <div className="text-center py-8 text-red-500 dark:text-red-400">
               <p>Error loading time logs</p>
             </div>
           ) : filteredLogs.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8 text-gray-700 dark:text-gray-300">
               <p>No time logs found matching your filters</p>
             </div>
           ) : (
-            <Card className="overflow-hidden border border-gray-200 shadow-sm">
+            <Card className="overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
               <LogsTable 
                 data={filteredLogs} 
                 projects={projects} 
@@ -405,7 +405,7 @@ export default function LogsPage() {
             </Card>
           )}
         </div>
-      </div>  
+      </div>
 
       {/* Edit Log Modal */}
       <EditTimeLogModal

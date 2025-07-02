@@ -21,5 +21,12 @@
   
 
 - edit proj btn - in the projects tbl only show edit proj to applicable users
-- 
 
+
+- change font family evrywhere 
+- add badages in dropdown ✔️
+- and make dropdpwn consistent
+- status dropdown shopul be consistent everywhere ✔️
+- make the imput/text area rings blue ✔️
+- add gray bg in add more btn
+- in the assignee section the profile icon should be at top

@@ -121,7 +121,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-gray-900">Checklist</h3>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Checklist</h3>
       
       {/* Add new item form */}
       {allowEditing && (
@@ -131,7 +131,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
             value={newItemText}
             onChange={(e) => setNewItemText(e.target.value)}
             placeholder="Add a new item..."
-            className="flex-1 rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+            className="flex-1 rounded-md border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
           />
           <Button
             type="submit"
@@ -146,7 +146,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
 
       {/* Checklist items */}
       {checklist.length === 0 ? (
-        <p className="text-gray-500 text-sm py-2">No items in this checklist yet.</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm py-2">No items in this checklist yet.</p>
       ) : (
         <ul className="space-y-2">
           {checklist.map((item: ChecklistItem) => (
@@ -157,7 +157,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                     type="text"
                     value={editingItem.text}
                     onChange={(e) => setEditingItem({ ...editingItem, text: e.target.value })}
-                    className="flex-1 rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                    className="flex-1 rounded-md border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                     autoFocus
                   />
                   <Button
@@ -184,10 +184,10 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                     checked={!!item.isCompleted}
                     onChange={() => allowEditing && handleToggleComplete(item)}
                     disabled={!allowEditing || updateItemMutation.isPending}
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
                   />
                   <span 
-                    className={`flex-1 ${item.isCompleted ? 'text-gray-400 line-through' : 'text-gray-700'}`}
+                    className={`flex-1 ${item.isCompleted ? 'text-gray-400 line-through dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}
                   >
                     {item.item}
                   </span>
@@ -200,7 +200,7 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
                         onClick={() => setEditingItem({ id: item.id, text: item.item })}
                         disabled={updateItemMutation.isPending}
                       >
-                        <Edit className="h-4 w-4 text-blue-600" />
+                        <Edit className="h-4 w-4 text-blue-600 dark:text-blue-500" />
                       </Button>
                       <Button
                         variant="destructive"
@@ -235,4 +235,4 @@ const TaskChecklist: React.FC<TaskChecklistProps> = ({ taskId, allowEditing = tr
   );
 };
 
-export default TaskChecklist; 
+export default TaskChecklist;

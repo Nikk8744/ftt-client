@@ -124,13 +124,13 @@ export default function ProjectsPage() {
         // variant="brand"
       />
 
-      <div className="flex-1 bg-gray-50 p-4 ">
-        <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 mt-3 mb-6 max-w-md">
+      <div className="flex-1 bg-gray-50 dark:bg-gray-900 p-4 ">
+        <div className="flex space-x-1 rounded-lg bg-gray-100 dark:bg-gray-800 p-1 mt-3 mb-6 max-w-md">
           <button
             className={`w-full rounded-md py-2.5 text-xs sm:text-sm font-medium leading-5 ${
               activeTab === "all"
-                ? "bg-white shadow text-brand-700"
-                : "text-gray-700 hover:bg-white/[0.5]"
+                ? "bg-white dark:bg-gray-700 shadow text-brand-700 dark:text-brand-300"
+                : "text-gray-700 dark:text-gray-300 hover:bg-white/[0.5] dark:hover:bg-gray-700/[0.5]"
             }`}
             onClick={() => setActiveTab("all")}
           >
@@ -139,8 +139,8 @@ export default function ProjectsPage() {
           <button
             className={`w-full rounded-md py-2.5 text-xs sm:text-sm font-medium leading-5 ${
               activeTab === "owned"
-                ? "bg-white shadow text-brand-700"
-                : "text-gray-700 hover:bg-white/[0.5]"
+                ? "bg-white dark:bg-gray-700 shadow text-brand-700 dark:text-brand-300"
+                : "text-gray-700 dark:text-gray-300 hover:bg-white/[0.5] dark:hover:bg-gray-700/[0.5]"
             }`}
             onClick={() => setActiveTab("owned")}
           >
@@ -149,8 +149,8 @@ export default function ProjectsPage() {
           <button
             className={`w-full rounded-md py-2.5 text-xs sm:text-sm font-medium leading-5 ${
               activeTab === "member"
-                ? "bg-white shadow text-brand-700"
-                : "text-gray-700 hover:bg-white/[0.5]"
+                ? "bg-white dark:bg-gray-700 shadow text-brand-700 dark:text-brand-300"
+                : "text-gray-700 dark:text-gray-300 hover:bg-white/[0.5] dark:hover:bg-gray-700/[0.5]"
             }`}
             onClick={() => setActiveTab("member")}
           >
@@ -164,7 +164,7 @@ export default function ProjectsPage() {
           ) : displayProjects.length === 0 ? (
             <div className="text-center py-12">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -181,10 +181,10 @@ export default function ProjectsPage() {
                   }
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
                 {activeTab === "member" ? "No memberships" : "No projects"}
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {activeTab === "member"
                   ? "You're not a member of any projects yet."
                   : "Get started by creating a new project."}

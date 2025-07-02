@@ -455,27 +455,27 @@ export default function ReportsPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-6">
-                <Card className="p-4">
-                  <h3 className="text-lg font-medium mb-4">Latest Activity Summary</h3>
+                <Card className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Latest Activity Summary</h3>
                   {userProjects.length > 0 ? (
                     <div className="space-y-4">
-                      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-md">
-                        <Clock className="h-5 w-5 text-blue-500" />
-                        <p className="text-sm">You have access to {userProjects.length} project(s)</p>
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900 rounded-md">
+                        <Clock className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                        <p className="text-sm text-gray-700 dark:text-gray-300">You have access to {userProjects.length} project(s)</p>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-md">
-                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                        <p className="text-sm">{taskSummary.overdueTasks || 0} tasks are overdue across your projects</p>
+                      <div className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900 rounded-md">
+                        <AlertTriangle className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+                        <p className="text-sm text-gray-700 dark:text-gray-300">{taskSummary.overdueTasks || 0} tasks are overdue across your projects</p>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-md">
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
-                        <p className="text-sm">{taskSummary.completedTasks || 0} tasks completed in the last 30 days</p>
+                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900 rounded-md">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
+                        <p className="text-sm text-gray-700 dark:text-gray-300">{taskSummary.completedTasks || 0} tasks completed in the last 30 days</p>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-md">
-                      <Clock className="h-5 w-5 text-blue-500" />
-                      <p className="text-sm">You don&apos;t have any projects yet</p>
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900 rounded-md">
+                      <Clock className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                      <p className="text-sm text-gray-700 dark:text-gray-300">You don&apos;t have any projects yet</p>
                     </div>
                   )}
                 </Card>

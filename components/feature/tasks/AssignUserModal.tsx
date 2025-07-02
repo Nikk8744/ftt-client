@@ -16,6 +16,8 @@ interface AssignUserModalProps {
   assignUserMutation: { isPending: boolean };
   projectMembersLoading: boolean;
   projectMembersData?: { data: User[] };
+  isEditMode: boolean;
+  selectedAssignees: User[];
 }
 
 export const AssignUserModal = ({
@@ -29,6 +31,8 @@ export const AssignUserModal = ({
   assignUserMutation,
   projectMembersLoading,
   projectMembersData,
+  isEditMode,
+  selectedAssignees,
 }: AssignUserModalProps) => {
   return (
     <Modal
@@ -98,6 +102,10 @@ export const AssignUserModal = ({
                     !filterText ||
                     user.name.toLowerCase().includes(filterText.toLowerCase()) ||
                     user.email.toLowerCase().includes(filterText.toLowerCase())
+                )
+                // For create mode, exclude already selected users
+                .filter((user: User) => 
+                  isEditMode || !selectedAssignees.some(assignee => assignee.id === user.id)
                 )
                 .map((user: User) => (
                   <div

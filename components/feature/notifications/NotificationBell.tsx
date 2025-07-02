@@ -59,11 +59,11 @@ export default function NotificationBell() {
           )}
         </Button> 
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-1 mr-4 lg:mr-6 mt-2 ">
+      <PopoverContent className="w-80 p-1 mr-4 lg:mr-6 mt-2 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <div className="flex items-baseline justify-between gap-4 px-3 py-2">
-          <Link href="/notifications" className="text-sm font-semibold">Notifications</Link>
+          <Link href="/notifications" className="text-sm font-semibold text-gray-900 dark:text-gray-100">Notifications</Link>
           {unreadCount > 0 && (
-            <button className="text-xs font-medium hover:underline" onClick={handleMarkAllAsRead}>
+            <button className="text-xs font-medium hover:underline text-primary-600 dark:text-primary-400" onClick={handleMarkAllAsRead}>
               Mark all as read
             </button>
           )}
@@ -71,22 +71,22 @@ export default function NotificationBell() {
         <div
           role="separator"
           aria-orientation="horizontal"
-          className="-mx-1 my-1 h-px bg-border"
+          className="-mx-1 my-1 h-px bg-border dark:bg-gray-700"
         ></div>
         {recentNotifications.length === 0 ? (
           <div className="py-6 text-center">
             <div className="flex justify-center mb-3">
-              <Bell size={24} className="text-gray-400" />
+              <Bell size={24} className="text-gray-400 dark:text-gray-500" />
             </div>
-            <p className="text-sm text-gray-500">No notifications yet</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">No notifications yet</p>
           </div>
         ) : (
           recentNotifications.map((notification: Notification) => (
             <div
               key={notification.id}
               className={cn(
-                "rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent",
-                notification.isRead === 0 ? "bg-blue-50" : "bg-transparent"
+                "rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent dark:hover:bg-gray-700",
+                notification.isRead === 0 ? "bg-blue-50 dark:bg-blue-900/30" : "bg-transparent"
               )}
             >
               <div className="relative flex items-start pe-3">
@@ -94,15 +94,15 @@ export default function NotificationBell() {
                   <button 
                     onClick={(e) => handleMarkAsRead(e, notification.id)}
                     className={cn(
-                      "flex items-center justify-center w-5 h-5 rounded-sm hover:bg-gray-100",
-                      notification.isRead === 0 ? "text-primary-600" : "text-gray-400"
+                      "flex items-center justify-center w-5 h-5 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-600",
+                      notification.isRead === 0 ? "text-primary-600 dark:text-primary-400" : "text-gray-400 dark:text-gray-500"
                     )}
                     title={notification.isRead === 0 ? "Mark as read" : "Already read"}
                   >
                     {notification.isRead === 0 ? (
-                      <Circle size={16} className="text-primary-600" />
+                      <Circle size={16} className="text-primary-600 dark:text-primary-400" />
                     ) : (
-                      <CheckCircle size={16} className="text-gray-500" />
+                      <CheckCircle size={16} className="text-gray-500 dark:text-gray-400" />
                     )}
                   </button>
                 </div>
@@ -115,16 +115,16 @@ export default function NotificationBell() {
                   > 
                     <span className={cn(
                       "font-medium hover:underline",
-                      notification.isRead === 0 ? "text-foreground font-semibold" : "text-foreground/80"
+                      notification.isRead === 0 ? "text-foreground dark:text-gray-100 font-semibold" : "text-foreground/80 dark:text-gray-300"
                     )}>
                       {notification.title}
                     </span>
-                    <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    <div className="text-xs text-muted-foreground dark:text-gray-400 mt-1 line-clamp-2">
                       {notification.message}
                     </div>
                   </Link>
                   <div className="flex items-center justify-between">
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground dark:text-gray-500">
                       {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                     </div>
                   </div>
@@ -133,10 +133,10 @@ export default function NotificationBell() {
             </div>
           ))
         )}
-        <div className="px-3 py-2 border-t border-gray-100">
+        <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700">
           <Link
             href="/notifications"
-            className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+            className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
           >
             View all notifications
           </Link>
@@ -144,4 +144,4 @@ export default function NotificationBell() {
       </PopoverContent>
     </Popover>
   );
-} 
+}

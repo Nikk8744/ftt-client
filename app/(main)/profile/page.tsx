@@ -112,7 +112,7 @@ export default function ProfilePage() {
         variant="default"
       />
       
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-gray-50 dark:bg-gray-900">
         <div className="p-6">
           <div className="max-w-4xl mx-auto">
             {/* Profile Header */}
@@ -123,20 +123,20 @@ export default function ProfilePage() {
                   <Avatar 
                     name={user.name} 
                     size="lg" 
-                    className="w-24 h-24 border-4 border-white shadow-lg"
+                    className="w-24 h-24 border-4 border-white dark:border-gray-800 shadow-lg"
                   />
                   {!isEditing && (
                     <button
                       onClick={handleEdit}
-                      className="absolute bottom-0 right-0 bg-white rounded-full p-1.5 shadow-md hover:bg-gray-50 transition-colors"
+                      className="absolute bottom-0 right-0 bg-white dark:bg-gray-700 rounded-full p-1.5 shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                     >
-                      <Pencil className="w-4 h-4 text-gray-600" />
+                      <Pencil className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                     </button>
                   )}
                 </div>
                 <div className="mb-3">
-                  <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-                  <p className="text-gray-500">@{user.userName}</p>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{user.name}</h2>
+                  <p className="text-gray-500 dark:text-gray-400">@{user.userName}</p>
                 </div>
               </div>
             </div>
@@ -144,36 +144,36 @@ export default function ProfilePage() {
             <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2">
-                <Card>
+                <Card className="bg-white dark:bg-gray-800">
                   {!isEditing ? (
                     // Profile View
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile Information</h3>
-                        <dl className="divide-y divide-gray-200">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Profile Information</h3>
+                        <dl className="divide-y divide-gray-200 dark:divide-gray-700">
                           <div className="py-4 grid grid-cols-3 gap-4">
-                            <dt className="text-sm font-medium text-gray-500">Full Name</dt>
-                            <dd className="text-sm text-gray-900 col-span-2">{user.name}</dd>
+                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</dt>
+                            <dd className="text-sm text-gray-900 dark:text-gray-100 col-span-2">{user.name}</dd>
                           </div>
                           <div className="py-4 grid grid-cols-3 gap-4">
-                            <dt className="text-sm font-medium text-gray-500">Username</dt>
-                            <dd className="text-sm text-gray-900 col-span-2">@{user.userName}</dd>
+                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Username</dt>
+                            <dd className="text-sm text-gray-900 dark:text-gray-100 col-span-2">@{user.userName}</dd>
                           </div>
                           <div className="py-4 grid grid-cols-3 gap-4">
-                            <dt className="text-sm font-medium text-gray-500">Email</dt>
-                            <dd className="text-sm text-gray-900 col-span-2">{user.email}</dd>
+                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+                            <dd className="text-sm text-gray-900 dark:text-gray-100 col-span-2">{user.email}</dd>
                           </div>
                           <div className="py-4 grid grid-cols-3 gap-4">
-                            <dt className="text-sm font-medium text-gray-500">Role</dt>
-                            <dd className="text-sm text-gray-900 col-span-2">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Role</dt>
+                            <dd className="text-sm text-gray-900 dark:text-gray-100 col-span-2">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 capitalize">
                                 {user.role}
                               </span>
                             </dd>
                           </div>
                           <div className="py-4 grid grid-cols-3 gap-4">
-                            <dt className="text-sm font-medium text-gray-500">Member Since</dt>
-                            <dd className="text-sm text-gray-900 col-span-2">
+                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Member Since</dt>
+                            <dd className="text-sm text-gray-900 dark:text-gray-100 col-span-2">
                               {new Date(user.created_at).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'long',
@@ -188,7 +188,7 @@ export default function ProfilePage() {
                     // Edit Profile Form
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit Profile</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Edit Profile</h3>
                         <div className="space-y-4">
                           <div>
                             <Input
@@ -197,6 +197,7 @@ export default function ProfilePage() {
                               {...register('name')}
                               error={errors.name?.message}
                               fullWidth
+                              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                             />
                           </div>
 
@@ -207,6 +208,7 @@ export default function ProfilePage() {
                               {...register('userName')}
                               error={errors.userName?.message}
                               fullWidth
+                              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                               // startAdornment=""
                             />
                           </div>
@@ -219,6 +221,7 @@ export default function ProfilePage() {
                               {...register('email')}
                               error={errors.email?.message}
                               fullWidth
+                              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                             />
                           </div>
                         </div>
@@ -228,6 +231,7 @@ export default function ProfilePage() {
                         <Button
                           variant="outline"
                           onClick={handleCancel}
+                          className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           Cancel
                         </Button>
@@ -242,7 +246,7 @@ export default function ProfilePage() {
                       </div>
 
                       {updateUserMutation.isError && (
-                        <div className="mt-2 text-sm text-red-600">
+                        <div className="mt-2 text-sm text-red-600 dark:text-red-400">
                           Error updating profile. Please try again.
                         </div>
                       )}
@@ -254,50 +258,50 @@ export default function ProfilePage() {
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Quick Stats */}
-                <Card>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Activity</h3>
+                <Card className="bg-white dark:bg-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Activity</h3>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <div className="flex items-center gap-2">
-                        <Folders className="w-5 h-5 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-500">Projects</span>
+                        <Folders className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Projects</span>
                       </div>
-                      <span className="text-sm font-semibold text-gray-900">{projects ? projects.length : 0}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{projects ? projects.length : 0}</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <div className="flex items-center gap-2">
-                        <ClipboardCheck className="w-5 h-5 text-green-500" />
-                        <span className="text-sm font-medium text-gray-500">Tasks</span>
+                        <ClipboardCheck className="w-5 h-5 text-green-500 dark:text-green-400" />
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Tasks</span>
                       </div>
-                      <span className="text-sm font-semibold text-gray-900">{tasks ? tasks.length : 0}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{tasks ? tasks.length : 0}</span>
                     </div>
                     <div className="flex items-center justify-between py-2">
                       <div className="flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-purple-500" />
-                        <span className="text-sm font-medium text-gray-500">Time Tracked</span>
+                        <Clock className="w-5 h-5 text-purple-500 dark:text-purple-400" />
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Time Tracked</span>
                       </div>
-                      <span className="text-sm font-semibold text-gray-900">124h</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">124h</span>
                     </div>
                   </div>
                 </Card>
 
                 {/* Account Info */}
-                <Card>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Account</h3>
+                <Card className="bg-white dark:bg-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Account</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-500">Status</span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                         Active
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-500">Last Login</span>
-                      <span className="text-sm text-gray-900">Today at 12:45 PM</span>
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Login</span>
+                      <span className="text-sm text-gray-900 dark:text-gray-100">Today at 12:45 PM</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-500">Two-Factor Auth</span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Two-Factor Auth</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
                         Not Enabled
                       </span>
                     </div>
@@ -310,4 +314,4 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-} 
+}

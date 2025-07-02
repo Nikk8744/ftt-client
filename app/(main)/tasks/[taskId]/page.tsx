@@ -287,17 +287,17 @@ export default function TaskDetailsPage() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       {/* Page Header */}
-      <div className="border-b border-gray-400 rounded-b-3xl">
+      <div className="border-b border-border rounded-b-3xl dark:border-gray-400">
         <div className="px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
               {taskLoading ? "Loading..." : taskData?.data?.subject}
             </h1>
             <div className="flex items-center space-x-2 mt-1">
               {taskData?.data?.projectId && (
                 <Link
                   href={`/projects/${taskData.data.projectId}`}
-                  className="text-sm text-blue-600 hover:underline flex items-center"
+                  className="text-sm text-blue-600 hover:underline flex items-center dark:text-blue-400"
                 >
                   <FolderOpenDot className="w-4 h-4 mr-1" />
                   {projectData?.data?.name || "Loading project..."}
@@ -343,7 +343,7 @@ export default function TaskDetailsPage() {
       </div>
 
       {/* Task Details */}
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 dark:bg-gray-900">
         <div className="p-3 sm:p-6">
           {taskLoading ? (
             <div className="text-center py-8">
@@ -376,8 +376,8 @@ export default function TaskDetailsPage() {
                 <Card className="hover:shadow-md transition-shadow duration-200">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-brand-700" />
-                      <h3 className="text-lg font-semibold text-gray-900 mb-0">
+                      <Clock className="w-5 h-5 text-brand-700 dark:text-brand-300" />
+                      <h3 className="text-lg font-semibold text-foreground mb-0">
                         Time Logs
                       </h3>
                     </div>
@@ -396,13 +396,13 @@ export default function TaskDetailsPage() {
                     <Loader centered size="sm" text="Loading time logs..." />
                   ) : logs.length === 0 ? (
                     <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Clock className="w-8 h-8 text-gray-400" />
+                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Clock className="w-8 h-8 text-muted-foreground" />
                       </div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">
+                      <h4 className="text-sm font-medium text-foreground mb-2">
                         No time logs yet
                       </h4>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         Start the timer to begin tracking time for this task
                       </p>
                     </div>
@@ -529,6 +529,8 @@ export default function TaskDetailsPage() {
         assignUserMutation={assignUserMutation}
         projectMembersLoading={projectMembersLoading}
         projectMembersData={projectMembersData}
+        isEditMode={!!task}
+        selectedAssignees={assignees}
       />
     </div>
   );

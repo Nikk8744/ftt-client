@@ -143,14 +143,14 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-4rem)]">
-      <div className="border-b border-gray-400 rounded-b-3xl">
+    <div className="flex flex-col min-h-[calc(100vh-4rem)] dark:bg-gray-900">
+      <div className="border-b border-gray-400 dark:border-gray-700 rounded-b-3xl">
         <div className="px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
               Notifications
             </h1>
-            <p className="mt-1 text-sm text-gray-500 max-w-4xl">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-4xl">
               View and manage your notifications
             </p>
           </div>
@@ -172,12 +172,12 @@ export default function NotificationsPage() {
           )}
         </div>
       </div>
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-gray-50 dark:bg-gray-900">
         <div className="p-6 space-y-6">
           {/* Bulk actions */}
           {selectedNotifications.length > 0 && (
-            <div className="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {selectedNotifications.length} notification{selectedNotifications.length > 1 ? "s" : ""} selected
               </span>
               <div className="flex gap-2">
@@ -204,11 +204,11 @@ export default function NotificationsPage() {
           )}
 
           {/* Notifications list */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             {isLoading ? (
               <div className="p-8 text-center">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-500">Loading notifications...</p>
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400 dark:text-gray-500 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">Loading notifications...</p>
               </div>
             ) : isError ? (
               <div className="p-8 text-center">
@@ -223,33 +223,33 @@ export default function NotificationsPage() {
               </div>
             ) : notifications.length === 0 ? (
               <div className="py-12 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="h-8 w-8 text-gray-400" />
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mail className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-1">No notifications</h3>
-                <p className="text-gray-500">You do not have any notifications yet</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">No notifications</h3>
+                <p className="text-gray-500 dark:text-gray-400">You do not have any notifications yet</p>
               </div>
             ) : (
               <div>
-                <div className="border-b border-gray-200 px-4 py-3 bg-gray-50">
+                <div className="border-b border-gray-200 dark:border-gray-700 px-4 py-3 bg-gray-50 dark:bg-gray-800">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-sm text-gray-700">
+                    <h3 className="font-medium text-sm text-gray-700 dark:text-gray-300">
                       {totalCount} Notification{totalCount !== 1 ? "s" : ""}
                     </h3>
                   </div>
                 </div>
 
-                <ul className="divide-y divide-gray-200">
+                <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                   {notifications.filter(notification => notification && notification.id).map((notification: Notification) => (
                     <li key={notification.id} className={cn(
-                      "px-4 py-4 hover:bg-gray-50 transition-colors",
-                      notification.isRead === 0 && "bg-blue-50/30"
+                      "px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors",
+                      notification.isRead === 0 && "bg-blue-50/30 dark:bg-blue-900/20"
                     )}>
                       <div className="flex items-start">
                         <div className="flex-shrink-0 mr-3">
                           <input
                             type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                            className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
                             checked={selectedNotifications.includes(notification.id)}
                             onChange={() => toggleSelection(notification.id)}
                           />
@@ -263,21 +263,21 @@ export default function NotificationsPage() {
                               href={`/${notification.entityType?.toLowerCase() || 'tasks'}/${notification.entityId || ''}`}
                               className={cn(
                                 "text-sm",
-                                notification.isRead === 0 ? "font-medium text-gray-900" : "text-gray-700"
+                                notification.isRead === 0 ? "font-medium text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300"
                               )}
                             >
                               {notification.title}
                             </Link>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
                               {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                             </span>
                           </div>
-                          <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
+                          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{notification.message}</p>
                           <div className="mt-2 flex items-center gap-2">
                             {notification.isRead === 0 && (
                               <button
                                 onClick={() => handleMarkAsRead(notification.id)}
-                                className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center"
+                                className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium flex items-center"
                               >
                                 <MailOpen className="h-3.5 w-3.5 mr-1" />
                                 Mark as read
@@ -285,7 +285,7 @@ export default function NotificationsPage() {
                             )}
                             <button
                               onClick={() => handleDeleteNotification(notification.id)}
-                              className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
+                              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 flex items-center"
                             >
                               <Trash2 className="h-3.5 w-3.5 mr-1" />
                               Delete
@@ -299,7 +299,7 @@ export default function NotificationsPage() {
 
                 {/* Load more button */}
                 {hasNextPage && (
-                  <div className="px-4 py-3 border-t border-gray-200 text-center">
+                  <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 text-center">
                     <Button
                       variant="outline"
                       onClick={() => fetchNextPage()}
@@ -322,4 +322,4 @@ export default function NotificationsPage() {
       </div>
     </div>
   );
-} 
+}

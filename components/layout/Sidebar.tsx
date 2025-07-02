@@ -116,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           variant="outline"
           size="icon"
           onClick={toggleSidebar}
-          className="bg-white shadow-md hover:bg-gray-50"
+          className="bg-white dark:bg-gray-800 shadow-md hover:bg-gray-50 dark:hover:bg-gray-700"
         >
           {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
@@ -134,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <aside
         className={`
           fixed top-0 bottom-0 left-0 z-[90]
-          w-[280px] bg-gradient-to-b from-white to-indigo-50 border-r border-indigo-100 shadow-lg
+          w-[280px] bg-gradient-to-b from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 border-r border-indigo-100 dark:border-gray-700 shadow-lg
           transition-all duration-300 ease-in-out
           lg:translate-x-0 lg:static lg:z-0
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -150,11 +150,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                   {/* <Clock className="w-6 h-6 text-white" /> */}
                   <Logo size="md" showText={false} />
                 </div>
-                <Link href="/dashboard" className="text-3xl font-semibold font-serif text-black">
+                <Link href="/dashboard" className="text-3xl font-semibold font-serif text-black dark:text-white">
                   Tracksy
                 </Link>
               </div>
-              <p className="pxj-2 text-xs text-black font-serif">
+              <p className="pxj-2 text-xs text-black dark:text-gray-400 font-serif">
                 Manage your time effectively
               </p>
             </div>
@@ -173,11 +173,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => isMobile && setIsOpen(false)}
                   className={`
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out
-                    group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50
+                    group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700
                     ${
                       isActive
-                        ? "bg-[#ecf3ff] text-brand font-semibold shadow-sm"
-                        : "text-gray-700 font-semibold hover:text-indigo-700"
+                        ? "bg-[#ecf3ff] dark:bg-indigo-900/50 text-brand dark:text-indigo-300 font-semibold shadow-sm"
+                        : "text-gray-700 dark:text-gray-300 font-semibold hover:text-indigo-700 dark:hover:text-indigo-300"
                     }
                   `}
                 >
@@ -185,7 +185,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className={`
                     mr-3 transition-transform duration-200 ease-in-out
                     group-hover:scale-110
-                    ${isActive ? "text-brand scale-110" : "text-gray-600"}
+                    ${isActive ? "text-brand dark:text-indigo-300 scale-110" : "text-gray-600 dark:text-gray-400"}
                   `}
                   >
                     {item.icon}
