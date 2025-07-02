@@ -110,7 +110,7 @@ export const AssignUserModal = ({
                 .map((user: User) => (
                   <div
                     key={user.id}
-                    className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
+                    className={`flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${
                       selectedUserId === user.id ? "bg-blue-50" : ""
                     }`}
                     onClick={() => setSelectedUserId(user.id)}
@@ -118,10 +118,10 @@ export const AssignUserModal = ({
                     <div className="flex items-center gap-3">
                       <Avatar name={user.name} size="sm" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
                           {user.name}
                         </p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
                       </div>
                     </div>
                     {selectedUserId === user.id && (

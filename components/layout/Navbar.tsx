@@ -38,15 +38,15 @@ export default function Navbar() {
           <div className="flex-none w-44">
             <div className="flex items-center">
               {/* <Clock className="w-4 h-4 lg:w-6 lg:h-6 text-white mr-2 mb-0" /> */}
-              <Logo size="md" showText={false} />
-              <span className="text-xl lg:text-2xl font-semibold text-white font-serif pr-7 py-3 rounded-xl tracking-widest ml-3">
+              <Logo size="md" />
+              {/* <span className="text-xl lg:text-2xl font-semibold text-white pr-7 py-3 rounded-xl tracking-widest ml-3">
                 Tracksy
-              </span>
+              </span> */}
             </div>
           </div>
 
           {/* Center - Navigation Links */}
-          <div className="flex-grow hidden md:flex justify-center font-serif text-xl tracking-wider">
+          <div className="flex-grow hidden md:flex justify-center text-xl tracking-wider">
             <div className="flex ">
               <Link
                 href="#features"
@@ -135,7 +135,7 @@ export default function Navbar() {
           isMenuOpen ? "block" : "hidden"
         } md:hidden bg-atlantis-400 border-t-2 border-atlantis-600/50 rounded-3xl absolute w-full`}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1 text-center font-serif text-lg tracking-wider">
+        <div className="px-2 pt-2 pb-3 space-y-1 text-center text-lg tracking-wider">
           <Link
             href="#features"
             className="block px-3 py-2 text-white hover:bg-gray-100 rounded-md"

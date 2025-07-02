@@ -69,7 +69,7 @@ const FooterLink = ({
 }) => (
   <Link
     href={href}
-    className="text-slate-200 font-serif hover:text-atlantis-400 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
+    className="text-slate-200hover:text-atlantis-400 transition-colors duration-300 text-sm hover:translate-x-1 inline-block transform"
   >
     {children}
   </Link>
@@ -165,11 +165,11 @@ export default function Footer() {
             <div className="flex items-center space-x-2 justify-center p-4 rounded-2xl">
               <div className="w-8 h-8 rounded-md flex items-center justify-center">
                 {/* <Clock className="w-7 h-7 text-white" /> */}
-                <Logo size="lg" showText={false} />
+                <Logo size="lg"  />
               </div>
-              <h3 className="text-3xl font-bold text-white font-mono tracking-wide mb-0">
+              {/* <h3 className="text-3xl font-bold text-white tracking-wide mb-0">
                 Tracksy
-              </h3>
+              </h3> */}
             </div>
             <p className="text-white font-thin text-lg tracking-wider max-w-xl mx-auto">
               The best time tracking solution for freelancers and small teams.
@@ -197,7 +197,7 @@ export default function Footer() {
                 className="space-y-4 items-center text-center
               "
               >
-                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider font-serif">
+                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider">
                   Product
                 </h3>
                 <div className="flex flex-col space-y-2">
@@ -210,7 +210,7 @@ export default function Footer() {
 
               {/* Resources column */}
               <div className="space-y-4 items-center text-center">
-                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider font-serif">
+                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider">
                   Resources
                 </h3>
                 <div className="flex flex-col space-y-2">
@@ -223,7 +223,7 @@ export default function Footer() {
 
               {/* Company column */}
               <div className="space-y-4 items-center text-center">
-                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider font-serif">
+                <h3 className="text-base md:text-lg font-bold uppercase text-white tracking-wider">
                   Company
                 </h3>
                 <div className="flex flex-col space-y-2">
@@ -258,7 +258,7 @@ export default function Footer() {
           </div> */}
 
           {/* Bottom bar with copyright and Back to Top */}
-          <div className="mt-12 pt-8 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center text-slate-200 text-sm gap-4 md:gap-0 font-serif tracking-wider font-normal">
+          <div className="mt-12 pt-8 border-t border-slate-700/50 flex flex-col md:flex-row justify-between items-center text-slate-200 text-sm gap-4 md:gap-0 tracking-wider font-normal">
             <div className="mb-2 md:mb-0">
               © {new Date().getFullYear()} TimeTracker. All rights reserved.
             </div>

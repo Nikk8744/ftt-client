@@ -176,8 +176,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700
                     ${
                       isActive
-                        ? "bg-[#ecf3ff] dark:bg-indigo-900/50 text-brand dark:text-indigo-300 font-semibold shadow-sm"
-                        : "text-gray-700 dark:text-gray-300 font-semibold hover:text-indigo-700 dark:hover:text-indigo-300"
+                        ? "bg-[#ecf3ff] dark:bg-indigo-900/50 text-brand dark:text-indigo-400 font-semibold shadow-sm"
+                        : "text-gray-700 dark:text-gray-300 font-semibold hover:text-indigo-700 dark:hover:text-indigo-400"
                     }
                   `}
                 >
@@ -185,7 +185,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className={`
                     mr-3 transition-transform duration-200 ease-in-out
                     group-hover:scale-110
-                    ${isActive ? "text-brand dark:text-indigo-300 scale-110" : "text-gray-600 dark:text-gray-400"}
+                    ${isActive ? "text-brand dark:text-indigo-400 scale-110" : "text-gray-600 dark:text-gray-400"}
                   `}
                   >
                     {item.icon}

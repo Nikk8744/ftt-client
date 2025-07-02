@@ -6,7 +6,7 @@ export default function CTASection() {
   return (
     <div className="py-16 bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-5xl sm:text-6xl font-bold text-atlantis-400 font-serif mb-10">
+        <h2 className="text-5xl sm:text-6xl font-bold text-atlantis-400 mb-10">
           Time tracking you <br />can rely on.
         </h2>
         <p className="max-w-2xl mx-auto text-xl text-gray-300 mb-10">

@@ -291,6 +291,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
               placeholder="Filter by name or description..."
               type="text"
               aria-label="Filter by name or description"
+              size="sm"
             />
             <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50 dark:text-gray-400">
               <ListFilter size={16} strokeWidth={2} aria-hidden="true" />

@@ -78,12 +78,12 @@ export default function FAQSection() {
                 <AccordionTrigger className="text-left bg-atlantis-400/75 text-white px-6 py-4 text-lg font-medium">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-slate-900 px-6 pb-4 text-base leading-relaxed">
+                <AccordionContent className="text-slate-900 bg-white px-6 pb-4 text-base leading-relaxed">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
-          </Accordion>
+      </Accordion>
         </div>
 
         {/* CTA Section */}
