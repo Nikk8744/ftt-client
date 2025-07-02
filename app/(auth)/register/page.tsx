@@ -78,7 +78,7 @@ export default function RegisterPage() {
   // Display either the auth store error or our local API error
   const errorMessage = authError || apiError;
 
-  if (!registrationSuccess) {
+  if (registrationSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-md text-center">
