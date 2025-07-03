@@ -24,6 +24,8 @@ export const buttonVariants = cva(
         myBtn: "bg-indigo-600 text-white hover:bg-indigo-800",
         darkBtn: "bg-gray-800 text-white hover:bg-gray-900",
         brandBtn: "bg-brand text-white hover:bg-indigo-700",
+        myCancel: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+
       },
       size: {
         default: "h-9 px-4 py-2",

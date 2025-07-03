@@ -126,11 +126,11 @@ export function EditTimeLogModal({
       title="Edit Time Log"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="myCancel" onClick={onClose}>
             Cancel
           </Button>
           <Button
-            variant="myBtn"
+            variant="brandBtn"
             onClick={handleSubmit(handleFormSubmit)}
             isLoading={isLoading}
           >
@@ -157,14 +157,15 @@ export function EditTimeLogModal({
         />
 
         <div className="space-y-1.5">
-          <label htmlFor="projectId" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="projectId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Project
           </label>
           <select
             id="projectId"
             className={cn(
-              "w-full rounded-md border border-gray-300 shadow-sm py-2 px-3",
-              "focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+              "w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm py-2 px-3",
+              "focus:outline-none focus:ring-primary-500 focus:border-brand",
+              "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             )}
             {...register("projectId")}
           >
@@ -183,14 +184,15 @@ export function EditTimeLogModal({
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="taskId" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="taskId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Task
           </label>
           <select
             id="taskId"
             className={cn(
-              "w-full rounded-md border border-gray-300 shadow-sm py-2 px-3",
-              "focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+              "w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm py-2 px-3",
+              "focus:outline-none focus:ring-primary-500 focus:border-brand",
+              "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             )}
             {...register("taskId")}
             disabled={!selectedProjectId}
@@ -210,15 +212,16 @@ export function EditTimeLogModal({
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Description
           </label>
           <textarea
             id="description"
             rows={3}
             className={cn(
-              "w-full rounded-md border border-gray-300 shadow-sm py-2 px-3",
-              "focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+              "w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm py-2 px-3",
+              "focus:outline-none focus:ring-primary-500 focus:border-brand",
+              "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             )}
             {...register("description")}
             placeholder="What did you work on?"

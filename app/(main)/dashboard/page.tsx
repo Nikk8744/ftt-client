@@ -129,7 +129,7 @@ export default function DashboardPage() {
   const totalTimeToday = totalTimeTodayData?.data.totalTimeSpent || 0;
 
   // Filter recent logs based on time frame
-  const recentLogs = logs.slice(0, 5);
+  const recentLogs = logs.slice(-5);
   
   // Get recent tasks that are not done - make sure it includes BOTH created and assigned tasks
   const recentTasks = allTasks

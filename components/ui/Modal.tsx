@@ -171,7 +171,7 @@ export default function Modal({
               <button 
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="rounded-full p-1.5 text-gray-400 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand"
                 aria-label="Close modal"
               >
                 <XMarkIcon className="h-5 w-5" aria-hidden="true" />

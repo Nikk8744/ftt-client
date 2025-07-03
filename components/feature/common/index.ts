@@ -1,1 +1,2 @@
-export * from './DescriptionSection'; 
+export * from './DescriptionSection';
+export * from './UserDropdown';
