@@ -55,7 +55,7 @@ export default function TestimonialsSection() {
           <div className="relative bg-gray-50 rounded-xl overflow-hidden shadow-lg">
             <div className="relative lg:grid lg:grid-cols-12">
               <div className="hidden lg:block lg:col-span-4 bg-indigo-600 relative">
-                <div className="relative" style={{ paddingBottom: '150%' }}>
+                <div className="relative" style={{ paddingBottom: '105%' }}>
                   <div className="absolute inset-0">
                     <Image 
                       className="object-cover  filter brightness-100 "
@@ -68,7 +68,7 @@ export default function TestimonialsSection() {
                   </div>
                 </div>
               </div>
-              <div className="relative lg:col-span-8 px-6 py-12 lg:p-16">
+              <div className="relative lg:col-span-8 px-6 py-12 lg:p-12">
                 <div className="relative">
                   <svg
                     className="absolute top-0 left-0 transform -translate-x-6 -translate-y-8 h-16 w-16 text-indigo-200"
@@ -139,4 +139,4 @@ export default function TestimonialsSection() {
       </div>
     </section>
   );
-} 
+}

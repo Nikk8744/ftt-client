@@ -53,7 +53,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     // Variant styles
     const variantStyles = {
-      outline: "border border-gray-500 rounded-md focus:border-brand focus:ring-0 focus:ring-brand bg-white dark:bg-transparent",
+      outline: "border border-gray-300 dark:border-gray-600 rounded-md focus:border-brand focus:ring-1 focus:ring-brand bg-white dark:bg-transparent shadow-sm",
       filled: "border border-transparent bg-gray-100 rounded-md focus:bg-white focus:border-brand focus:ring-1 focus:ring-brand",
       flushed: "border-b border-gray-300 rounded-none focus:border-brand focus:ring-0 px-0",
     };

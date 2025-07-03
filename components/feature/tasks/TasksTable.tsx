@@ -428,6 +428,7 @@ export function TasksTable({
               )}
               placeholder="Filter tasks..."
               type="text"
+              size="sm"
               aria-label="Filter tasks"
             />
             <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
@@ -454,7 +455,7 @@ export function TasksTable({
                 table.getColumn("priority")?.setFilterValue(value === "all" ? "" : value);
               }}
             >
-              <SelectTrigger className="h-9 w-[170px] text-xs sm:text-sm">
+              <SelectTrigger className="h-9 w-[170px] text-xs sm:text-sm dark:border-gray-600">
                 <SelectValue placeholder="All Priorities" />
               </SelectTrigger>
               <SelectContent align="start" className="border border-gray-200">
@@ -485,7 +486,7 @@ export function TasksTable({
                 table.getColumn("status")?.setFilterValue(value === "all" ? "" : value);
               }}
             >
-              <SelectTrigger className="h-9 w-[170px] text-xs sm:text-sm">
+              <SelectTrigger className="h-9 w-[170px] text-xs sm:text-sm dark:border-gray-600">
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent align="start" className="border border-gray-200">
@@ -511,7 +512,7 @@ export function TasksTable({
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-3">
+              <Button variant="outline" className="text-xs sm:text-sm px-2 sm:px-3 dark:border-gray-600 dark:bg-transparent">
                 <Columns3
                   className="opacity-60"
                   size={16}

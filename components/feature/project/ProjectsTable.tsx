@@ -314,7 +314,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
           {/* Filter by status */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="dark:bg-transparent dark:border-gray-600 focus:ring-1 focus:ring-brand">
                 <Filter
                   className="-ms-1 me-2 opacity-60"
                   size={16}
@@ -370,7 +370,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
           {/* Toggle columns visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="dark:bg-transparent dark:border-gray-600 focus:ring-1 focus:ring-brand">
                 <Columns3
                   className="-ms-1 me-2 opacity-60"
                   size={16}
