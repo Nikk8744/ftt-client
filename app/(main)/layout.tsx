@@ -57,7 +57,9 @@ import ClientMainWrapper from './ClientMainWrapper';
 // Server component for initial auth check
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   // Server-side auth check using httpOnly cookies
+  console.log("Reached MainLayout");
   const cookieStore = await cookies();
+  console.log("🚀 ~ MainLayout ~ cookieStore:", cookieStore)
   const accessToken = cookieStore.get('accessToken');
   console.log("🚀 ~ MainLayout ~ accessToken:", accessToken)
 

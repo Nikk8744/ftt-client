@@ -30,6 +30,7 @@ export default function useAuth() {
       // Handle the login response according to the API guide
       if (response && response.data) {
         login(response.data as User);
+        console.log("🚀 ~ handleLogin ~ isAuthenticated:", isAuthenticated)
         router.push('/dashboard');
       } else {
         throw new Error('Invalid response structure from login API');
