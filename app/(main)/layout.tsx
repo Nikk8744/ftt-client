@@ -59,6 +59,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   // Server-side auth check using httpOnly cookies
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken');
+  console.log("🚀 ~ MainLayout ~ accessToken:", accessToken)
 
   if (!accessToken) {
     redirect('/login');
