@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
+  
 /**
  * Base fetch function with error handling and automatic JSON parsing
  */
