@@ -255,7 +255,7 @@ export default function RegisterPage() {
                   variant="default"
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
-                  className="w-full bg-brand hover:bg-indigo-600"
+                  className="w-full bg-brand hover:bg-indigo-600 text-white"
                 >
                   {isSubmitting ? "Creating account..." : "Create account"}
                 </Button>

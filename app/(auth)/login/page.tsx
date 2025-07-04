@@ -187,13 +187,13 @@ export default function LoginPage() {
                   variant="default"
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
-                  className="w-full bg-brand hover:bg-indigo-700"
+                  className="w-full bg-brand hover:bg-indigo-700 text-white"
                 >
                   {isSubmitting ? "Signing in..." : "Sign in"}
                 </Button>
               </div>
             </form>
-
+                  
             <p className="text-center text-sm text-gray-600">
               Don&apos;t have an account?{" "}
               <Link
