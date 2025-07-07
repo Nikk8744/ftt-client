@@ -80,7 +80,7 @@ export default function LoginPage() {
           
           <div className="mb-8">
             <h1 className="text-3xl font-bold dark:text-gray-200">Sign In</h1>
-            <p className="mt-2 text-gray-100 dark:text-gray-400">
+            <p className="mt-2 text-gray-500 dark:text-gray-400">
               Enter your email and password to sign in to your account
             </p>
           </div>

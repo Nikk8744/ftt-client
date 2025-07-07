@@ -38,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${dmSans.variable}`}>
-      <body className={`${inter.className} antialiased m-0 p-0`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${dmSans.variable} h-full`}>
+      <body className={`${inter.className} antialiased m-0 p-0 min-h-full`}>
         <Providers>
           <ThemeProvider
             attribute="class"

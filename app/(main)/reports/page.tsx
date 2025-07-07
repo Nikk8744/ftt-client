@@ -326,7 +326,7 @@ export default function ReportsPage() {
   const showDateFilter = activeTab === 'tasks';
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 min-h-[calc(100vh-4rem)]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold">Reports Dashboard</h1>
         

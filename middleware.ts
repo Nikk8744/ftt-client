@@ -27,7 +27,7 @@ export function middleware(request: NextRequest) {
   if (isAuthenticated && isPublicPath &&
       (request.nextUrl.pathname === '/login' || 
        request.nextUrl.pathname === '/register')) {
-    // return NextResponse.redirect(new URL('/dashboard', request.url));
+    // return NextResponse.redirect(new URL('/dashboard', request.url));  
     const url = new URL('/dashboard', request.url);
     return NextResponse.redirect(url);
   }

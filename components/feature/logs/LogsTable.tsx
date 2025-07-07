@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TimeLog, Project, Task } from "@/types";
+import { TimeLog, Project, Task, User } from "@/types";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -21,15 +21,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Button from "@/components/ui/Button";
-import { Clock, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, Edit, Trash2, ChevronLeft, ChevronRight, User as UserIcon } from "lucide-react";
 import { formatDate, formatDuration } from "@/lib/utils";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import useAuthStore from "@/store/auth";
 
 interface LogsTableProps {
   data: TimeLog[];
   projects: Project[];
   tasks: Task[];
+  users?: User[];
   isLoading?: boolean;
   showActions?: boolean;
   showPagination?: boolean;
@@ -41,11 +43,13 @@ export function LogsTable({
   data,
   projects,
   tasks,
+  users = [],
   showActions = true,
   showPagination = true,
   onEdit,
   onDelete,
 }: LogsTableProps) {
+  const { user: currentUser } = useAuthStore();
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "startTime",
@@ -67,6 +71,23 @@ export function LogsTable({
     return task ? task.subject : "No Task";
   };
 
+  // Get user name by ID - simplified version
+  const getUserName = (userId: number) => {
+    // If it's the current user, use that
+    if (currentUser && currentUser.id === userId) {
+      return currentUser.name;
+    }
+    
+    // Check the users array
+    const user = users.find((u) => u.id === userId);
+    if (user) {
+      return user.name;
+    }
+    
+    // If no match, just return Unknown User
+    return `Unknown User`;
+  };
+  
   const columns: ColumnDef<TimeLog>[] = [
     {
       header: "Date",
@@ -79,10 +100,12 @@ export function LogsTable({
       accessorKey: "projectId",
       cell: ({ row }) => {
         const projectId = row.getValue("projectId") as number;
-        return (
+        return projectId ? (
           <Link href={`/projects/${projectId}`} className="hover:underline text-blue-600">
             {getProjectName(projectId)}
           </Link>
+        ) : (
+          "No Project"
         );
       },
       size: 150,
@@ -101,6 +124,20 @@ export function LogsTable({
         );
       },
       size: 200,
+    },
+    {
+      header: "User",
+      accessorKey: "userId",
+      cell: ({ row }) => {
+        const userId = row.getValue("userId") as number;
+        return (
+          <div className="flex items-center gap-1.5">
+            <UserIcon className="h-3.5 w-3.5 text-gray-500" />
+            <span>{getUserName(userId)}</span>
+          </div>
+        );
+      },
+      size: 150,
     },
     {
       header: "Duration",
