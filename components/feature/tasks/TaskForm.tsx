@@ -28,6 +28,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -533,7 +534,9 @@ const TaskForm = ({
                         </FormControl>
                         <SelectContent className="z-[9999]">
                           <SelectItem value="Pending">Not Started</SelectItem>
+                          <SelectSeparator className="bg-gray-200 dark:bg-gray-600" />
                           <SelectItem value="In-Progress">In Progress</SelectItem>
+                          <SelectSeparator className="bg-gray-200 dark:bg-gray-600" />
                           <SelectItem value="Done">Completed</SelectItem>
                         </SelectContent>
                       </Select>
@@ -561,8 +564,11 @@ const TaskForm = ({
                         </FormControl>
                         <SelectContent className="z-[9999]">
                           <SelectItem value="Low">Low</SelectItem>
+                          <SelectSeparator className="bg-gray-200 dark:bg-gray-600" />
                           <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectSeparator className="bg-gray-200 dark:bg-gray-600" />
                           <SelectItem value="High">High</SelectItem>
+                          <SelectSeparator className="bg-gray-200 dark:bg-gray-600" />
                           <SelectItem value="Urgent">Urgent</SelectItem>
                         </SelectContent>
                       </Select>
@@ -576,13 +582,14 @@ const TaskForm = ({
                 control={form.control}
                 name="dueDate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col space-y-4">
                     <FormLabel>Due Date</FormLabel>
                     <FormControl>
                       <Input
                         type="date"
                         className="w-full"
                         {...field}
+                        size="sm"
                       />
                     </FormControl>
                     <FormMessage />

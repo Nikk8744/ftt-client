@@ -9,6 +9,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -129,6 +130,7 @@ export default function CreateProjectModal({
                       {...field}
                       className="w-full"
                       fullWidth={true}
+                      size="sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -146,8 +148,9 @@ export default function CreateProjectModal({
                     <Textarea
                       placeholder="Enter project description"
                       className="w-full resize-none"
-                      rows={4}
+                      rows={3}
                       {...field}
+
                     />
                   </FormControl>
                   <FormMessage />
@@ -167,6 +170,7 @@ export default function CreateProjectModal({
                         type="date"
                         className="w-full"
                         {...field}
+                        size="sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -185,6 +189,7 @@ export default function CreateProjectModal({
                         type="date"
                         className="w-full"
                         {...field}
+                        size="sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -209,9 +214,11 @@ export default function CreateProjectModal({
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="z-[9999]">
+                      <SelectContent className="z-[9999] border border-gray-200 dark:border-gray-700">
                         <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectSeparator className="bg-gray-200 dark:bg-gray-600"/>
                         <SelectItem value="In-Progress">In Progress</SelectItem>
+                        <SelectSeparator className="bg-gray-200 dark:bg-gray-600" />
                         <SelectItem value="Completed">Completed</SelectItem>
                       </SelectContent>
                     </Select>

@@ -37,7 +37,7 @@ export interface Project {
   endDate: string;
   status: 'Pending' | 'In-Progress' | 'Completed' | null;
   completedAt: string | null;
-  userId: number; // Owner ID
+  ownerId: number; // Owner ID
   totalHours: number | string | null;
   createdAt: string;
   updatedAt: string;

@@ -12,6 +12,7 @@ import {
 import Button  from "@/components/ui/Button";
 import { Ellipsis } from "lucide-react";
 import Link from "next/link";
+import useAuthStore from "@/store/auth";
 
 interface ProjectRowActionsProps {
   row: Row<Project>;
@@ -20,6 +21,9 @@ interface ProjectRowActionsProps {
 }
 
 export function ProjectRowActions({ row, onDelete, onEdit }: ProjectRowActionsProps) {
+  const { user } = useAuthStore();
+  const isOwner = user?.id === row.original.ownerId;
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,23 +33,35 @@ export function ProjectRowActions({ row, onDelete, onEdit }: ProjectRowActionsPr
           </Button>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[160px] border border-gray-200 dark:border-gray-700">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link href={`/projects/${row.original.id}`}>
             <DropdownMenuItem>View Details</DropdownMenuItem>
           </Link>
-          <DropdownMenuItem onClick={() => onEdit(row.original)}>Edit Project</DropdownMenuItem>
+          
+          {isOwner && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onEdit(row.original)}>Edit Project</DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem 
-            className="text-destructive focus:text-destructive"
-            onClick={() => onDelete(row.original.id)}
-          >
-            Delete Project
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        
+        {isOwner && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem 
+                className="text-destructive focus:text-destructive"
+                onClick={() => onDelete(row.original.id)}
+              >
+                Delete Project
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

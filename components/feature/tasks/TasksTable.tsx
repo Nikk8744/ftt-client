@@ -645,7 +645,7 @@ export function TasksTable({
         </div>
         <div className="flex flex-wrap items-center gap-4 sm:space-x-6 lg:space-x-8 order-1 sm:order-2">
           <div className="flex items-center space-x-2">
-            <p className="text-xs sm:text-sm font-medium">Rows per page</p>
+            <p className="text-xs sm:text-sm font-medium mb-0">Rows per page</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {

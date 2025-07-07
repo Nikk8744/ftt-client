@@ -34,3 +34,5 @@
 - in the recent time logs on dashboard page, the logs are not recent . they are all old logs. so need to fix this. ✔️
 - use toast/sonner component wherever needed 
 - change the color of the cancel btn
+
+- project tbl dropdown issue and btns not working.

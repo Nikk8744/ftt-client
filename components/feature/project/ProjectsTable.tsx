@@ -515,7 +515,7 @@ export function ProjectsTable({ data, onDelete, onEdit }: ProjectsTableProps) {
         </div>
         {/* Page number information */}
         <div className="flex grow justify-end whitespace-nowrap text-sm text-muted-foreground">
-          <p className="whitespace-nowrap text-sm text-muted-foreground" aria-live="polite">
+          <p className="whitespace-nowrap text-sm text-muted-foreground mb-0" aria-live="polite">
             <span className="text-foreground">
               {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
               {Math.min(

@@ -223,7 +223,10 @@ export default function ProjectsPage() {
                   projectId: projectId,
                 })
               }
-              onEdit={setSelectedProject}
+              onEdit={(project) => {
+                setSelectedProject(project);
+                setIsEditModalOpen(true);
+              }}
             />
           )}
         </div>
