@@ -7,6 +7,11 @@ import { Moon, Sun } from "lucide-react"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
+  
+  // Add debugging to see what's happening
+  React.useEffect(() => {
+    console.log("Current theme:", theme);
+  }, [theme]);
 
   return (
     <div className="flex items-center space-x-2">

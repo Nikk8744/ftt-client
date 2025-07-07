@@ -116,15 +116,15 @@ export default function RegisterPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <Link href="/login" className="inline-flex items-center text-sm text-gray-400 hover:text-primary-600">
+            <Link href="/login" className="inline-flex items-center text-sm dark:text-gray-400 hover:text-primary-600">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to login
             </Link>
           </div>
           
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-200">Sign Up</h1>
-            <p className="mt-2 text-gray-400">
+            <h1 className="text-3xl font-bold dark:text-gray-200">Sign Up</h1>
+            <p className="mt-2 dark:text-gray-400">
               Create your account to get started with Time Tracker
             </p>
           </div>
@@ -244,7 +244,7 @@ export default function RegisterPage() {
                   type="checkbox"
                   className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
-                <label htmlFor="terms" className="ml-2 block text-sm text-gray-400">
+                <label htmlFor="terms" className="ml-2 block text-sm dark:text-gray-400">
                   I agree to the <a href="#" className="text-brand hover:text-primary-500">Terms of Service</a> and <a href="#" className="text-brand hover:text-primary-500">Privacy Policy</a>
                 </label>
               </div>
@@ -262,7 +262,7 @@ export default function RegisterPage() {
               </div>
             </form>
 
-            <p className="text-center text-sm text-gray-400">
+            <p className="text-center text-sm dark:text-gray-400">
               Already have an account?{" "}
               <Link
                 href="/login"

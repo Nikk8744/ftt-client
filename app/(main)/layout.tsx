@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import ClientLayout from '@/components/layout/ClientLayout';
-import useAuthStore from '@/store/auth';
-import { parseCookies } from 'nookies';
-import { useNotificationStore } from '@/store/useNotificationStore';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import ClientLayout from "@/components/layout/ClientLayout";
+import useAuthStore from "@/store/auth";
+import { parseCookies } from "nookies";
+import { useNotificationStore } from "@/store/useNotificationStore";
+// import { ThemeProvider } from "@/components/theme-provider";
 
 export default function MainLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
@@ -20,20 +21,20 @@ export default function MainLayout({
   useEffect(() => {
     // Check for authentication cookies
     const cookies = parseCookies();
-    console.log("🚀 ~ useEffect ~ cookies:", cookies)
-    const hasAuthCookie = !!cookies['accessToken']
-    console.log("🚀 ~ useEffect ~ hasAuthCookie:", hasAuthCookie)
-    
+    console.log("🚀 ~ useEffect ~ cookies:", cookies);
+    const hasAuthCookie = !!cookies["accessToken"];
+    console.log("🚀 ~ useEffect ~ hasAuthCookie:", hasAuthCookie);
+
     // Only redirect if we're sure the store has hydrated and there's no auth
     if (!isLoading && !isAuthenticated && !hasAuthCookie) {
-      router.push('/login');
+      router.push("/login");
     }
-    
+
     // Fetch recent notifications if authenticated
     if (isAuthenticated && user) {
       fetchRecentNotifications();
     }
-    
+
     setIsLoading(false);
   }, [isAuthenticated, router, user, fetchRecentNotifications, isLoading]);
 
@@ -42,5 +43,16 @@ export default function MainLayout({
     return null;
   }
 
-  return <ClientLayout>{children}</ClientLayout>;
-} 
+  return (
+    <ClientLayout>
+      {/* <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      > */}
+        {children}
+      {/* </ThemeProvider> */}
+    </ClientLayout>
+  );
+}

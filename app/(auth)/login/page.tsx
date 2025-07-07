@@ -72,15 +72,15 @@ export default function LoginPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <Link href="/" className="inline-flex items-center text-sm text-gray-200 hover:text-primary-600">
+            <Link href="/" className="inline-flex items-center text-sm dark:text-gray-200 hover:text-primary-600">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Link>
           </div>
           
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-200">Sign In</h1>
-            <p className="mt-2 text-gray-400">
+            <h1 className="text-3xl font-bold dark:text-gray-200">Sign In</h1>
+            <p className="mt-2 text-gray-100 dark:text-gray-400">
               Enter your email and password to sign in to your account
             </p>
           </div>
@@ -165,7 +165,7 @@ export default function LoginPage() {
                   />
                   <label
                     htmlFor="remember-me"
-                    className="ml-2 block text-sm text-gray-300"
+                    className="ml-2 block text-sm dark:text-gray-300"
                   >
                     Remember me
                   </label>
