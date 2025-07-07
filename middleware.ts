@@ -9,20 +9,24 @@ export function middleware(request: NextRequest) {
   const isPublicPath = publicPaths.some(path => 
     request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
   );
-// Get the token from cookies
+  
+  // Get the token from cookies
   const token = request.cookies.get('accessToken')?.value;
   const isAuthenticated = !!token;
 
   // If the user is on a protected path but not authenticated, redirect to login
-  // if (!isPublicPath && !isAuthenticated) {
-  //   return NextResponse.redirect(new URL('/login', request.url));
-  // }
+  if (!isPublicPath && !isAuthenticated) {
+    // Use NextResponse.redirect with { redirect: 'manual' } to prevent full page refresh
+    const url = new URL('/login', request.url);
+    return NextResponse.redirect(url);
+  }
 
   // If the user is authenticated but tries to access login/register, redirect to dashboard
   if (isAuthenticated && isPublicPath &&
       (request.nextUrl.pathname === '/login' || 
        request.nextUrl.pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    const url = new URL('/dashboard', request.url);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
