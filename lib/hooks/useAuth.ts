@@ -36,7 +36,6 @@ export default function useAuth() {
         setTimeout(() => {
           console.log("Navigating to dashboard...");
           router.push('/dashboard');
-          // router.replace('/dashboard');
           // Force a hard navigation to ensure the server component reruns
           // window.location.href = '/dashboard';
         }, 100);
@@ -107,8 +106,6 @@ export default function useAuth() {
 
       setIsLoading(false);
       router.push('/login');
-      // Use replace instead of push for smoother transition
-      // router.replace('/login');
     } catch (err: unknown) {
       setIsLoading(false);
       const errorMsg = err instanceof Error ? err.message : 'Logout failed. Please try again.';

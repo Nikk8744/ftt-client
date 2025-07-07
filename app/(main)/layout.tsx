@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ClientLayout from "@/components/layout/ClientLayout";
 import useAuthStore from "@/store/auth";
 import { parseCookies } from "nookies";
@@ -14,7 +14,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const { isAuthenticated, user } = useAuthStore();
-  // const router = useRouter();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const { fetchRecentNotifications } = useNotificationStore();
 
@@ -28,9 +28,9 @@ export default function MainLayout({
     // Let middleware handle the redirect, we just won't render content
     // This prevents double redirects and refreshes
     if (!isAuthenticated && !hasAuthCookie) {
-      // router.push("/login");
-      setIsLoading(false);
-      return; // Don't proceed further
+      router.push("/login");
+      // setIsLoading(false);
+      // return; // Don't proceed further
     }
 
     // Fetch recent notifications if authenticated
@@ -39,7 +39,7 @@ export default function MainLayout({
     }
 
     setIsLoading(false);
-  }, [isAuthenticated, user, fetchRecentNotifications]);
+  }, [isAuthenticated, user, fetchRecentNotifications, router]);
 
   // Don't render anything during loading to prevent flash of content
   if (isLoading) {
@@ -47,7 +47,7 @@ export default function MainLayout({
   }
 
   // If not authenticated, show a minimal loading state
-  // // The middleware will handle the actual redirect
+  // The middleware will handle the actual redirect
   // if (!isAuthenticated) {
   //   return null;
   // }
