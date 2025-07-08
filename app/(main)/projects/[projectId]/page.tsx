@@ -10,7 +10,6 @@ import TeamMembers from "@/components/feature/members/TeamMembers";
 import {
   getProjectById,
   updateProject,
-  getProjectOwner,
 } from "@/services/project";
 import { getTasksByProject, updateTask, deleteTask } from "@/services/task";
 import {
@@ -68,13 +67,6 @@ export default function ProjectDetailsPage() {
     queryKey: ["project", projectId],
     queryFn: () => getProjectById(Number(projectId)),
     enabled: !!projectId,
-  });
-
-  // Get project owner information
-  const { data: ownerData, isLoading: ownerLoading } = useQuery({
-    queryKey: ["project-owner", projectData?.data?.ownerId],
-    queryFn: () => getProjectOwner(Number(projectData?.data?.ownerId)),
-    enabled: !!projectData?.data?.ownerId,
   });
 
   // Get project tasks
@@ -180,7 +172,6 @@ export default function ProjectDetailsPage() {
   const project = projectData?.data;
   const tasks = tasksData?.data || [];
   const teamMembers = teamData?.data || [];
-  const projectOwner = ownerData?.data;
 
   // Check if current user is the project owner
   const isOwner = project && user ? project.ownerId === user.id : false;
@@ -291,9 +282,9 @@ export default function ProjectDetailsPage() {
                 {/* Project Info */}
                 <ProjectInfo 
                   project={project}
-                  ownerName={projectOwner?.name || ""}
+                  ownerName={project?.ownerName || ""}
                   isCurrentUserOwner={isOwner}
-                  ownerLoading={ownerLoading}
+                  ownerLoading={false}
                 />
 
                 {/* Team Members */}

@@ -2,7 +2,7 @@ import React from 'react';
 import Card from '@/components/ui/Card';
 import { User as UserIcon, Check, FolderOpenDot, Calendar, Clock, PlusCircle } from 'lucide-react';
 import { formatDate, formatDuration } from '@/lib/utils';
-import { Task, User } from '@/types';
+import { Task } from '@/types';
 import { Info } from 'lucide-react';
 import Link from 'next/link';
 import Avatar from '@/components/ui/Avatar';
@@ -11,7 +11,8 @@ import Badge from '@/components/ui/Badge';
 interface TaskInfoProps {
   task: Task;
   project?: { id: number; name: string } | null;
-  creator?: User | null;
+  // creator?: User | null;
+  creator?: string;
   creatorLoading?: boolean;
   statusVariant: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "default" | undefined;
 }
@@ -45,9 +46,9 @@ export const TaskInfo = ({
             <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           ) : creator ? (
             <div className="flex items-center gap-2">
-              <Avatar name={creator.name} size="xs" />
+              <Avatar name={creator} size="xs" />
               <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">
-                {creator.name}
+                {creator}
               </span>
             </div>
           ) : (

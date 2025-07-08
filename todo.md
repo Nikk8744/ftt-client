@@ -36,3 +36,6 @@
 - change the color of the cancel btn
 
 - project tbl dropdown issue and btns not working.
+
+
+- can optimize the project and task info sections and props properly, like we are passing the owner info seperately.

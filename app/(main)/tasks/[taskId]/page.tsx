@@ -25,7 +25,7 @@ import TaskChecklist from "@/components/feature/tasks/TaskChecklist";
 import Link from "next/link";
 import useTimer from "@/lib/hooks/useTimer";
 import { User, TimeLog, TimeLogUpdateData } from "@/types";
-import { getCurrentUser, getUserById } from "@/services/user";
+import { getCurrentUser } from "@/services/user";
 import { getAllMembersOfProject } from "@/services/projectMember";
 import {
   Edit,
@@ -88,17 +88,6 @@ export default function TaskDetailsPage() {
     queryKey: ["project", taskData?.data?.projectId],
     queryFn: () => getProjectById(taskData?.data?.projectId || 0),
     enabled: !!taskData?.data?.projectId,
-  });
-
-  // Get task creator details
-  const { data: creatorData, isLoading: creatorLoading } = useQuery({
-    queryKey: ["taskCreator", taskData?.data?.ownerId],
-    queryFn: async () => {
-      if (!taskData?.data?.ownerId) return { user: null };
-      const response = await getUserById(taskData.data.ownerId);
-      return response;
-    },
-    enabled: !!taskData?.data?.ownerId,
   });
 
   // Get task assignee
@@ -194,12 +183,14 @@ export default function TaskDetailsPage() {
       queryFn: async () => {
         if (!taskData?.data?.projectId) return { members: [] };
         // Use the proper service function to get project members
+        console.log("🚀 ~ TaskDetailsPage ~ project:", project)
         return getAllMembersOfProject(taskData.data.projectId);
       },
       enabled: !!taskData?.data?.projectId && assignUserModalOpen,
     });
-
+    
   const task = taskData?.data;
+  console.log("🚀 ~ TaskDetailsPage ~ task:", task)
   const project = projectData?.data;
   const assignees = assigneeData?.data || [];
   const followers = followersData?.data || [];
@@ -426,8 +417,8 @@ export default function TaskDetailsPage() {
                 <TaskInfo 
                   task={task}
                   project={project}
-                  creator={creatorData?.data}
-                  creatorLoading={creatorLoading}
+                  creator={task?.ownerName}
+                  creatorLoading={false}
                   statusVariant={getStatusBadgeVariant(task.status)}
                 />
 

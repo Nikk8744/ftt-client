@@ -277,7 +277,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">My Tasks</h2>
               <Link href="/tasks" className="text-sm text-brand hover:text-brand-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-                View all tasks
+                View all
               </Link>
             </div>
 
