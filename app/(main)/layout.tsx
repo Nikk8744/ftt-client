@@ -21,9 +21,9 @@ export default function MainLayout({
   useEffect(() => {
     // Check for authentication cookies
     const cookies = parseCookies();
-    console.log("🚀 ~ useEffect ~ cookies:", cookies);
+    // console.log("🚀 ~ useEffect ~ cookies:", cookies);
     const hasAuthCookie = !!cookies["accessToken"];
-    console.log("🚀 ~ useEffect ~ hasAuthCookie:", hasAuthCookie);
+    // console.log("🚀 ~ useEffect ~ hasAuthCookie:", hasAuthCookie);
 
     // Let middleware handle the redirect, we just won't render content
     // This prevents double redirects and refreshes

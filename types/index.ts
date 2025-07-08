@@ -127,6 +127,11 @@ export interface TimeLog {
   duration: number | null; // in seconds
   createdAt: string;
   updatedAt?: string;
+  // New fields from API response
+  userName?: string;
+  userEmail?: string;
+  projectName?: string;
+  taskName?: string;
 }
 
 export interface TimeLogCreateData {

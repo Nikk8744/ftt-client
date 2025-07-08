@@ -65,7 +65,7 @@ export default function DashboardPage() {
 
   const { data: logsData, isLoading: logsLoading } = useQuery({
     queryKey: ['logs'],
-    queryFn: getUserLogs,
+    queryFn: () => getUserLogs(user?.id || 1),
   });
 
   const { data: totalTimeTodayData, isLoading: totalTimeTodayLoading } = useQuery({

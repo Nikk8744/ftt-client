@@ -46,12 +46,12 @@ export async function getTimeLogById(logId: number) {
 /**
  * Get all logs for the currently authenticated user
  */
-export const getUserLogs = async () => {
+export const getUserLogs = async (userId: number) => {
   try {
-    // Note: The API endpoint expects a userId parameter in the path, but the controller 
+    //! Note: The API endpoint expects a userId parameter in the path, but the controller 
     // ignores it and uses the authenticated user ID from the request
-    const userId = 1; // This is just a placeholder since the backend ignores it
-    const response = await apiClient.get(`/logs/getUserLogs/${userId}`);
+    const userIdParam = userId || 1; // This is just a placeholder since the backend ignores it
+    const response = await apiClient.get(`/logs/getUserLogs/${userIdParam}`);
     return {
       logs: response.data.data || []
     };

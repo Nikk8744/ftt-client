@@ -58,35 +58,6 @@ export function LogsTable({
   ]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  // Get project name by ID
-  const getProjectName = (projectId: number) => {
-    const project = projects.find((p) => p.id === projectId);
-    return project ? project.name : "Unknown Project";
-  };
-
-  // Get task subject by ID
-  const getTaskSubject = (taskId: number) => {
-    const task = tasks.find((t) => t.id === taskId);
-    return task ? task.subject : "No Task";
-  };
-
-  // Get user name by ID - simplified version
-  const getUserName = (userId: number) => {
-    // If it's the current user, use that
-    if (currentUser && currentUser.id === userId) {
-      return currentUser.name;
-    }
-    
-    // Check the users array
-    const user = users.find((u) => u.id === userId);
-    if (user) {
-      return user.name;
-    }
-    
-    // If no match, just return Unknown User
-    return `Unknown User`;
-  };
   
   const columns: ColumnDef<TimeLog>[] = [
     {
@@ -99,13 +70,18 @@ export function LogsTable({
       header: "Project",
       accessorKey: "projectId",
       cell: ({ row }) => {
-        const projectId = row.getValue("projectId") as number;
-        return projectId ? (
+        const log = row.original;
+        const projectId = log.projectId;
+        
+        if (!projectId) return "No Project";
+        
+        // Use projectName from log data if available
+        const projectName = log.projectName || projects.find(p => p.id === projectId)?.name || "Unknown Project";
+        
+        return (
           <Link href={`/projects/${projectId}`} className="hover:underline text-blue-600">
-            {getProjectName(projectId)}
+            {projectName}
           </Link>
-        ) : (
-          "No Project"
         );
       },
       size: 150,
@@ -114,13 +90,18 @@ export function LogsTable({
       header: "Task",
       accessorKey: "taskId",
       cell: ({ row }) => {
-        const taskId = row.original.taskId;
-        return taskId ? (
+        const log = row.original;
+        const taskId = log.taskId;
+        
+        if (!taskId) return "No Task";
+        
+        // Use taskName from log data if available
+        const taskName = log.taskName || tasks.find(t => t.id === taskId)?.subject || "Unknown Task";
+        
+        return (
           <Link href={`/tasks/${taskId}`} className="hover:underline text-blue-600">
-            {getTaskSubject(taskId)}
+            {taskName}
           </Link>
-        ) : (
-          "No Task"
         );
       },
       size: 200,
@@ -129,11 +110,25 @@ export function LogsTable({
       header: "User",
       accessorKey: "userId",
       cell: ({ row }) => {
-        const userId = row.getValue("userId") as number;
+        const log = row.original;
+        const userId = log.userId;
+        
+        // Get user name from multiple sources in order of priority
+        let userName = log.userName;
+        
+        if (!userName) {
+          if (currentUser && currentUser.id === userId) {
+            userName = currentUser.name;
+          } else {
+            const user = users.find(u => u.id === userId);
+            userName = user ? user.name : `Unknown User`;
+          }
+        }
+        
         return (
           <div className="flex items-center gap-1.5">
             <UserIcon className="h-3.5 w-3.5 text-gray-500" />
-            <span>{getUserName(userId)}</span>
+            <span>{userName}</span>
           </div>
         );
       },

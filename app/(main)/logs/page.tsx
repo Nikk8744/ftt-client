@@ -43,7 +43,7 @@ export default function LogsPage() {
     isError: logsError,
   } = useQuery({
     queryKey: ["logs"],
-    queryFn: getUserLogs,
+    queryFn: () => getUserLogs(user?.id || 1),
   });
 
   // Fetch user-owned tasks
