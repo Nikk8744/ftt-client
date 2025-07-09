@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Button  from "@/components/ui/Button";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Eye, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import useAuthStore from "@/store/auth";
 
@@ -38,13 +38,19 @@ export function ProjectRowActions({ row, onDelete, onEdit }: ProjectRowActionsPr
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link href={`/projects/${row.original.id}`}>
-            <DropdownMenuItem>View Details</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Eye size={16} strokeWidth={2} aria-hidden="true" />
+              View Details
+            </DropdownMenuItem>
           </Link>
           
           {isOwner && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onEdit(row.original)}>Edit Project</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit(row.original)}>
+                <Pencil size={16} strokeWidth={2} aria-hidden="true" />
+                Edit Project
+              </DropdownMenuItem>
             </>
           )}
         </DropdownMenuGroup>
@@ -57,6 +63,7 @@ export function ProjectRowActions({ row, onDelete, onEdit }: ProjectRowActionsPr
                 className="text-destructive focus:text-destructive"
                 onClick={() => onDelete(row.original.id)}
               >
+                <Trash2 size={16} strokeWidth={2} aria-hidden="true" />
                 Delete Project
               </DropdownMenuItem>
             </DropdownMenuGroup>

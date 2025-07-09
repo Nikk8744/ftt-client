@@ -148,3 +148,18 @@ export const getTotalTimeToday = async () => {
     throw error;
   }
 }; 
+
+/**
+ * Get weekly summary of time tracked for the current user
+ */
+export const getWeeklySummary = async (): Promise<{ date: string; totalTime: number }[]> => {
+  try {
+    const response = await apiClient.get('/logs/weeklySummary');
+    console.log("🚀 ~ getWeeklySummary ~ response:", response)
+    // if (!response.ok) throw new Error('Failed to fetch weekly summary');
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching weekly summary:', error);
+    throw error;
+  }
+}; 

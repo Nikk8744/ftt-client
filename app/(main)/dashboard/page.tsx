@@ -17,6 +17,8 @@ import { Clock, Plus, FolderOpenDot, ClipboardCheck } from 'lucide-react';
 import { LogsTable } from '@/components/feature/logs/LogsTable';
 import StatCard from '@/components/feature/reports/StatCard';
 import Loader from '@/components/ui/Loader';
+import { ThisWeekBarGraph } from '@/components/feature/reports/ThisWeekBarGraph';
+import { RecentlyTrackedTasks } from '@/components/feature/reports/RecentlyTrackedTasks';
 // import Loader from '@/components/ui/Loader';
 
 export default function DashboardPage() {
@@ -270,6 +272,12 @@ export default function DashboardPage() {
               iconColor="text-green-600 dark:text-green-400"
               tooltip="Total time tracked today"
             />
+          </div>
+
+          {/* New: This Week Bar Graph and Recently Tracked Tasks */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <ThisWeekBarGraph />
+            <RecentlyTrackedTasks logs={logs} />
           </div>
 
           {/* My Tasks Section */}
