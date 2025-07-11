@@ -130,38 +130,37 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Fixed Position */}
       <aside
         className={`
-          fixed top-0 bottom-0 left-0 z-[90]
+          fixed top-0 left-0 h-full z-[90]
           w-[280px] bg-gradient-to-b from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 border-r border-indigo-100 dark:border-gray-700 shadow-lg
-          transition-all duration-300 ease-in-out
-          lg:translate-x-0 lg:static lg:z-0
-          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          transition-all duration-300 ease-in-out flex flex-col
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          ${isMobile ? "" : "lg:translate-x-0"}
           ${className}
         `}
       >
-        <div className="flex flex-col h-full">
-          {/* Logo and Title */}
-          <div className="px-6 py-8">
-            <div className="flex flex-col gap-1 justify-center">
-              <div className="flex items-center justify-normal gap-1">
-                <div className="p-2 bg-transparent">
-                  {/* <Clock className="w-6 h-6 text-white" /> */}
-                  <Logo size="md" showText={false} />
-                </div>
-                <Link href="/dashboard" className="text-3xl font-semibold font-serif text-black dark:text-white">
-                  Tracksy
-                </Link>
+        {/* Logo and Title - Fixed at the top */}
+        <div className="px-6 py-8 flex-shrink-0">
+          <div className="flex flex-col gap-1 justify-center">
+            <div className="flex items-center justify-normal gap-1">
+              <div className="p-2 bg-transparent">
+                <Logo size="md" showText={false} />
               </div>
-              <p className="pxj-2 text-xs text-black dark:text-gray-400 font-serif">
-                Manage your time effectively
-              </p>
+              <Link href="/dashboard" className="text-3xl font-semibold font-serif text-black dark:text-white">
+                Tracksy
+              </Link>
             </div>
+            <p className="pxj-2 text-xs text-black dark:text-gray-400 font-serif">
+              Manage your time effectively
+            </p>
           </div>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+        {/* Navigation - Scrollable */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <nav className="px-4 space-y-1">
             {navigation.map((item) => {
               const isActive =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -173,11 +172,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => isMobile && setIsOpen(false)}
                   className={`
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out
-                    group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-gray-800 dark:hover:to-gray-700
+                    group hover:bg-gradient-to-r hover:from-indigo-50 hover:to-brand-100 dark:hover:from-gray-800 dark:hover:to-brand-900/30
                     ${
                       isActive
-                        ? "bg-[#ecf3ff] dark:bg-indigo-900/50 text-brand dark:text-indigo-400 font-semibold shadow-sm"
-                        : "text-gray-700 dark:text-gray-300 font-semibold hover:text-indigo-700 dark:hover:text-indigo-400"
+                        ? "bg-[#ecf3ff] dark:bg-brand-900 text-brand dark:text-brand-300 font-semibold shadow-sm"
+                        : "text-gray-700 dark:text-gray-300 font-semibold hover:text-brand-600 dark:hover:text-brand-300"
                     }
                   `}
                 >
@@ -185,7 +184,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className={`
                     mr-3 transition-transform duration-200 ease-in-out
                     group-hover:scale-110
-                    ${isActive ? "text-brand dark:text-indigo-400 scale-110" : "text-gray-600 dark:text-gray-400"}
+                    ${isActive ? "text-brand dark:text-brand-300 scale-110" : "text-gray-600 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-brand-300"}
                   `}
                   >
                     {item.icon}
@@ -195,25 +194,11 @@ const Sidebar: React.FC<SidebarProps> = ({
               );
             })}
           </nav>
-
-          {/* Help Section */}
-          {/* <div className="px-4 py-6">
-            <div className="bg-gradient-to-r from-indigo-100 to-purple-100 p-5 rounded-lg shadow-inner border border-indigo-200">
-              <h3 className="text-sm font-medium text-indigo-700 mb-1">Need help?</h3>
-              <p className="text-xs text-gray-600 mb-3">Check out our documentation or contact support</p>
-              <a
-                href="https://github.com/your-repo/time-tracker"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
-              >
-                <ExternalLink className="mr-1.5 h-4 w-4" />
-                View Documentation
-              </a>
-            </div>
-          </div> */}
         </div>
       </aside>
+
+      {/* This empty div creates space for the sidebar in the layout */}
+      <div className="hidden lg:block w-[280px] flex-shrink-0"></div>
     </>
   );
 };
