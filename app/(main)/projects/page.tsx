@@ -19,6 +19,7 @@ import EditProjectModal from "@/components/feature/project/EditProjectModal";
 import CreateProjectModal from "@/components/feature/project/CreateProjectModal";
 import Loader from "@/components/ui/Loader";
 import PageHeader from "@/components/layout/PageHeader";
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ProjectsPage() {
   const queryClient = useQueryClient();
@@ -125,38 +126,13 @@ export default function ProjectsPage() {
       />
 
       <div className="flex-1 bg-gray-50 dark:bg-gray-900 p-4 ">
-        <div className="flex space-x-1 rounded-lg bg-gray-100 dark:bg-gray-800 p-1 mt-3 mb-6 max-w-md">
-          <button
-            className={`w-full rounded-md py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-              activeTab === "all"
-                ? "bg-white dark:bg-gray-700 shadow text-brand-700 dark:text-brand-300"
-                : "text-gray-700 dark:text-gray-300 hover:bg-white/[0.5] dark:hover:bg-gray-700/[0.5]"
-            }`}
-            onClick={() => setActiveTab("all")}
-          >
-            All Projects
-          </button>
-          <button
-            className={`w-full rounded-md py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-              activeTab === "owned"
-                ? "bg-white dark:bg-gray-700 shadow text-brand-700 dark:text-brand-300"
-                : "text-gray-700 dark:text-gray-300 hover:bg-white/[0.5] dark:hover:bg-gray-700/[0.5]"
-            }`}
-            onClick={() => setActiveTab("owned")}
-          >
-            Your Projects
-          </button>
-          <button
-            className={`w-full rounded-md py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-              activeTab === "member"
-                ? "bg-white dark:bg-gray-700 shadow text-brand-700 dark:text-brand-300"
-                : "text-gray-700 dark:text-gray-300 hover:bg-white/[0.5] dark:hover:bg-gray-700/[0.5]"
-            }`}
-            onClick={() => setActiveTab("member")}
-          >
-            Member Of
-          </button>
-        </div>
+        <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'all' | 'owned' | 'member')} className="mt-3 mb-6">
+          <TabsList>
+            <TabsTrigger value="all">All Projects</TabsTrigger>
+            <TabsTrigger value="owned">Your Projects</TabsTrigger>
+            <TabsTrigger value="member">Member Of</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         <div className="p-6">
           {isLoading ? (

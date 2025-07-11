@@ -4,21 +4,21 @@ import { useQuery } from '@tanstack/react-query';
 import { getAllProjectsOfUser } from '@/services/project';
 import { getUserTasks } from '@/services/task';
 import { getUserLogs, getTotalTimeToday } from '@/services/log';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-import { formatDate, formatDuration } from '@/lib/utils';
+import { formatDuration } from '@/lib/utils';
 import useAuth from '@/lib/hooks/useAuth';
 import Link from 'next/link';
 import { Project, Task } from '@/types';
 import { getAllProjectsUserIsMemberOf } from '@/services/projectMember';
 import { getUserAssignedTasks } from '@/services/taskMembers';
 import { useEffect, useState } from 'react';
-import { Clock, Plus, FolderOpenDot, ClipboardCheck } from 'lucide-react';
-import { LogsTable } from '@/components/feature/logs/LogsTable';
+import { Clock, FolderOpenDot, ClipboardCheck } from 'lucide-react';
 import StatCard from '@/components/feature/reports/StatCard';
 import Loader from '@/components/ui/Loader';
-import { ThisWeekBarGraph } from '@/components/feature/reports/ThisWeekBarGraph';
-import { RecentlyTrackedTasks } from '@/components/feature/reports/RecentlyTrackedTasks';
+import { ThisWeekBarGraph } from '@/components/feature/dashboard/ThisWeekBarGraph';
+import { RecentlyTrackedTasks } from '@/components/feature/dashboard/RecentlyTrackedTasks';
+import RecentTasks from '@/components/feature/dashboard/RecentTasks';
+import { RecentLogs } from '@/components/feature/dashboard/RecentLogs';
+import RecentProjects from '@/components/feature/dashboard/RecentProjects';
 // import Loader from '@/components/ui/Loader';
 
 export default function DashboardPage() {
@@ -129,44 +129,12 @@ export default function DashboardPage() {
 
   const logs = logsData?.logs || [];
   const totalTimeToday = totalTimeTodayData?.data.totalTimeSpent || 0;
-
-  // Filter recent logs based on time frame
-  const recentLogs = logs.slice(-5);
   
   // Get recent tasks that are not done - make sure it includes BOTH created and assigned tasks
   const recentTasks = allTasks
     .filter((task: Task) => task.status !== 'Done')
     .slice(0, 3);
     
-  // Status badge color
-  const getStatusBadgeVariant = (status: string | null) => {
-    if (status === null) return 'primary';
-    
-    switch (status) {
-      case 'Not Started':
-      case 'Pending':
-        return 'secondary';
-      case 'In Progress':
-      case 'In-Progress':
-        return 'warning';
-      case 'Done':
-        return 'success';
-      default:
-        return 'primary';
-    }
-  };
-
-  // Get color for task border based on status
-  const getTaskBorderColor = (status: string | null) => {
-    if (status === 'In Progress' || status === 'In-Progress') {
-      return '#f59e0b'; // Amber/Orange for in progress
-    } else if (status === 'Done') {
-      return '#10b981'; // Green for completed
-    } else {
-      return '#6366f1'; // Indigo for not started or other
-    }
-  };
-  
   // Loading state for all project-related data
   const projectsDataLoading = projectsLoading || memberProjectsLoading;
   
@@ -288,74 +256,7 @@ export default function DashboardPage() {
                 View all
               </Link>
             </div>
-
-            {tasksDataLoading ? (
-              <Card className="p-8 text-center bg-white dark:bg-gray-800">
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                    <svg className="w-8 h-8 text-gray-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Loading tasks...</h3>
-                  <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-                </div>
-              </Card>
-            ) : recentTasks.length === 0 ? (
-              <Card className="p-8 text-center bg-white dark:bg-gray-800">
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                    <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No active tasks found</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">Create a task to get started with your projects</p>
-                  <Link href="/tasks" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand hover:bg-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create a Task
-                  </Link>
-                </div>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {recentTasks.map((task: Task) => (
-                  <Card 
-                    key={task.id} 
-                    className="hover:shadow-md transition-all duration-200 border-l-4 bg-white dark:bg-gray-800"
-                    style={{ borderLeftColor: getTaskBorderColor(task.status) }}
-                  >
-                    <div className="flex flex-col h-full">
-                      <div className="flex justify-between items-start">
-                        <h3 className="text-md font-medium text-gray-900 dark:text-gray-100">{task.subject }</h3>
-                        <Badge variant={getStatusBadgeVariant(task.status)}>
-                          {task.status}
-                        </Badge>
-                      </div>
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2 flex-grow">
-                        {task.description || 'No description provided'}
-                      </p>
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Project: {allProjects.find((p: Project) => p.id === task.projectId)?.name || 'Unknown'}
-                        </span>
-                        {task.dueDate && (
-                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                            Due: {formatDate(task.dueDate)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                        {createdTasks.some((t: Task) => t.id === task.id) ? 
-                          <Badge variant="default" className="text-xs">Created</Badge> : 
-                          <Badge variant="secondary" className="text-xs">Assigned</Badge>
-                        }
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
+            <RecentTasks tasks={recentTasks} projects={allProjects} createdTasks={createdTasks} />
           </div>
 
           {/* Recent Logs Section */}
@@ -366,43 +267,12 @@ export default function DashboardPage() {
                 View all
               </Link>
             </div>
-            
-            {logsLoading ? (
-              <Card className="p-8 text-center bg-white dark:bg-gray-800">
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                    <Clock className="w-8 h-8 text-gray-300 dark:text-gray-500" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Loading logs...</h3>
-                  <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-                </div>
-              </Card>
-              // <Loader centered size="sm" text="Loading logs..." />
-
-            ) : recentLogs.length === 0 ? (
-              <Card className="p-8 text-center bg-white dark:bg-gray-800">
-                <div className="flex flex-col items-center py-6">
-                  <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/50 rounded-full flex items-center justify-center mb-3">
-                    <Clock className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No time logs found</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">Start tracking time to see your activity history here</p>
-                  <Link href="/logs" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <Clock className="w-4 h-4 mr-2" />
-                    Track Time
-                  </Link>
-                </div>
-              </Card>
-            ) : (
-              <Card className="overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
-                <LogsTable 
-                  data={recentLogs} 
-                  projects={allProjects} 
-                  tasks={allTasks} 
-                  showActions={false}
-                />
-              </Card>
-            )}
+            <RecentLogs 
+              logs={logs} 
+              projects={allProjects} 
+              tasks={allTasks} 
+              isLoading={logsLoading} 
+            />
           </div>
 
           {/* Projects Section */}
@@ -413,63 +283,7 @@ export default function DashboardPage() {
                 View all
               </Link>
             </div>
-            
-            {projectsDataLoading ? (
-              <Card className="p-8 text-center bg-white dark:bg-gray-800">
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 animate-pulse">
-                    <svg className="w-8 h-8 text-gray-300 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Loading projects...</h3>
-                  <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-                </div>
-              </Card>
-            ) : allProjects.length === 0 ? (
-              <Card className="p-8 text-center bg-white dark:bg-gray-800">
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                    <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No projects found</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">Create your first project to get started</p>
-                  <Link href="/projects" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Create a Project
-                  </Link>
-                </div>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allProjects.slice(0, 3).map((project: Project) => (
-                  <Link href={`/projects/${project.id}`} key={project.id}>
-                    <Card className="h-full hover:shadow-md transition-shadow bg-white dark:bg-gray-800">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-md font-medium text-gray-900 dark:text-gray-100">{project.name}</h3>
-                        {ownedProjects.some((p: Project) => p.id === project.id) ? 
-                          <Badge variant="primary" className="text-xs">Owner</Badge> : 
-                          <Badge variant="secondary" className="text-xs">Member</Badge>
-                        }
-                      </div>
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{project.description}</p>
-                      <div className="mt-4 flex items-center justify-between">
-                        <Badge variant="primary" rounded>
-                          {allTasks.filter((t: Task) => t.projectId === project.id).length} Tasks
-                        </Badge>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Created {formatDate(project.createdAt)}
-                        </span>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <RecentProjects projects={allProjects} tasks={allTasks} ownedProjects={ownedProjects} />
           </div>
         </div>
       </div>

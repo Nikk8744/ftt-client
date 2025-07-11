@@ -6,6 +6,7 @@ import useAuthStore from '@/store/auth';
 import { loginUser, registerUser, logoutUser } from '@/services/user';
 import { UserLoginCredentials, UserRegistrationData, User } from '@/types';
 import { AxiosError } from 'axios';
+import { useToast } from '@/components/ui/use-toast';
 
 // Define a type for the API error response
 interface ApiErrorResponse {
@@ -17,6 +18,7 @@ export default function useAuth() {
   const router = useRouter();
   const { isAuthenticated, user, login, logout, updateUser, setIsLoading, setError, error } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const handleLogin = async (credentials: UserLoginCredentials) => {
     try {
@@ -103,7 +105,10 @@ export default function useAuth() {
       await logoutUser();
       
       logout();
-
+      toast({
+        title: 'Logged out',
+        description: 'You have been logged out successfully.'
+      });
       setIsLoading(false);
       router.push('/login');
     } catch (err: unknown) {

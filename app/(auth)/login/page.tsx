@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { EyeIcon, EyeOffIcon, ArrowLeft, Mail, Lock, CircleAlert } from "lucide-react";
 import { AxiosError } from "axios";
+import { useToast } from '@/components/ui/use-toast';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -29,6 +30,7 @@ export default function LoginPage() {
   const { login, isSubmitting, error: authError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const {
     register,
@@ -46,6 +48,10 @@ export default function LoginPage() {
     setApiError(null); // Reset API error
     try {
       await login(data);
+      toast({
+        title: 'Login successful',
+        description: 'Welcome back!'
+      });
       // The redirect is handled in the useAuth hook
     } catch (error: unknown) {
       console.error("Login failed:", error);

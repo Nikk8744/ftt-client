@@ -32,11 +32,11 @@ const ThisWeekBarGraph: React.FC = () => {
   console.log("🚀 ~ data:", data)
 
   if (isLoading) {
-    return <ChartCard title="This Week: Time Tracked"><Loader text="Loading weekly summary..." /></ChartCard>;
+    return <ChartCard title="This Week: Time Tracked"><Loader centered text="Loading weekly summary..." /></ChartCard>;
   }
 
   if (isError || !data) {
-    return <ChartCard title="This Week: Time Tracked"><div className="text-red-500">Failed to load weekly summary.</div></ChartCard>;
+    return <ChartCard title="This Week: Time Tracked"><div className="text-red-500 text-center py-4">Failed to load weekly summary.</div></ChartCard>;
   }
 
   // Format date for display (e.g., Mon, Tue, ...)
@@ -49,9 +49,10 @@ const ThisWeekBarGraph: React.FC = () => {
       {
         label: "Hours Tracked",
         data: hours,
-        backgroundColor: "rgba(99, 102, 241, 0.7)", // Tailwind indigo-500
+        // data: [1, 2, 3, 4, 5, 6, 7],
+        backgroundColor: "rgba(67 56 202)",
         borderRadius: 6,
-        maxBarThickness: 32,
+        maxBarThickness: 40,
       },
     ],
   };

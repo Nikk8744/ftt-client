@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useEffect, useState } from "react";
+import { useToast } from '@/components/ui/use-toast';
 
 // Form validation schema
 const projectSchema = z.object({
@@ -70,6 +71,8 @@ export default function CreateProjectModal({
     }
   }, [isOpen]);
 
+  const { toast } = useToast();
+
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -84,6 +87,23 @@ export default function CreateProjectModal({
   const handleClose = () => {
     form.reset();
     onClose();
+  };
+
+  const handleSubmit = async (data: ProjectFormData) => {
+    try {
+      await onSubmit(data);
+      toast({
+        title: 'Project created',
+        description: 'Your project has been created successfully.'
+      });
+      handleClose();
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to create project. Please try again.',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
@@ -102,7 +122,7 @@ export default function CreateProjectModal({
           </Button>
           <Button
             variant="brandBtn"
-            onClick={form.handleSubmit(onSubmit)}
+            onClick={form.handleSubmit(handleSubmit)}
             isLoading={isLoading}
             disabled={isLoading}
             className="px-4 py-2"
@@ -115,7 +135,7 @@ export default function CreateProjectModal({
       <div className="relative">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-5 py-2 w-full"
           >
             <FormField

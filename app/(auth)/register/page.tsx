@@ -10,6 +10,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { EyeIcon, EyeOffIcon, ArrowLeft, Mail, Lock, User, UserCircle, ClockIcon } from 'lucide-react';
 import { AxiosError } from 'axios';
+import { useToast } from '@/components/ui/use-toast';
 
 // Form validation schema
 const registerSchema = z.object({
@@ -36,6 +37,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const {
     register,
@@ -58,6 +60,10 @@ export default function RegisterPage() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
+      toast({
+        title: 'Registration successful',
+        description: 'Your account has been created.'
+      });
       setRegistrationSuccess(true);
     } catch (error: unknown) {
       console.error('Registration failed:', error);

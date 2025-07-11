@@ -41,6 +41,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { AssignUserModal } from "./AssignUserModal";
+import { useToast } from '@/components/ui/use-toast';
 
 // Form validation schema
 const taskSchema = z.object({
@@ -93,6 +94,7 @@ const TaskForm = ({
   const queryClient = useQueryClient();
   const isEditMode = !!task;
   const [isMounted, setIsMounted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
@@ -252,6 +254,10 @@ const TaskForm = ({
       }
     },
     onSuccess: () => {
+      toast({
+        title: 'Task created',
+        description: 'Your task has been created successfully.'
+      });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["assignedTasks"] });
       onClose();
@@ -260,11 +266,12 @@ const TaskForm = ({
       setSelectedAssignees([]);
       setDueDateError(null);
     },
-    onError: (error) => {
-      console.error("Error creating task:", error);
-      if (axios.isAxiosError(error)) {
-        console.error("Error response data:", error.response?.data);
-      }
+    onError: () => {
+      toast({
+        title: 'Error',
+        description: 'Failed to create task. Please try again.',
+        variant: 'destructive'
+      });
     },
   });
 

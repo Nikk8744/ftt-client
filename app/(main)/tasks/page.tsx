@@ -12,6 +12,7 @@ import { Task } from "@/types";
 import { getCurrentUser } from "@/services/user";
 import Loader from "@/components/ui/Loader";
 import PageHeader from "@/components/layout/PageHeader";
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function TasksPage() {
   const [editTaskModalOpen, setEditTaskModalOpen] = useState(false);
@@ -141,39 +142,13 @@ export default function TasksPage() {
 
       <div className="flex-1 bg-gray-50 dark:bg-gray-900">
         <div className="p-3 sm:p-6">
-            {/* Tab Navigation */}
-            <div className="flex space-x-1 rounded-lg bg-gray-100 dark:bg-gray-800 p-1 mb-4 sm:mb-6 max-w-md">
-              <button
-                className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-                  activeTab === "all"
-                    ? "bg-white shadow text-brand-700 dark:bg-gray-700 dark:text-white"
-                    : "text-gray-700 hover:bg-white/[0.5] dark:text-gray-300 dark:hover:bg-gray-700/[0.5]"
-                }`}
-                onClick={() => setActiveTab("all")}
-              >
-                All Tasks
-              </button>
-              <button
-                className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-                  activeTab === "owned"
-                    ? "bg-white shadow text-brand-700 dark:bg-gray-700 dark:text-white"
-                    : "text-gray-700 hover:bg-white/[0.5] dark:text-gray-300 dark:hover:bg-gray-700/[0.5]"
-                }`}
-                onClick={() => setActiveTab("owned")}
-              >
-                Created
-              </button>
-              <button
-                className={`w-full rounded-md py-2 sm:py-2.5 text-xs sm:text-sm font-medium leading-5 ${
-                  activeTab === "assigned"
-                    ? "bg-white shadow text-brand-700 dark:bg-gray-700 dark:text-white"
-                    : "text-gray-700 hover:bg-white/[0.5] dark:text-gray-300 dark:hover:bg-gray-700/[0.5]"
-                }`}
-                onClick={() => setActiveTab("assigned")}
-              >
-                Assigned
-              </button>
-            </div>
+          <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'all' | 'owned' | 'assigned')} className="mb-4 sm:mb-6">
+            <TabsList>
+              <TabsTrigger value="all">All Tasks</TabsTrigger>
+              <TabsTrigger value="owned">Created</TabsTrigger>
+              <TabsTrigger value="assigned">Assigned</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
           {isLoading ? (
             <Loader centered text="Loading tasks..." />
