@@ -19,8 +19,8 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   return (
     <Button 
       variant="outline" 
-      size="sm" 
-      className={cn(className, "text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700")} 
+      size="lg" 
+      className={cn(className, "text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700")} 
       disabled={disabled}
       onClick={onExport}
     >

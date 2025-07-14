@@ -156,7 +156,7 @@ export default function DateRangePicker({
             variant="outline"
             className={cn(
               "min-w-[240px] justify-start font-normal h-10 px-3",
-              "border-gray-200 hover:border-gray-300 hover:bg-gray-50",
+              "border-gray-200 dark:border-gray-700 dark:bg-gray-800 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800",
               "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
               "transition-all duration-200",
               !date && "text-gray-500"

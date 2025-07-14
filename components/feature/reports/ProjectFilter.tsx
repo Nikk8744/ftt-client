@@ -66,7 +66,7 @@ const ProjectFilter: React.FC<ProjectFilterProps> = ({ onChange, defaultValue = 
       onValueChange={onChange}
       disabled={isLoading}
     >
-      <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm text-gray-900 dark:text-gray-100">
+      <SelectTrigger className="w-full h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm text-gray-900 dark:text-gray-100">
         <div className="flex items-center gap-2">
           <FolderKanban className="h-4 w-4 text-blue-500 dark:text-blue-400" />
           <SelectValue placeholder="Select Project" />
