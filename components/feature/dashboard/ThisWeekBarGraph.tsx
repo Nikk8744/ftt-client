@@ -29,7 +29,6 @@ const ThisWeekBarGraph: React.FC = () => {
     queryKey: ["weeklyBarGraph"],
     queryFn: getWeeklySummary,
   });
-  console.log("🚀 ~ data:", data)
 
   if (isLoading) {
     return <ChartCard title="This Week: Time Tracked"><Loader centered text="Loading weekly summary..." /></ChartCard>;
