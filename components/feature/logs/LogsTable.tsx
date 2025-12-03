@@ -287,7 +287,7 @@ export function LogsTable({
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className={cn("h-8 w-8 p-0", 
+              className={cn("h-6 w-6 p-0", 
                 !table.getCanPreviousPage() ? "border-gray-100" : "border-gray-200"
               )}
             >
@@ -301,7 +301,7 @@ export function LogsTable({
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className={cn("h-8 w-8 p-0", 
+              className={cn("h-6 w-6 p-0", 
                 !table.getCanNextPage() ? "border-gray-100" : "border-gray-200"
               )}
             >

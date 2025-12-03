@@ -23,15 +23,24 @@ export const TaskAssignees = ({
   unassignUserMutation,
 }: TaskAssigneesProps) => {
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200">
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
-          <h3 className="text-base sm:text-lg font-semibold text-foreground mb-0">
-            Assignees
-          </h3>
+    <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-full bg-green-100 dark:bg-green-900/30">
+            <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-foreground mb-0">
+              Assignees
+            </h3>
+            {assignees.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {assignees.length} {assignees.length === 1 ? 'person' : 'people'} assigned
+              </p>
+            )}
+          </div>
           {assignees.length > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="success" className="text-xs font-semibold">
               {assignees.length}
             </Badge>
           )}
@@ -40,61 +49,79 @@ export const TaskAssignees = ({
           variant="default"
           size="sm"
           onClick={() => setAssignUserModalOpen(true)}
-          className="text-xs"
+          className="text-xs font-medium shadow-sm hover:shadow-md transition-shadow"
         >
-          <UserPlus className="h-4 w-4 md:mr-1" />
+          <UserPlus className="h-4 w-4 md:mr-2" />
           <span className="hidden md:inline">
             {assignees.length > 0 ? "Add More" : "Assign"}
           </span>
+          <span className="md:hidden">
+            {assignees.length > 0 ? "Add" : "Assign"}
+          </span>
         </Button>
       </div>
+      
       {assigneeLoading ? (
-        <div className="flex items-center gap-3 animate-pulse">
-          <div className="w-10 h-10 bg-muted rounded-full"></div>
-          <div className="flex-1">
-            <div className="h-4 bg-muted rounded mb-2"></div>
-            <div className="h-3 bg-muted rounded w-2/3"></div>
+        <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse flex-shrink-0"></div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
           </div>
         </div>
       ) : assignees.length > 0 ? (
-        <div className="space-y-2 max-h-48 overflow-y-auto">
+        <div className="space-y-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
           {assignees.map((assignee: User) => (
             <div
               key={assignee.id}
-              className="flex items-center justify-between p-2 sm:p-3 bg-muted rounded-lg"
+              className="group flex items-center justify-between p-2 sm:p-3 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all duration-200"
             >
-              <div className="flex flex-col items-start gap-2 sm:gap-3">
-                <div className="flex flex-row gap-3 items-center justify-center">
-                <Avatar name={assignee.name} size="sm" />
-                  <p className="text-xs sm:text-sm font-semibold text-foreground truncate m-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="relative flex-shrink-0">
+                  <Avatar name={assignee.name} size="xs" />
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs lg:text-sm mb-0 font-semibold text-foreground truncate">
                     {assignee.name}
                   </p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <p className="text-xs text-muted-foreground truncate mb-0">
+                      {assignee.email}
+                    </p>
+                  </div>
                 </div>
-                  <p className="pl-11 text-xs text-muted-foreground truncate hidden sm:block">
-                    {assignee.email}
-                  </p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleUnassignUser(assignee.id)}
                 disabled={unassignUserMutation.isPending}
-                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-600"
+                className="opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 flex-shrink-0 ml-2"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" />
               </Button>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-6">
-          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
-            <Users className="w-6 h-6 text-muted-foreground" />
+        <div className="text-center py-8 px-4">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-gray-400" />
           </div>
-          <p className="text-sm font-medium text-muted-foreground mb-1">No assignees</p>
-          <p className="text-xs text-muted-foreground">
-            This task hasn&apos;t been assigned yet
+          <h4 className="text-base font-semibold text-foreground mb-2">No assignees yet</h4>
+          <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
+            This task hasn&apost been assigned to anyone. Click the button above to assign team members.
           </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAssignUserModalOpen(true)}
+            className="text-xs"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Assign Team Member
+          </Button>
         </div>
       )}
     </Card>

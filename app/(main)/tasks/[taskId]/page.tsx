@@ -190,7 +190,6 @@ export default function TaskDetailsPage() {
     });
     
   const task = taskData?.data;
-  console.log("🚀 ~ TaskDetailsPage ~ task:", task)
   const project = projectData?.data;
   const assignees = assigneeData?.data || [];
   const followers = followersData?.data || [];
