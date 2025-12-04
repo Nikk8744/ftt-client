@@ -7,7 +7,6 @@ import { useNotificationStore } from '@/store/useNotificationStore';
 
 export default function ClientMainWrapper({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuthStore();
-  console.log("🚀 ~ ClientMainWrapper ~ isAuthenticated:", isAuthenticated)
   const { fetchRecentNotifications } = useNotificationStore();
   const router = useRouter();
   

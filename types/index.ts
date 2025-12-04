@@ -191,4 +191,30 @@ export interface TimerState {
   startTime: Date | null;
   activeLogId: number | null;
   elapsedSeconds: number;
+}
+
+// WebSocket Timer Event Types
+export interface TimerAutoStoppedEvent {
+  type: 'TIMER_AUTO_STOPPED';
+  message: string;
+  data: {
+    id: number;
+    name: string | null;
+    description: string | null;
+    startTime: string;
+    endTime: string;
+    timeSpent: number;
+    projectId: number | null;
+    taskId: number | null;
+  };
+}
+
+export interface TimerNotification {
+  id?: number;
+  title: string;
+  message: string;
+  type: 'timer_auto_stopped' | 'timer_started' | 'timer_stopped';
+  timestamp: string;
+  data?: TimeLog;
+  isRead?: number;
 } 

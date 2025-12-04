@@ -27,12 +27,10 @@ export default function useAuth() {
       setError(null);
 
       const response = await loginUser(credentials);
-      console.log("🚀 ~ handleLogin ~ response:", response)
 
       // Handle the login response according to the API guide
       if (response && response.data) {
         login(response.data as User);
-        console.log("🚀 ~ handleLogin ~ isAuthenticated:", isAuthenticated);
         
         // Add a small delay to ensure state is updated and cookie is set
         setTimeout(() => {

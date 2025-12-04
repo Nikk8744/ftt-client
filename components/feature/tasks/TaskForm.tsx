@@ -238,11 +238,9 @@ const TaskForm = ({
       } catch (error) {
         console.error("Error in task creation:", error);
         if (axios.isAxiosError(error)) {
-          console.log("🚀 ~ mutationFn: ~ error:", error)
           console.error("Error response:", error.response?.data.message);
           const errorData = error.response?.data;
           if (errorData?.message?.includes("Due date") || errorData?.errors?.dueDate) {
-            console.log("🚀 ~ mutationFn: ~ errorData:", errorData)
             setDueDateError(errorData?.errors?.dueDate || errorData?.message || "Invalid due date");
           }
           // Throw a more descriptive error

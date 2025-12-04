@@ -3,6 +3,8 @@ import { io, Socket } from 'socket.io-client';
 import { Notification, getNotifications, getUnreadCount } from '@/services/notification';
 import { toast } from '@/components/ui/use-toast';
 import useAuthStore from '@/store/auth';
+import { TimerAutoStoppedEvent } from '@/types';
+import useTimerStore from '@/store/timer';
 
 interface NotificationState {
   // State
@@ -67,7 +69,49 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     socketInstance.on('unreadNotificationsCount', ({ count }: { count: number }) => {
       set({ unreadCount: count });
     });
-    
+
+    // Listen for timer auto-stopped events
+    socketInstance.on('timerStopped', (event: TimerAutoStoppedEvent) => {
+      console.log('[WebSocket] Timer auto-stopped event received:', event);
+
+      // Update timer store
+      const timerStore = useTimerStore.getState();
+      timerStore.handleAutoStop({
+        id: event.data.id,
+        endTime: event.data.endTime,
+        timeSpent: event.data.timeSpent
+      });
+
+      // Add notification to timer store
+      timerStore.addNotification({
+        title: 'Timer Auto-Stopped',
+        message: event.message,
+        type: 'timer_auto_stopped',
+        timestamp: new Date().toISOString(),
+        data: {
+          id: event.data.id,
+          name: event.data.name,
+          description: event.data.description,
+          startTime: event.data.startTime,
+          endTime: event.data.endTime,
+          timeSpent: event.data.timeSpent,
+          projectId: event.data.projectId,
+          taskId: event.data.taskId,
+          userId: 0, // Will be populated by backend
+          duration: event.data.timeSpent,
+          createdAt: new Date().toISOString(),
+        }
+      });
+
+      // Show toast notification
+      toast({
+        title: 'Timer Auto-Stopped',
+        description: event.message,
+        variant: 'default',
+        duration: 10000, // Show for 10 seconds
+      });
+    });
+
     // Store the socket instance
     set({ socket: socketInstance });
     

@@ -2,27 +2,47 @@
 
 import { useEffect, useState } from 'react';
 import useTimerStore from '@/store/timer';
-import { startTimeLog, stopTimeLog } from '@/services/log';
+import { startTimeLog, stopTimeLog, getTimeLogById } from '@/services/log';
 import { formatDuration } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function useTimer() {
-  const { 
-    isRunning, 
-    activeLogId, 
-    startTime, 
-    elapsedTime, 
-    startTimer, 
-    stopTimer, 
-    updateElapsedTime, 
-    resetTimer 
+  const {
+    isRunning,
+    activeLogId,
+    startTime,
+    elapsedTime,
+    startTimer,
+    stopTimer,
+    updateElapsedTime,
+    resetTimer
   } = useTimerStore();
-  
+
   const [formattedTime, setFormattedTime] = useState<string>('00:00:00');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
+
+  // Check if timer was stopped on the backend when component mounts
+  useEffect(() => {
+    const checkTimerStatus = async () => {
+      if (isRunning && activeLogId) {
+        try {
+          const response = await getTimeLogById(activeLogId);
+          // If the timer has an endTime, it was stopped on the backend
+          if (response.data?.endTime) {
+            console.log('[useTimer] Timer was stopped on backend, syncing local state');
+            resetTimer();
+          }
+        } catch (err) {
+          console.error('[useTimer] Error checking timer status:', err);
+        }
+      }
+    };
+
+    checkTimerStatus();
+  }, [activeLogId, isRunning, resetTimer]);
 
   // Calculate elapsed time and update it every second
   useEffect(() => {

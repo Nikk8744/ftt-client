@@ -183,7 +183,6 @@ export default function TaskDetailsPage() {
       queryFn: async () => {
         if (!taskData?.data?.projectId) return { members: [] };
         // Use the proper service function to get project members
-        console.log("🚀 ~ TaskDetailsPage ~ project:", project)
         return getAllMembersOfProject(taskData.data.projectId);
       },
       enabled: !!taskData?.data?.projectId && assignUserModalOpen,
